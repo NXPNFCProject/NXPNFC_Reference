@@ -7,7 +7,13 @@ This Repo contains any additional information/files required to support the rele
 | :-------------: |:-------------:| 
 | NXPNFC_Reference    |  git clone https://github.com/NXPNFCProject/NXPNFC_Reference.git |
 
-####Supported Versions 
+####Supported Versions on "master" Branch
+
+| Android Version        | NXP Release          | NXP Tag  |
+| :-------------: |:-------------:| :-----:|
+| android-5.0.0_r1/android5.1.0_r1     |  3.5.0_L (PN547C2/PN548C2) |  NFC_NCIHALx_AR0F.3.5.0_L_OpnSrc |
+
+####Supported Versions on "br_android_ncihalx_m" Branch
 
 | Android Version        | NXP Release          | NXP Tag  |
 | :-------------: |:-------------:| :-----:|
