@@ -1,0 +1,139 @@
+diff --git a/api/current.txt b/api/current.txt
+index 41a7d5b..fa7f49f 100644
+--- a/api/current.txt
++++ b/api/current.txt
+@@ -9336,6 +9336,7 @@
+     field public static final java.lang.String FEATURE_MIDI = "android.software.midi";
+     field public static final java.lang.String FEATURE_NFC = "android.hardware.nfc";
+     field public static final java.lang.String FEATURE_NFC_HOST_CARD_EMULATION = "android.hardware.nfc.hce";
++    field public static final java.lang.String FEATURE_NFC_HOST_CARD_EMULATION_NFCF = "android.hardware.nfc.hcef";
+     field public static final java.lang.String FEATURE_OPENGLES_EXTENSION_PACK = "android.hardware.opengles.aep";
+     field public static final java.lang.String FEATURE_PRINTING = "android.software.print";
+     field public static final java.lang.String FEATURE_SCREEN_LANDSCAPE = "android.hardware.screen.landscape";
+@@ -23873,6 +23874,28 @@
+     field public static final java.lang.String SERVICE_META_DATA = "android.nfc.cardemulation.host_apdu_service";
+   }
+
++  public abstract class HostNfcFService extends android.app.Service {
++    ctor public HostNfcFService();
++    method public final android.os.IBinder onBind(android.content.Intent);
++    method public abstract void onDeactivated(int);
++    method public abstract byte[] processNfcFPacket(byte[], android.os.Bundle);
++    method public final void sendResponsePacket(byte[]);
++    field public static final int DEACTIVATION_LINK_LOSS = 0; // 0x0
++    field public static final java.lang.String SERVICE_INTERFACE = "android.nfc.cardemulation.action.HOST_NFCF_SERVICE";
++    field public static final java.lang.String SERVICE_META_DATA = "android.nfc.cardemulation.host_nfcf_service";
++  }
++
++  public final class NfcFCardEmulation {
++    method public boolean disableNfcFForegroundService(android.app.Activity);
++    method public boolean enableNfcFForegroundService(android.app.Activity, android.content.ComponentName);
++    method public static synchronized android.nfc.cardemulation.NfcFCardEmulation getInstance(android.nfc.NfcAdapter);
++    method public java.lang.String getNfcid2ForService(android.content.ComponentName);
++    method public java.lang.String getSystemCodeForService(android.content.ComponentName);
++    method public boolean registerSystemCodeForService(android.content.ComponentName, java.lang.String);
++    method public boolean removeSystemCodeForService(android.content.ComponentName);
++    method public boolean setNfcid2ForService(android.content.ComponentName, java.lang.String);
++  }
++
+   public abstract class OffHostApduService extends android.app.Service {
+     ctor public OffHostApduService();
+     method public abstract android.os.IBinder onBind(android.content.Intent);
+diff --git a/api/system-current.txt b/api/system-current.txt
+index 7db6074..a2c9040 100644
+--- a/api/system-current.txt
++++ b/api/system-current.txt
+@@ -9630,6 +9630,7 @@
+     field public static final java.lang.String FEATURE_MIDI = "android.software.midi";
+     field public static final java.lang.String FEATURE_NFC = "android.hardware.nfc";
+     field public static final java.lang.String FEATURE_NFC_HOST_CARD_EMULATION = "android.hardware.nfc.hce";
++    field public static final java.lang.String FEATURE_NFC_HOST_CARD_EMULATION_NFCF = "android.hardware.nfc.hcef";
+     field public static final java.lang.String FEATURE_OPENGLES_EXTENSION_PACK = "android.hardware.opengles.aep";
+     field public static final java.lang.String FEATURE_PRINTING = "android.software.print";
+     field public static final java.lang.String FEATURE_SCREEN_LANDSCAPE = "android.hardware.screen.landscape";
+@@ -25818,6 +25819,28 @@
+     field public static final java.lang.String SERVICE_META_DATA = "android.nfc.cardemulation.host_apdu_service";
+   }
+
++  public abstract class HostNfcFService extends android.app.Service {
++    ctor public HostNfcFService();
++    method public final android.os.IBinder onBind(android.content.Intent);
++    method public abstract void onDeactivated(int);
++    method public abstract byte[] processNfcFPacket(byte[], android.os.Bundle);
++    method public final void sendResponsePacket(byte[]);
++    field public static final int DEACTIVATION_LINK_LOSS = 0; // 0x0
++    field public static final java.lang.String SERVICE_INTERFACE = "android.nfc.cardemulation.action.HOST_NFCF_SERVICE";
++    field public static final java.lang.String SERVICE_META_DATA = "android.nfc.cardemulation.host_nfcf_service";
++  }
++
++  public final class NfcFCardEmulation {
++    method public boolean disableNfcFForegroundService(android.app.Activity);
++    method public boolean enableNfcFForegroundService(android.app.Activity, android.content.ComponentName);
++    method public static synchronized android.nfc.cardemulation.NfcFCardEmulation getInstance(android.nfc.NfcAdapter);
++    method public java.lang.String getNfcid2ForService(android.content.ComponentName);
++    method public java.lang.String getSystemCodeForService(android.content.ComponentName);
++    method public boolean registerSystemCodeForService(android.content.ComponentName, java.lang.String);
++    method public boolean removeSystemCodeForService(android.content.ComponentName);
++    method public boolean setNfcid2ForService(android.content.ComponentName, java.lang.String);
++  }
++
+   public abstract class OffHostApduService extends android.app.Service {
+     ctor public OffHostApduService();
+     method public abstract android.os.IBinder onBind(android.content.Intent);
+diff --git a/core/java/android/content/pm/PackageManager.java b/core/java/android/content/pm/PackageManager.java
+index 054dafe..3029b11 100644
+--- a/core/java/android/content/pm/PackageManager.java
++++ b/core/java/android/content/pm/PackageManager.java
+@@ -1295,6 +1295,14 @@
+
+     /**
+      * Feature for {@link #getSystemAvailableFeatures} and
++     * {@link #hasSystemFeature}: The device supports host-
++     * based NFC-F card emulation.
++     */
++    @SdkConstant(SdkConstantType.FEATURE)
++    public static final String FEATURE_NFC_HOST_CARD_EMULATION_NFCF = "android.hardware.nfc.hcef";
++
++    /**
++     * Feature for {@link #getSystemAvailableFeatures} and
+      * {@link #hasSystemFeature}: The device supports the OpenGL ES
+      * <a href="http://www.khronos.org/registry/gles/extensions/ANDROID/ANDROID_extension_pack_es31a.txt">
+      * Android Extension Pack</a>.
+
+diff --git a/core/res/res/values/attrs.xml b/core/res/res/values/attrs.xml
+index 2828d21..5a08169 100644
+--- a/core/res/res/values/attrs.xml
++++ b/core/res/res/values/attrs.xml
+@@ -3315,6 +3315,32 @@
+         <attr name="name" />
+     </declare-styleable>
+
++    <!-- Use <code>host-nfcf-service</code> as the root tag of the XML resource that
++         describes an {@link android.nfc.cardemulation.HostNfcFService} service, which
++         is referenced from its {@link android.nfc.cardemulation.HostNfcFService#SERVICE_META_DATA}
++         entry. -->
++    <declare-styleable name="HostNfcFService">
++        <!-- Short description of the functionality the service implements. This attribute
++             is mandatory.-->
++        <attr name="description" />
++    </declare-styleable>
++
++    <!-- Specify one or more <code>system-code-filter</code> elements inside a
++         <code>host-nfcf-service</code> element to specify a System Code
++         your service can handle. -->
++    <declare-styleable name="SystemCodeFilter">
++        <!-- The System Code. This attribute is mandatory. -->
++        <attr name="name" />
++    </declare-styleable>
++
++    <!-- Specify one or more <code>nfcid2-filter</code> elements inside a
++         <code>host-nfcf-service</code> element to specify a NFCID2
++         your service can handle. -->
++    <declare-styleable name="Nfcid2Filter">
++        <!-- The NFCID2. This attribute is mandatory. -->
++        <attr name="name" />
++    </declare-styleable>
++
+     <declare-styleable name="ActionMenuItemView">
+         <attr name="minWidth" />
+     </declare-styleable>
