@@ -27,3 +27,4 @@ This Repo contains any additional information/files required to support the rele
 | Android Version        | NXP Release          | NXP Tag  |
 | :-------------: |:-------------:| :-----:|
 | android-7.0.0_r1                     |  7.0.3_N (PN548C2/PN551) |  NFC_NCIHALx_AR3C.7.0.3_N_OpnSrc |
+| android-7.0.0_r12                     |  7.1.0_N (PN548C2/PN551/PN553) |  NFC_NCIHALx_ARFC.7.1.0_N_OpnSrc |
