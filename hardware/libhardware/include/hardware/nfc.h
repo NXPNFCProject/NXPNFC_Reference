@@ -122,8 +122,10 @@ enum {
     HAL_NFC_IOCTL_NCI_TRANSCEIVE,
     HAL_NFC_IOCTL_P61_GET_ACCESS,
     HAL_NFC_IOCTL_P61_REL_ACCESS,
-    HAL_NFC_IOCTL_P73_ISO_RST,
-    HAL_NFC_IOCTL_REL_SVDD_WAIT
+    HAL_NFC_IOCTL_ESE_CHIP_RST,
+    HAL_NFC_IOCTL_REL_SVDD_WAIT,
+    HAL_NFC_IOCTL_SET_JCP_DWNLD_ENABLE,
+    HAL_NFC_IOCTL_SET_JCP_DWNLD_DISABLE
 };
 
 /*
@@ -224,6 +226,11 @@ typedef struct nfc_nci_device {
     * between NFC Wired and SPI.
     */
     int (*ioctl)(const struct nfc_nci_device *p_dev, long arg, void *p_data);
+    /*
+    * (*check_fw_dwnld_flag)() Is called to get FW downlaod request.
+    *
+    */
+    int (*check_fw_dwnld_flag)(const struct nfc_nci_device *p_dev, uint8_t* param1);
 
 } nfc_nci_device_t;
 
