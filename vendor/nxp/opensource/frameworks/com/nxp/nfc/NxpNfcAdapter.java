@@ -36,7 +36,7 @@ import android.util.Log;
 
 public final class NxpNfcAdapter {
     private static final String TAG = "NXPNFC";
-    private static int ALL_SE_ID_TYPE = 0x03;
+    private static int ALL_SE_ID_TYPE = 0x07;
     // Guarded by NfcAdapter.class
     static boolean sIsInitialized = false;
 
