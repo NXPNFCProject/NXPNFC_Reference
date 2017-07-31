@@ -50,7 +50,6 @@ import java.util.List;
 import java.io.PrintWriter;
 import android.content.res.TypedArray;
 
-
 /**
  * @hide
  */
@@ -218,7 +217,6 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
 
             mStaticNxpAidGroups = new HashMap<String, NxpAidGroup>();
             mDynamicNxpAidGroups = new HashMap<String, NxpAidGroup>();
-
             for(Map.Entry<String,AidGroup> stringaidgroup : mStaticAidGroups.entrySet()) {
                 String category = stringaidgroup.getKey();
                 AidGroup aidg = stringaidgroup.getValue();
@@ -236,13 +234,49 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
             mNfcid2s = new ArrayList<String>();
 
             final int depth = parser.getDepth();
-
+            NxpAidGroup.ApduPatternGroup currApduPatternGroup = null;
             Nfcid2Group currentNfcid2Group = null;
-
             while (((eventType = parser.next()) != XmlPullParser.END_TAG || parser.getDepth() > depth)
                     && eventType != XmlPullParser.END_DOCUMENT) {
                 tagName = parser.getName();
-                if (eventType == XmlPullParser.START_TAG && "nfcid2-group".equals(tagName) &&
+                if (!onHost && eventType == XmlPullParser.START_TAG && "apdu-pattern-group".equals(tagName) &&
+                    currApduPatternGroup == null) {
+                    Log.e(TAG, "apdu-pattern-group");
+                    final TypedArray groupAttrs = res.obtainAttributes(attrs,
+                            com.android.internal.R.styleable.ApduPatternGroup);
+                    String groupDescription = groupAttrs.getString(
+                            com.android.internal.R.styleable.ApduPatternGroup_description);
+                    NxpAidGroup aidGroup = mStaticNxpAidGroups.get(CardEmulation.CATEGORY_OTHER);
+                    currApduPatternGroup = new NxpAidGroup.ApduPatternGroup(groupDescription);
+                    groupAttrs.recycle();
+                } else if (!onHost && eventType == XmlPullParser.END_TAG && "apdu-pattern-group".equals(tagName) &&
+                    currApduPatternGroup != null) {
+                    if(currApduPatternGroup.getApduPattern().size() > 0x00) {
+                        mStaticNxpAidGroups.get(CardEmulation.CATEGORY_OTHER).addApduGroup(currApduPatternGroup);
+                    }
+                    Log.e(TAG, "apdu-pattern-group end");
+                } else if (!onHost && eventType == XmlPullParser.START_TAG && "apdu-pattern-filter".equals(tagName) &&
+                    currApduPatternGroup != null) {
+                    /*
+                    final TypedArray a = res.obtainAttributes(attrs,
+                            com.android.internal.R.styleable.ApduPatternFilter);
+                    String reference_data = a.getString(com.android.internal.R.styleable.ApduPatternFilter_reference_data).
+                            //toUpperCase();
+                    String mask = a.getString(com.android.internal.R.styleable.ApduPatternFilter_apdupattern_mask).
+                            toUpperCase();
+                    String description = a.getString(com.android.internal.R.styleable.ApduPatternFilter_description).
+                            toUpperCase();
+                    if (CardEmulation.isValidApduString(reference_data) && CardEmulation.isValidApduString(mask)) {
+                        NxpAidGroup.ApduPattern apdu = mStaticNxpAidGroups.get(CardEmulation.CATEGORY_OTHER).new ApduPattern(reference_data, mask,description);
+                        currApduPatternGroup.addApduPattern(apdu);
+                    } else {
+                        Log.e(TAG, "Ignoring invalid apdu pattern: " + reference_data);
+                    }
+                    Log.e(TAG, "valid apdu pattern"+ reference_data+mask+description);
+
+                    a.recycle();
+                                        */
+                } else if (eventType == XmlPullParser.START_TAG && "nfcid2-group".equals(tagName) &&
                         currentNfcid2Group == null) {
                     final TypedArray groupAttrs = res.obtainAttributes(attrs,
                             com.android.internal.R.styleable.AidGroup);
@@ -448,6 +482,7 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
         return groups;
     }
 
+
     /**
      * This is a convenience function to create an ApduServiceInfo object of the current
      * NxpApduServiceInfo.
@@ -508,6 +543,7 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
         }
         return aidCacheSize;
     }
+
     /**
      * This api can be used to find the total aids count registered
      * by this service.
