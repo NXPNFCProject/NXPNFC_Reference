@@ -39,7 +39,8 @@ enum {
     HAL_NFC_IOCTL_REL_SVDD_WAIT,
     HAL_NFC_IOCTL_SET_JCP_DWNLD_ENABLE,
     HAL_NFC_IOCTL_SET_JCP_DWNLD_DISABLE,
-    HAL_NFC_IOCTL_SET_NFC_SERVICE_PID
+    HAL_NFC_IOCTL_SET_NFC_SERVICE_PID,
+    HAL_NFC_IOCTL_GET_FEATURE_LIST
 };
 enum {
     HAL_NFC_ENABLE_I2C_FRAGMENTATION_EVT = 0x07,
@@ -103,6 +104,7 @@ typedef union{
     uint16_t            fwUpdateInf;
     uint16_t            fwDwnldStatus;
     uint16_t            fwMwVerStatus;
+    uint8_t             chipType;
 }outputData_t;
 
 /*
