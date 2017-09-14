@@ -49,7 +49,7 @@ import java.io.FileDescriptor;
 import java.util.List;
 import java.io.PrintWriter;
 import android.content.res.TypedArray;
-
+import android.graphics.BitmapFactory;
 /**
  * @hide
  */
@@ -98,11 +98,10 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
     final HashMap<String, NxpAidGroup> mDynamicNxpAidGroups;
 
     final HashMap<String, Nfcid2Group> mNfcid2CategoryToGroup;
-
     /**
-     * The Drawable of the service banner specified by the Application Dynamically.
-     */
-    public final Drawable mBanner;
+    * The Drawable of the service banner specified by the Application Dynamically to be stored as byteArray.
+    */
+    byte[] mByteArrayBanner = null;
 
     /**
      * This says whether the Application can modify the AIDs or not.
@@ -130,13 +129,13 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
             ArrayList<NxpAidGroup> staticNxpAidGroups, ArrayList<NxpAidGroup> dynamicNxpAidGroups,
             boolean requiresUnlock, int bannerResource, int uid,
             String settingsActivityName, ESeInfo seExtension,
-            ArrayList<Nfcid2Group> nfcid2Groups, Drawable banner,boolean modifiable) {
+            ArrayList<Nfcid2Group> nfcid2Groups,  byte[] banner,boolean modifiable) {
         super(info, onHost, description, nxpAidGroups2AidGroups(staticNxpAidGroups), nxpAidGroups2AidGroups(dynamicNxpAidGroups),
                 requiresUnlock, bannerResource, uid, settingsActivityName);
         if(banner != null) {
-            this.mBanner = banner;
+            this.mByteArrayBanner = banner;
         } else {
-            this.mBanner = null;
+            this.mByteArrayBanner = null;
         }
         this.mModifiable = modifiable;
         this.mServiceState = NxpConstants.SERVICE_STATE_ENABLING;
@@ -170,7 +169,6 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
     public NxpApduServiceInfo(PackageManager pm, ResolveInfo info, boolean onHost)
             throws XmlPullParserException, IOException {
         super(pm, info, onHost);
-        this.mBanner = null;
         this.mModifiable = false;
         this.mServiceState = NxpConstants.SERVICE_STATE_ENABLING;
         ServiceInfo si = info.serviceInfo;
@@ -620,6 +618,14 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
         return mModifiable;
     }
 
+    public Bitmap getBitmapBanner() {
+        if(mByteArrayBanner == null) {
+            return null;
+        }
+        Bitmap bitmap = BitmapFactory.decodeByteArray(mByteArrayBanner, 0, mByteArrayBanner.length);
+        return bitmap;
+    }
+
     public void setOrReplaceDynamicNxpAidGroup(NxpAidGroup nxpAidGroup) {
         super.setOrReplaceDynamicAidGroup(nxpAidGroup);
         mDynamicNxpAidGroups.put(nxpAidGroup.getCategory(), nxpAidGroup);
@@ -640,9 +646,9 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
         try {
             res = pm.getResourcesForApplication(mService.serviceInfo.packageName);
             if(mBannerResourceId == -1) {
-                 banner = mBanner;
+                banner = new BitmapDrawable((Bitmap)getBitmapBanner());
             } else {
-                banner = res.getDrawable(mBannerResourceId);
+                banner = res.getDrawable(mBannerResourceId,null);
             }
             return banner;
         } catch (NotFoundException e) {
@@ -723,12 +729,7 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
         if (mNfcid2Groups.size() > 0) {
             dest.writeTypedList(mNfcid2Groups);
         }
-        if(mBanner != null) {
-            Bitmap bitmap = (Bitmap)((BitmapDrawable) mBanner).getBitmap();
-            dest.writeParcelable(bitmap, flags);
-        } else {
-            dest.writeParcelable(null, flags);
-        }
+        dest.writeByteArray(mByteArrayBanner);
         dest.writeInt(mModifiable ? 1 : 0);
         dest.writeInt(mServiceState);
     };
@@ -760,18 +761,12 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
             if (numGroups > 0) {
                 source.readTypedList(nfcid2Groups, Nfcid2Group.CREATOR);
             }
-            Drawable drawable = null;
-            if(getClass().getClassLoader() != null) {
-                Bitmap bitmap = (Bitmap) source.readParcelable(getClass().getClassLoader());
-                if(bitmap != null){
-                    drawable = new BitmapDrawable(bitmap);
-                    bannerResource = -1;
-                }
-            }
+            byte[] byteArrayBanner = new byte[]{0};
+            byteArrayBanner = source.createByteArray();
             boolean modifiable = source.readInt() != 0;
             NxpApduServiceInfo service = new NxpApduServiceInfo(info, onHost, description, staticNxpAidGroups,
                     dynamicNxpAidGroups, requiresUnlock, bannerResource, uid,
-                    settingsActivityName, seExtension, nfcid2Groups, drawable,modifiable);
+                    settingsActivityName, seExtension, nfcid2Groups, byteArrayBanner ,modifiable);
             service.setServiceState(CardEmulation.CATEGORY_OTHER, source.readInt());
             return service;
         }

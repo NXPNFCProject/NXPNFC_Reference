@@ -383,7 +383,7 @@ public class NfcController {
     private NxpOffHostService convertToNxpOffhostService(OffHostService service) {
          ArrayList<android.nfc.cardemulation.NxpAidGroup> mAidGroupList = convertToCeAidGroupList(service.mAidGroupList);
          NxpOffHostService mNxpOffHostService = new NxpOffHostService(service.mUserId,service.mDescription, service.mSEName, service.mPackageName, service.mServiceName, service.mModifiable);
-         //mNxpOffHostService.setBanner(service.mBanner);
+         mNxpOffHostService.setBanner(service.mBanner);
          mNxpOffHostService.setContext(mContext);
          mNxpOffHostService.setBannerId(service.mBannerResId);
          mNxpOffHostService.mNxpAidGroupList.addAll(mAidGroupList);

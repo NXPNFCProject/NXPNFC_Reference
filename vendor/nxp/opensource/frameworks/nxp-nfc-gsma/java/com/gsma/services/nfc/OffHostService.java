@@ -21,6 +21,9 @@ import android.app.ActivityThread;
 import android.content.pm.PackageManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Bitmap;
+import dalvik.system.DexClassLoader;
 import android.nfc.cardemulation.CardEmulation;
 import android.util.Log;
 
@@ -70,7 +73,7 @@ public class OffHostService {
         mServiceName = service.mServiceName;
         mModifiable = service.mModifiable;  // It will distinguish between static service and dynamic services
         mAidGroupList = convertToOffHostAidGroupList(service.mNxpAidGroupList);
-        //mBanner = service.mBanner;
+        mBanner = service.mBanner;
         mBannerResId = service.getBannerId();
         mContext = service.getContext();
         mNxpNfcController = service.mNxpNfcController;
@@ -80,7 +83,7 @@ public class OffHostService {
         if (mBannerResId > 0) {
             try {
                 Log.d(TAG, "setBannerResId(): getDrawable() with mBannerResId=" + String.valueOf(mBannerResId));
-                mBanner = pManager.getResourcesForApplication(mPackageName).getDrawable(mBannerResId);
+                mBanner = pManager.getResourcesForApplication(mPackageName).getDrawable(mBannerResId,null);
             } catch (Exception e) {
                 Log.e(TAG, "Exception : " + e.getMessage());
             }
@@ -131,8 +134,8 @@ public class OffHostService {
                         Field[] f = Class.forName(packName + ".R").getClasses()[i].getDeclaredFields();
                         for (int counter = 0, max = f.length; counter < max; counter++) {
                             int resId = f[counter].getInt(null);
-                            Drawable d = pManager.getResourcesForApplication(packName).getDrawable(resId);
-                            if ( (d.getConstantState().equals(banner.getConstantState())) ) {
+                            Drawable d = pManager.getResourcesForApplication(packName).getDrawable(resId,null);
+                            if ( areDrawablesEqual(banner,d) ) {
                                 mBannerResId = resId;
                                 mBanner = d;
                                 Log.d(TAG, "setBanner() Resources GOT THE DRAWABLE On loop "
@@ -146,7 +149,7 @@ public class OffHostService {
             }
         } catch (Exception e) {
             Log.d(TAG, "setBanner() Resources exception ..." + e.getMessage());
-
+            e.printStackTrace();
         }
         if(mBannerResId == 0x00) {
             Log.d(TAG, "bannerId  set to 0");
@@ -172,7 +175,7 @@ public class OffHostService {
         if (mBannerResId > 0) {
             try {
                 Log.d(TAG, "setBannerResId(): getDrawable() with mBannerResId=" + String.valueOf(mBannerResId));
-                mBanner = pManager.getResourcesForApplication(packName).getDrawable(mBannerResId);
+                mBanner = pManager.getResourcesForApplication(packName).getDrawable(mBannerResId,null);
             } catch (Exception e) {
                 Log.e(TAG, "Exception : " + e.getMessage());
             }
@@ -275,6 +278,8 @@ public class OffHostService {
     public void commit() throws InsufficientResourcesException{
         boolean status = false;
        // if(mModifiable ==true) {
+            Log.d(TAG, "GSMA: banner ResId=" + String.valueOf(mBannerResId));
+            Log.d(TAG, "GSMA: banner =" + String.valueOf(mBanner));
             status = mNxpNfcController.commitOffHostService(mUserId, mPackageName, convertToNxpOffhostService(this));
             Log.d("GSMA", " commit status value" + status);
             if(status == false)
@@ -305,6 +310,37 @@ public class OffHostService {
             mOffHostAidGroups.add(mAidGroup);
         }
         return mOffHostAidGroups;
+    }
+
+    /*Compare drawable resources(ex: .png/.jpg/.bmp/..)
+     * Description: if constantState of two drawables are equal, then Drawables are equal
+     * However converse of it is not necessarily true.
+     * In case ConstantState's are not equal, their bitmaps are compared.*/
+    private boolean areDrawablesEqual(Drawable drawableA, Drawable drawableB) {
+        Drawable.ConstantState stateA = drawableA.getConstantState();
+        Drawable.ConstantState stateB = drawableB.getConstantState();
+        if(stateA != null && stateB != null && stateA.equals(stateB))
+            return true;
+        else if(areDrawableBitmapsEqual(drawableA,drawableB))
+            return true;
+        else
+            return false;
+    }
+
+    private boolean areDrawableBitmapsEqual(Drawable drawableA, Drawable drawableB) {
+        boolean result =false;
+        if (drawableA instanceof BitmapDrawable) {
+            if (drawableB instanceof BitmapDrawable) {
+                Bitmap bitmapA =  ((BitmapDrawable) drawableA).getBitmap();
+                Bitmap bitmapB =  ((BitmapDrawable) drawableB).getBitmap();
+                if (bitmapA.getWidth() == bitmapB.getWidth() &&
+                        bitmapA.getHeight() == bitmapB.getHeight()) {
+                    if(bitmapA.sameAs(bitmapB))
+                        result =true;
+                }
+            }
+        }
+        return result;
     }
 
 }

@@ -95,6 +95,7 @@ typedef struct {
     uint8_t _ESE_DUAL_MODE_PRIO_SCHEME                   : 2;
     uint8_t _ESE_FORCE_ENABLE                            : 1;
     uint8_t _ESE_RESET_METHOD                            : 1;
+    uint8_t _EXCLUDE_NV_MEM_DEPENDENCY                   : 1;
     uint8_t _ESE_ETSI_READER_ENABLE                      : 1;
     uint8_t _ESE_SVDD_SYNC                               : 1;
     uint8_t _NFCC_ESE_UICC_CONCURRENT_ACCESS_PROTECTION  : 1;
@@ -301,6 +302,7 @@ extern tNfc_featureList nfcFL;
         nfcFL.eseFL._ESE_P73_ISO_RST = false;                               \
         nfcFL.eseFL._BLOCK_PROPRIETARY_APDU_GATE = false;                   \
         nfcFL.eseFL._JCOP_WA_ENABLE = true;                                 \
+        nfcFL.eseFL._EXCLUDE_NV_MEM_DEPENDENCY = false;                     \
         nfcFL.nfccFL._NXP_NFC_UICC_ETSI12 = false;                          \
         nfcFL.nfccFL._NFCC_SPI_FW_DOWNLOAD_SYNC = false;                    \
         \
@@ -338,6 +340,7 @@ extern tNfc_featureList nfcFL;
             \
             \
             nfcFL.eseFL._ESE_ETSI12_PROP_INIT = true;                       \
+            nfcFL.eseFL._EXCLUDE_NV_MEM_DEPENDENCY = true;                  \
             \
             \
             nfcFL.platformFL._NFCC_RESET_RSP_LEN = 0x10U;                   \
@@ -367,6 +370,7 @@ extern tNfc_featureList nfcFL;
             \
             nfcFL.eseFL._ESE_ETSI12_PROP_INIT = true;                       \
             nfcFL.eseFL._JCOP_WA_ENABLE = false;                            \
+            nfcFL.eseFL._EXCLUDE_NV_MEM_DEPENDENCY = true;                  \
             \
             \
             nfcFL.platformFL._NFCC_RESET_RSP_LEN = 0x10U;                   \

@@ -164,8 +164,13 @@ public final class NxpAidGroup extends AidGroup implements Parcelable {
                     Log.d(TAG, "Ignoring unexpected tag: " + tagName);
                 }
             } else if (eventType == XmlPullParser.END_TAG) {
-                if (tagName.equals("aid-group") && inGroup && aids.size() > 0) {
-                    group = new NxpAidGroup(aids, category, description);
+                if (tagName.equals("aid-group") && inGroup) {
+                    if(aids.size() > 0) {
+                        group = new NxpAidGroup(aids, category, description);
+                    }
+                    else {
+                        group = new NxpAidGroup(category, description);
+                    }
                     break;
                 }
             }
