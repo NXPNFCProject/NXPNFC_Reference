@@ -346,6 +346,10 @@ extern tNfc_featureList nfcFL;
             nfcFL.platformFL._NFCC_RESET_RSP_LEN = 0x10U;                   \
             \
             \
+            nfcFL.nfcMwFL._NCI_INTERFACE_UICC_DIRECT = 0x82;                \
+            nfcFL.nfcMwFL._NCI_INTERFACE_ESE_DIRECT = 0x83;                 \
+            \
+            \
         }                                                                   \
         else if (chipType == pn553)                                         \
         {                                                                   \
