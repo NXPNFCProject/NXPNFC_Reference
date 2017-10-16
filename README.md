@@ -44,3 +44,4 @@ This Repo contains any additional information/files required to support the rele
 | android-o-preview2                     |  8.0.13_O (PN553/PN557) |  NFC_NCIHALx_AR18C0.8.0.13_O_OpnSrc |
 | android-8.0.0_r4               |  8.1.0_O (PN553) |  NFC_NCIHALx_AR00C0.8.1.0_O_OpnSrc |
 | android-8.0.0_r4               |  8.2.0_O (PN557) |  NFC_NCIHALx_AR18C0.8.2.0_O_OpnSrc |
+| android-8.0.0_r4               |  8.2.3_O (PN557) |  NFC_NCIHALx_AR18C0.8.2.3_O_OpnSrc |
