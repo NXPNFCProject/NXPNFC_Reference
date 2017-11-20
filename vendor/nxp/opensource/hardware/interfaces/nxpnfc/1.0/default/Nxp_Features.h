@@ -250,6 +250,7 @@ extern tNfc_featureList nfcFL;
             nfcFL.eseFL._LEGACY_APDU_GATE = true;                           \
             nfcFL.eseFL._NFCC_ESE_UICC_CONCURRENT_ACCESS_PROTECTION = true; \
             nfcFL.eseFL._ESE_DWP_SPI_SYNC_ENABLE = true;                    \
+            nfcFL.eseFL._NXP_ESE_VER = JCOP_VER_3_3;                        \
         }                                                                   \
         else if (chipType == pn66T)                                         \
         {                                                                   \
@@ -265,6 +266,7 @@ extern tNfc_featureList nfcFL;
             nfcFL.eseFL._LEGACY_APDU_GATE = true;                           \
             nfcFL.eseFL._NFCC_ESE_UICC_CONCURRENT_ACCESS_PROTECTION = true; \
             nfcFL.eseFL._ESE_DWP_SPI_SYNC_ENABLE = true;                    \
+            nfcFL.eseFL._NXP_ESE_VER = JCOP_VER_3_3;                        \
         }                                                                   \
         else if (chipType == pn65T)                                         \
         {                                                                   \
