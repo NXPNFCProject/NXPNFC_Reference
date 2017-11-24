@@ -459,6 +459,7 @@ extern tNfc_featureList nfcFL;
             \
             \
             nfcFL.eseFL._ESE_FORCE_ENABLE = true;                           \
+            nfcFL.platformFL._NFCC_RESET_RSP_LEN = 0x11U;                   \
             \
             \
             nfcFL.nfcMwFL._NCI_INTERFACE_UICC_DIRECT = 0x82;                \
@@ -497,6 +498,7 @@ extern tNfc_featureList nfcFL;
             \
             nfcFL.nfcMwFL._NCI_INTERFACE_UICC_DIRECT = 0x81;                \
             nfcFL.nfcMwFL._NCI_INTERFACE_ESE_DIRECT = 0x82;                 \
+            nfcFL.platformFL._NFCC_RESET_RSP_LEN = 0x11U;                   \
             \
             \
             SRTCPY_FW("libpn547_fw", "libpn547_fw_platform",                \
