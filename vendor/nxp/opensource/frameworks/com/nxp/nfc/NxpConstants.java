@@ -205,6 +205,7 @@ public final class NxpConstants {
     public static final String EXTRA_GSMA_PREV_PAYMENT_COMPONENT = "com.gsma.services.nfc.extra.PREV_PAYMENT_COMPONENT";
     public static final String ACTION_GSMA_ENABLE_NFC = "com.gsma.services.nfc.action.ENABLE_NFC";
     public static final String ACTION_GSMA_ENABLE_SET_FLAG = "com.gsma.services.nfc.action.ENABLE_NFC_SET_FALG";
+    public static final String CAT_ACTIVATE_NOTIFY_ACTION = "org.codeaurora.intent.action.stk.activate_notify";
 
     /**
      * Indicates the states of an APDU service.

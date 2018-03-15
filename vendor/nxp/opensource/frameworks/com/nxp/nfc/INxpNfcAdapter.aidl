@@ -1,5 +1,5 @@
  /*
-  * Copyright (C) 2015 NXP Semiconductors
+  * Copyright (C) 2015-2018 NXP Semiconductors
   *
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package com.nxp.nfc;
 
 
-import com.nxp.nfc.INfcDta;
 import com.nxp.nfc.INxpNfcAccessExtras;
 import com.nxp.nfc.INxpNfcAdapterExtras;
 import com.nxp.nfc.INfcVzw;
@@ -29,7 +28,6 @@ import com.nxp.nfc.gsma.internal.INxpNfcController;
 interface INxpNfcAdapter
 {
 
-    INfcDta getNfcDtaInterface();
     INxpNfcAccessExtras getNxpNfcAccessExtrasInterface(in String pkg);
     INfcVzw getNfcVzwInterface();
     INxpNfcAdapterExtras getNxpNfcAdapterExtrasInterface();

@@ -37,7 +37,7 @@ public final class NxpAidGroup extends AidGroup implements Parcelable {
     /**
      * Mapping from category to static APDU pattern group
      */
-    protected ArrayList<ApduPatternGroup> mStaticApduPatternGroups;
+    protected ArrayList<ApduPatternGroup> mStaticApduPatternGroups = null;
 
     public NxpAidGroup(List<String> aids, String category, String description) {
         super(aids, category);
@@ -71,6 +71,11 @@ public final class NxpAidGroup extends AidGroup implements Parcelable {
      * @return An AidGroup object to be serialized via parcel
      */
     public AidGroup createAidGroup() {
+        if(this.getAids() == null || this.getAids().isEmpty()){
+          Log.d(TAG, "Empty aid group creation");
+          return new AidGroup(this.getCategory(), this.getDescription());
+        }
+        Log.d(TAG, "Non Empty aid group creation");
         return new AidGroup(this.getAids(), this.getCategory());
     }
 
@@ -85,11 +90,25 @@ public final class NxpAidGroup extends AidGroup implements Parcelable {
      */
     public ArrayList<ApduPattern> getApduPatternList() {
         final ArrayList<ApduPattern> apdulist = new ArrayList<ApduPattern>();
-        for (ApduPatternGroup group : mStaticApduPatternGroups) {
-            for(ApduPattern apduPattern : group.getApduPattern()) {
-                apdulist.add(apduPattern);
-            }
+        if(apdulist == null || mStaticApduPatternGroups == null){
+          return null;
         }
+        try
+        {
+          for (ApduPatternGroup group : mStaticApduPatternGroups) {
+            if(group == null){
+              continue;
+            }
+            for(ApduPattern apduPattern : group.getApduPattern()) {
+              if(apduPattern == null){
+                continue;
+              }
+              apdulist.add(apduPattern);
+            }
+          }
+        }catch(NullPointerException e){
+          e.printStackTrace();
+       }
         return apdulist;
     }
 
@@ -122,7 +141,11 @@ public final class NxpAidGroup extends AidGroup implements Parcelable {
                 source.readStringList(aidList);
             }
             String description = source.readString();
-            return new NxpAidGroup(aidList, category, description);
+            if(aidList == null || aidList.size() == 0){
+              return new NxpAidGroup(category, description);
+            }
+            else
+             return new NxpAidGroup(aidList, category, description);
         }
 
         @Override

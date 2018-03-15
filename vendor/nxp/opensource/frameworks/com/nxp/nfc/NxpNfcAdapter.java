@@ -2,7 +2,7 @@
 *
 *  The original Work has been changed by NXP Semiconductors.
 *
-*  Copyright (C) 2013-2014 NXP Semiconductors
+*  Copyright (C) 2013-2018 NXP Semiconductors
 *
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -457,22 +457,6 @@ public final class NxpNfcAdapter {
              return null;
          }
     }*/
-
-    /**
-     * Helper to create an Nfc Dta object.
-     * <p>Requires {@link android.Manifest.permission#NFC} permission.
-     *
-     * @return the NfcDta, or null if no NfcDta exists
-     */
-    public NfcDta createNfcDta() {
-         try {
-             return new NfcDta(sNxpService.getNfcDtaInterface());
-         } catch (RemoteException e) {
-             Log.e(TAG, "createNfcDta failed", e);
-             attemptDeadServiceRecovery(e);
-             return null;
-         }
-    }
 
     /**
     * Get the handle to an INxpNfcAccessExtras Interface

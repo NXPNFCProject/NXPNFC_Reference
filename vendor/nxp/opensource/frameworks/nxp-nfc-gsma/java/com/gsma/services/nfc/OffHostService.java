@@ -26,7 +26,7 @@ import android.graphics.Bitmap;
 import dalvik.system.DexClassLoader;
 import android.nfc.cardemulation.CardEmulation;
 import android.util.Log;
-
+import android.nfc.cardemulation;
 import com.gsma.services.utils.InsufficientResourcesException;
 import com.gsma.services.nfc.OffHostService;
 
@@ -254,7 +254,13 @@ public class OffHostService {
             for(String aid :mGroup.getAidList()) {
                 aidList.add(aid);
             }
-            mCeAidGroup = new android.nfc.cardemulation.NxpAidGroup(aidList, mGroup.getCategory(), mGroup.getDescription());
+
+            if(aidList == null || aidList.size() == 0) {
+              mCeAidGroup = new NxpAidGroup(mGroup.getCategory(), mGroup.getDescription());
+            }else {
+              mCeAidGroup = new NxpAidGroup(aidList, mGroup.getCategory(), mGroup.getDescription());
+            }
+
             mApduAidGroupList.add(mCeAidGroup);
         }
     return mApduAidGroupList;
