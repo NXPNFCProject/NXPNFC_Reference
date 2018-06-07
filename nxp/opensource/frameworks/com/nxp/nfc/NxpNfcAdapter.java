@@ -30,6 +30,7 @@ import android.os.ServiceManager;
 import java.io.IOException;
 import android.os.UserHandle;
 import android.os.RemoteException;
+import com.nxp.nfc.gsma.internal.INxpNfcController;
 
 import android.util.Log;
 
@@ -154,5 +155,156 @@ public final class NxpNfcAdapter {
             return null;
         }
     }
-   
+
+
+   /**
+     * This is the first API to be called to start or stop the mPOS mode
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     * <li>This api shall be called only Nfcservice is enabled.
+     * <li>This api shall be called only when there are no NFC transactions ongoing
+     * </ul>
+     * @param  pkg package name of the caller
+     * @param  on Sets/Resets the mPOS state.
+     * @return whether the update of state is
+     *          success or busy or fail.
+     *          MPOS_STATUS_BUSY
+     *          MPOS_STATUS_REJECTED
+     *          MPOS_STATUS_SUCCESS
+     * @throws IOException If a failure occurred during reader mode set or reset
+     */
+    public int mPOSSetReaderMode (String pkg, boolean on) throws IOException {
+        try {
+            return sNxpService.mPOSSetReaderMode(pkg, on);
+        } catch(RemoteException e) {
+            Log.e(TAG, "RemoteException in mPOSSetReaderMode (int state): ", e);
+            e.printStackTrace();
+            attemptDeadServiceRecovery(e);
+            throw new IOException("RemoteException in mPOSSetReaderMode (int state)");
+        }
+    }
+
+    /**
+     * This is provides the info whether mPOS mode is activated or not
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     * <li>This api shall be called only Nfcservice is enabled.
+     * <li>This api shall be called only when there are no NFC transactions ongoing
+     * </ul>
+     * @param  pkg package name of the caller
+     * @return TRUE if reader mode is started
+     *          FALSE if reader mode is not started
+     * @throws IOException If a failure occurred during reader mode set or reset
+     */
+    public boolean mPOSGetReaderMode (String pkg) throws IOException {
+        try {
+            return sNxpService.mPOSGetReaderMode(pkg);
+        } catch(RemoteException e) {
+            Log.e(TAG, "RemoteException in mPOSGetReaderMode (): ", e);
+            e.printStackTrace();
+            attemptDeadServiceRecovery(e);
+            throw new IOException("RemoteException in mPOSSetReaderMode ()");
+        }
+    }
+
+    /**
+     * This API is called by application to stop RF discovery
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     * <li>This api shall be called only Nfcservice is enabled.
+     * </ul>
+     * @param  pkg package name of the caller
+     * @param  mode
+     *         LOW_POWER
+     *         ULTRA_LOW_POWER
+     * @return None
+     * @throws IOException If a failure occurred during stop discovery
+    */
+    public void stopPoll(String pkg, int mode) throws IOException {
+        try {
+            sNxpService.stopPoll(pkg, mode);
+        } catch(RemoteException e) {
+            Log.e(TAG, "RemoteException in stopPoll(int mode): ", e);
+            e.printStackTrace();
+            attemptDeadServiceRecovery(e);
+            throw new IOException("RemoteException in stopPoll(int mode)");
+        }
+    }
+
+    /**
+     * This API is called by application to start RF discovery
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     * <li>This api shall be called only Nfcservice is enabled.
+     * </ul>
+     * @param  pkg package name of the caller
+     * @return None
+     * @throws IOException If a failure occurred during start discovery
+    */
+    public void startPoll(String pkg) throws IOException {
+        try {
+            sNxpService.startPoll(pkg);
+        } catch(RemoteException e) {
+            Log.e(TAG, "RemoteException in startPoll(): ", e);
+            e.printStackTrace();
+            attemptDeadServiceRecovery(e);
+            throw new IOException("RemoteException in startPoll()");
+        }
+    }
+
+   /**
+    * Get the handle to an INxpNfcController Interface
+    * @hide
+    */
+    public INxpNfcController getNxpNfcControllerInterface() {
+        if(sService == null) {
+            throw new UnsupportedOperationException("You need a reference from NfcAdapter to use the "
+                    + " NXP NFC APIs");
+        }
+        try {
+            return sNxpService.getNxpNfcControllerInterface();
+        }catch(RemoteException e) {
+            return null;
+        }
+    }
+     /**
+     * Get the Active Secure Element List
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     *
+     * @throws IOException If a failure occurred during the getActiveSecureElementList()
+     */
+    public String[] getActiveSecureElementList(String pkg) throws IOException {
+        int [] activeSEList;
+        String [] arr;
+        try{
+            Log.d(TAG, "getActiveSecureElementList-Enter");
+            activeSEList = sNxpService.getActiveSecureElementList(pkg);
+            if (activeSEList!=null && activeSEList.length != 0)
+            {
+                arr= new String[activeSEList.length];
+                for(int i=0;i<activeSEList.length;i++)
+                {
+                    Log.e(TAG, "getActiveSecureElementList activeSE[i]" + activeSEList[i]);
+                    if(activeSEList[i]==NxpConstants.SMART_MX_ID_TYPE)
+                    {
+                        arr[i]= NxpConstants.SMART_MX_ID;
+                    }
+                    else if(activeSEList[i]==NxpConstants.UICC_ID_TYPE)
+                    {
+                        arr[i]= NxpConstants.UICC_ID;
+                    }
+                    else if(activeSEList[i]==NxpConstants.UICC2_ID_TYPE)
+                    {
+                        arr[i]= NxpConstants.UICC2_ID;
+                    }
+                    else {
+                        throw new IOException("No Secure Element Activeted");
+                    }
+                }
+            } else {
+                arr = new String[0];
+            }
+            return arr;
+        } catch (RemoteException e) {
+            Log.e(TAG, "getActiveSecureElementList: failed", e);
+            attemptDeadServiceRecovery(e);
+            throw new IOException("Failure in deselecting the selected Secure Element");
+        }
+    }   
 }

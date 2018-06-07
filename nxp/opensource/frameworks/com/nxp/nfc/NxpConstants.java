@@ -88,6 +88,22 @@ public final class NxpConstants {
     static final byte PN553_FW_ROM_VER = 0x11;
 
     /**
+     * mpos mode status
+     */
+    public static final int MPOS_STATUS_SUCCESS = 0x00;
+
+    public static final int MPOS_STATUS_BUSY = 0xEB;
+
+    public static final int MPOS_STATUS_REJECTED = 0x01;
+
+    /**
+     * parameter for configuring RF poll
+     */
+    public static final int LOW_POWER = 0x00;
+
+    public static final int ULTRA_LOW_POWER = 0x01;
+
+    /**
      * Broadcast Action: Multiple card presented to emvco reader.
      */
     @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
@@ -149,42 +165,42 @@ public final class NxpConstants {
      *
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_SWP_READER_REQUESTED = "com.nxp.nfc_extras.ACTION_SWP_READER_REQUESTED";
+    public static final String ACTION_NFC_MPOS_READER_MODE_START_SUCCESS = "com.nxp.nfc_extras.action.NFC_MPOS_READER_MODE_START_SUCCESS";
 
     /**
      * Intent received when the SWP Reader is Requested by Application
      *
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_SWP_READER_REQUESTED_FAILED = "com.nxp.nfc_extras.ACTION_SWP_READER_REQUESTED_FAILED";
-
-   /**
-     * Intent received when the SWP Reader is connected to card.
-     *
-     */
-    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_SWP_READER_ACTIVATED = "com.nxp.nfc_extras.ACTION_SWP_READER_ACTIVATED";
+    public static final String ACTION_NFC_MPOS_READER_MODE_START_FAIL = "com.nxp.nfc_extras.action.NFC_MPOS_READER_MODE_START_FAIL";
 
     /**
      * Intent received when the SWP Reader is disconnected from card.
      *
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_SWP_READER_DEACTIVATED = "com.nxp.nfc_extras.ACTION_SWP_READER_DEACTIVATED";
-
-    /**
-     * Intent received when the SWP Reader is started and ready to transcation.
-     *
-     */
-    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_SWP_READER_TAG_PRESENT = "com.nxp.nfc_extras.ACTION_SWP_READER_TAG_PRESENT";
+    public static final String ACTION_NFC_MPOS_READER_MODE_STOP_SUCCESS = "com.nxp.nfc_extras.action.NFC_MPOS_READER_MODE_STOP_SUCCESS";
 
     /**
      * Intent received when the SWP Reader transcation is done.
      *
      */
     @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
-    public static final String ACTION_SWP_READER_TAG_REMOVE = "com.nxp.nfc_extras.ACTION_SWP_READER_TAG_REMOVE";
+    public static final String ACTION_NFC_MPOS_READER_MODE_REMOVE_CARD = "com.nxp.nfc_extras.action.NFC_MPOS_READER_MODE_REMOVE_CARD";
+
+    /**
+     * Intent received when the SWP Reader gets timeout.
+     *
+     */
+    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
+    public static final String ACTION_NFC_MPOS_READER_MODE_TIMEOUT = "com.nxp.nfc_extras.action.NFC_MPOS_READER_MODE_TIMEOUT";
+
+    /**
+     * Intent received when the SWP Reader needs to restart.
+     *
+     */
+    @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)
+    public static final String ACTION_NFC_MPOS_READER_MODE_RESTART = "com.nxp.nfc_extras.action.NFC_MPOS_READER_MODE_RESTART";
 
 
     public static final String ACTION_ROUTING_TABLE_FULL = "nfc.intent.action.AID_ROUTING_TABLE_FULL";
