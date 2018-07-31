@@ -34,10 +34,13 @@ interface INxpNfcAdapter
     int[] getActiveSecureElementList(String pkg);
     int updateServiceState(int userId , in Map serviceState);
     int setConfig(String configs , String pkg);
+    byte[] readerPassThruMode(byte status, byte modulationTyp);
+    byte[] transceiveAppData(in byte[] data);
     int mPOSSetReaderMode(String pkg, boolean on);
     boolean mPOSGetReaderMode(String pkg);
     void stopPoll(String pkg, int mode);
     void startPoll(String pkg);
+    int nfcSelfTest(String pkg, int type);
     int selectUicc(int uiccSlot);
     int getSelectedUicc();
 }

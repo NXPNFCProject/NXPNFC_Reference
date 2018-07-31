@@ -111,35 +111,6 @@ public final class NxpConstants {
             "com.nxp.action.EMVCO_MULTIPLE_CARD_DETECTED";
 
     /**
-     * Broadcast Action: a transaction with a secure element has been detected.
-     *
-     * Always contains the extra field
-     * {@link com.nxp.nfc.NxpConstants#EXTRA_AID} and {@link com.nxp.nfc.NxpConstants#EXTRA_SOURCE}
-     *
-     */
-    @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
-    public static final String ACTION_TRANSACTION_DETECTED =
-            "com.nxp.action.TRANSACTION_DETECTED";
-
-    /**
-     * Mandatory byte array extra field in
-     * {@link com.nxp.nfc.NxpConstants#ACTION_TRANSACTION_DETECTED}.
-     * <p>
-     * Contains the AID of the applet involved in the transaction.
-     *
-     */
-    public static final String EXTRA_AID = "com.nxp.extra.AID";
-
-    /**
-     * Mandatory byte array extra field in
-     * {@link com.nxp.nfc.NxpConstants#ACTION_TRANSACTION_DETECTED}.
-     * <p>
-     * Contains the extra data of the applet involved in the transaction.
-     *
-     */
-    public static final String EXTRA_DATA = "com.nxp.extra.DATA";
-
-    /**
      * Broadcast Action: a connectivity event coming from the UICC/ESE
      * has been detected.
      * <p>
@@ -210,7 +181,6 @@ public final class NxpConstants {
     public static final String ACTION_MULTI_EVT_TRANSACTION = "com.gsma.services.nfc.action.TRANSACTION_EVENT";
     public static final String ACTION_CHECK_X509 = "org.simalliance.openmobileapi.service.ACTION_CHECK_X509";
     public static final String SET_PACKAGE_NAME = "org.simalliance.openmobileapi.service";
-    public static final String EXTRA_SE_NAME = "org.simalliance.openmobileapi.service.EXTRA_SE_NAME";
     public static final String EXTRA_PKG = "org.simalliance.openmobileapi.service.extra.EXTRA_PKG";
     public static final String EXTRA_RESULT = "org.simalliance.openmobileapi.service.extra.EXTRA_RESULT";
 
@@ -232,5 +202,23 @@ public final class NxpConstants {
     public static final int SERVICE_STATE_ENABLING  = 2;
     public static final int SERVICE_STATE_DISABLING = 3;
 
-
+    /**
+     * NFC self test Parameter IDs defined by NXP NFC.
+     */
+    /**
+     *@hide
+     */
+    public static final int TEST_TYPE_RF_ON = 0x00;
+    /**
+     *@hide
+     */
+    public static final int TEST_TYPE_RF_OFF = 0x01;
+    /**
+     *@hide
+     */
+    public static final int TEST_TYPE_TRANSAC_A = 0x02;
+    /**
+     *@hide
+     */
+    public static final int TEST_TYPE_TRANSAC_B = 0x03;
 }

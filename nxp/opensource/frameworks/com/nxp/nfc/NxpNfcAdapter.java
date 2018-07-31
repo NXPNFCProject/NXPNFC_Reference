@@ -498,7 +498,29 @@ public final class NxpNfcAdapter {
             throw new IOException("RemoteException in startPoll()");
         }
     }
-
+    /**
+     * This API is called by application to execute the analog self test
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     * <li>This api shall be called only Nfcservice is enabled.
+     * </ul>
+     * @param  pkg, package name of the caller
+     * @param  type, type of the analog slef test
+     * @return status
+     * @throws IOException If a failure occurred during nfcSelfTest
+     * @hide
+     */
+    public int nfcSelfTest(String pkg, int type) throws IOException {
+      int status = 0xFF;
+      try {
+        status = sNxpService.nfcSelfTest(pkg, type);
+      } catch (RemoteException e) {
+        Log.e(TAG, "RemoteException in nfcSelfTest(): ", e);
+        e.printStackTrace();
+        attemptDeadServiceRecovery(e);
+        throw new IOException("RemoteException in nfcSelfTest()");
+      }
+      return status;
+    }
     /**
      * This api is called by applications to get the maximum routing table for AID registration
      * The returned value doesn't provide the current remaining size available for AID.
@@ -531,5 +553,24 @@ public final class NxpNfcAdapter {
             attemptDeadServiceRecovery(e);
             return 0x00;
         }
+    }
+
+    public byte[] readerPassThruMode(byte status, byte modulationTyp)
+        throws IOException {
+      try {
+        return sNxpService.readerPassThruMode(status, modulationTyp);
+      } catch (RemoteException e) {
+        Log.e(TAG, "Remote exception in readerPassThruMode(): ", e);
+        throw new IOException("Remote exception in readerPassThruMode()");
+      }
+    }
+
+    public byte[] transceiveAppData(byte[] data) throws IOException {
+      try {
+        return sNxpService.transceiveAppData(data);
+      } catch (RemoteException e) {
+        Log.e(TAG, "RemoteException in transceiveAppData(): ", e);
+        throw new IOException("RemoteException in transceiveAppData()");
+      }
     }
 }
