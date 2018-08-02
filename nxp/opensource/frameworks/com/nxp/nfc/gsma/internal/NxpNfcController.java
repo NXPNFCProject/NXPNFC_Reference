@@ -37,10 +37,10 @@ import android.nfc.NfcAdapter;
 import com.nxp.nfc.NxpNfcAdapter;
 import android.annotation.SystemApi;
 import android.util.Log;
-import android.nfc.cardemulation.NxpAidGroup;
+import android.nfc.cardemulation.NfcAidGroup;
 import android.nfc.cardemulation.AidGroup;
-import android.nfc.cardemulation.NxpApduServiceInfo;
-import android.nfc.cardemulation.NxpApduServiceInfo.ESeInfo;
+import android.nfc.cardemulation.NfcApduServiceInfo;
+import android.nfc.cardemulation.NfcApduServiceInfo.ESeInfo;
 import android.os.UserHandle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -48,7 +48,7 @@ import android.os.RemoteException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import com.nxp.nfc.gsma.internal.INxpNfcController;
-import com.nxp.nfc.NxpConstants;
+import com.nxp.nfc.NfcConstants;
 import java.io.ByteArrayOutputStream;
 
 public class NxpNfcController {
@@ -81,8 +81,8 @@ public class NxpNfcController {
     private boolean mDialogBoxFlag = false;
     private NxpNfcController.NxpCallbacks mCallBack = null;
 
-    // Map between SE name and NxpApduServiceInfo
-    private final HashMap<String, NxpApduServiceInfo> mSeNameApduService =  new HashMap<String, NxpApduServiceInfo>();//Maps.newHashMap();
+    // Map between SE name and NfcApduServiceInfo
+    private final HashMap<String, NfcApduServiceInfo> mSeNameApduService =  new HashMap<String, NfcApduServiceInfo>();//Maps.newHashMap();
 
     public static interface NxpCallbacks {
         /**
@@ -125,7 +125,7 @@ public class NxpNfcController {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action.equals(NxpConstants.ACTION_GSMA_ENABLE_SET_FLAG)) {
+            if(action.equals(NfcConstants.ACTION_GSMA_ENABLE_SET_FLAG)) {
                 mState = intent.getExtras().getBoolean("ENABLE_STATE");
             }
             if(mState == false) {
@@ -172,12 +172,12 @@ public class NxpNfcController {
         mContext.registerReceiver(mOwnerReceiver, ownerFilter);
 
         IntentFilter filter = new IntentFilter();
-        filter.addAction(NxpConstants.ACTION_GSMA_ENABLE_SET_FLAG);
+        filter.addAction(NfcConstants.ACTION_GSMA_ENABLE_SET_FLAG);
         mContext.registerReceiver(mReceiver, filter);
 
         // To Enable NfC
         Intent enableNfc = new Intent();
-        enableNfc.setAction(NxpConstants.ACTION_GSMA_ENABLE_NFC);
+        enableNfc.setAction(NfcConstants.ACTION_GSMA_ENABLE_NFC);
         mContext.sendBroadcast(enableNfc);
     }
 
@@ -185,18 +185,18 @@ public class NxpNfcController {
      * Converting from apdu service to off host service.
      * return Off-Host service object
      */
-    private NxpOffHostService ConvertApduServiceToOffHostService(PackageManager pm, NxpApduServiceInfo apduService) {
+    private NxpOffHostService ConvertApduServiceToOffHostService(PackageManager pm, NfcApduServiceInfo apduService) {
         NxpOffHostService mService;
         int seId=0;
         String sEname =null;
         ResolveInfo resolveInfo = apduService.getResolveInfo();
         String description = apduService.getDescription();
         seId = apduService.getSEInfo().getSeId();
-        if (NxpConstants.UICC_ID_TYPE == seId) {
+        if (NfcConstants.UICC_ID_TYPE == seId) {
             sEname = "SIM1";
-        } else if (NxpConstants.UICC2_ID_TYPE == seId) {
+        } else if (NfcConstants.UICC2_ID_TYPE == seId) {
             sEname = "SIM2";
-        } else if (NxpConstants.SMART_MX_ID_TYPE == seId) {
+        } else if (NfcConstants.SMART_MX_ID_TYPE == seId) {
             sEname = "eSE";
         } else {
             Log.e(TAG,"Wrong SE ID");
@@ -210,12 +210,12 @@ public class NxpNfcController {
         mService =  new NxpOffHostService(userId,description, sEname, resolveInfo.serviceInfo.packageName,
                                           resolveInfo.serviceInfo.name, modifiable);
         if(modifiable) {
-            for(android.nfc.cardemulation.NxpAidGroup group : apduService.getDynamicNxpAidGroups()) {
-                mService.mNxpAidGroupList.add(group);
+            for(android.nfc.cardemulation.NfcAidGroup group : apduService.getDynamicNfcAidGroups()) {
+                mService.mNfcAidGroupList.add(group);
             }
         } else {
-            for(android.nfc.cardemulation.NxpAidGroup group : apduService.getStaticNxpAidGroups()) {
-                mService.mNxpAidGroupList.add(group);
+            for(android.nfc.cardemulation.NfcAidGroup group : apduService.getStaticNfcAidGroups()) {
+                mService.mNfcAidGroupList.add(group);
             }
         }
         //mService.setBanner(banner);
@@ -230,14 +230,14 @@ public class NxpNfcController {
      * Converting from Off_Host service object to Apdu Service object
      * return APDU service Object
     */
-    private NxpApduServiceInfo ConvertOffhostServiceToApduService(NxpOffHostService mService, int userId, String pkg) {
-        NxpApduServiceInfo apduService =null;
+    private NfcApduServiceInfo ConvertOffhostServiceToApduService(NxpOffHostService mService, int userId, String pkg) {
+        NfcApduServiceInfo apduService =null;
         boolean onHost = false;
         String description = mService.getDescription();
         boolean modifiable = mService.getModifiable();
-        ArrayList<android.nfc.cardemulation.NxpAidGroup> staticNxpAidGroups = null;
-        ArrayList<NxpAidGroup> dynamicNxpAidGroup = new ArrayList<NxpAidGroup>();
-        dynamicNxpAidGroup.addAll(mService.mNxpAidGroupList);
+        ArrayList<android.nfc.cardemulation.NfcAidGroup> staticNfcAidGroups = null;
+        ArrayList<NfcAidGroup> dynamicNfcAidGroup = new ArrayList<NfcAidGroup>();
+        dynamicNfcAidGroup.addAll(mService.mNfcAidGroupList);
         boolean requiresUnlock = false;
         Drawable banner = mService.getBanner();
         byte[] byteArrayBanner = null;
@@ -261,17 +261,17 @@ public class NxpNfcController {
         resolveInfo.serviceInfo.name = mService.getServiceName();
         if(seName != null) {
             if(seName.equals("SIM") || seName.equals("SIM1")) {
-                seId = NxpConstants.UICC_ID_TYPE;
+                seId = NfcConstants.UICC_ID_TYPE;
             } else if (seName.equals("SIM2")) {
-                seId = NxpConstants.UICC2_ID_TYPE;
+                seId = NfcConstants.UICC2_ID_TYPE;
             } else if (seName.equals("eSE")) {
-                seId = NxpConstants.SMART_MX_ID_TYPE;
+                seId = NfcConstants.SMART_MX_ID_TYPE;
             } else {
                 Log.e(TAG,"wrong Se name");
             }
         }
-        NxpApduServiceInfo.ESeInfo mEseInfo = new NxpApduServiceInfo.ESeInfo(seId,powerstate);
-        apduService = new NxpApduServiceInfo(resolveInfo,onHost,description,staticNxpAidGroups, dynamicNxpAidGroup,
+        NfcApduServiceInfo.ESeInfo mEseInfo = new NfcApduServiceInfo.ESeInfo(seId,powerstate);
+        apduService = new NfcApduServiceInfo(resolveInfo,onHost,description,staticNfcAidGroups, dynamicNfcAidGroup,
                                            requiresUnlock,bannerId,userId, "Fixme: NXP:<Activity Name>", mEseInfo, modifiable);
         return apduService;
     }
@@ -282,7 +282,7 @@ public class NxpNfcController {
     */
     public boolean deleteOffHostService(int userId, String packageName, NxpOffHostService service) {
         boolean result = false;
-        NxpApduServiceInfo apduService;
+        NfcApduServiceInfo apduService;
         apduService = ConvertOffhostServiceToApduService(service, userId, packageName);
         try {
             result = mNfcControllerService.deleteOffHostService(userId, packageName, apduService);
@@ -301,7 +301,7 @@ public class NxpNfcController {
      * return off-Host service List
     */
     public ArrayList<NxpOffHostService> getOffHostServices(int userId, String packageName) {
-        List<NxpApduServiceInfo> apduServices = new ArrayList<NxpApduServiceInfo>();
+        List<NfcApduServiceInfo> apduServices = new ArrayList<NfcApduServiceInfo>();
         ArrayList<NxpOffHostService> mService = new ArrayList<NxpOffHostService>();
         PackageManager pm = mContext.getPackageManager();
         try {
@@ -313,7 +313,7 @@ public class NxpNfcController {
             Log.e(TAG, "getOffHostServices failed", e);
             return null;
         }
-        for(NxpApduServiceInfo service: apduServices) {
+        for(NfcApduServiceInfo service: apduServices) {
             mService.add(ConvertApduServiceToOffHostService(pm, service));
         }
         return mService;
@@ -324,7 +324,7 @@ public class NxpNfcController {
      * return default off-Host service
     */
     public NxpOffHostService getDefaultOffHostService(int userId, String packageName) {
-        NxpApduServiceInfo apduService;
+        NfcApduServiceInfo apduService;
         NxpOffHostService mService;
         PackageManager pm = mContext.getPackageManager();
         try {
@@ -347,7 +347,7 @@ public class NxpNfcController {
     */
     public boolean commitOffHostService(int userId, String packageName, NxpOffHostService service) {
         boolean result = false;
-        NxpApduServiceInfo newService;
+        NfcApduServiceInfo newService;
         String serviceName = service.getServiceName();
         newService = ConvertOffhostServiceToApduService(service, userId, packageName);
         try {
@@ -373,15 +373,15 @@ public class NxpNfcController {
     */
     public boolean commitOffHostService(String packageName, String seName, String description,
                                         int bannerResId, int uid, List<String> aidGroupDescriptions,
-                                        List<android.nfc.cardemulation.NxpAidGroup> nxpAidGroups) {
+                                        List<android.nfc.cardemulation.NfcAidGroup> nfcAidGroups) {
 
         boolean result = false;
         int userId = UserHandle.myUserId();
-        NxpApduServiceInfo service = null;
+        NfcApduServiceInfo service = null;
         boolean onHost = false;
-        ArrayList<android.nfc.cardemulation.NxpAidGroup> staticNxpAidGroups = null;
-        ArrayList<NxpAidGroup> dynamicNxpAidGroup = new ArrayList<NxpAidGroup>();
-        dynamicNxpAidGroup.addAll(nxpAidGroups);
+        ArrayList<android.nfc.cardemulation.NfcAidGroup> staticNfcAidGroups = null;
+        ArrayList<NfcAidGroup> dynamicNfcAidGroup = new ArrayList<NfcAidGroup>();
+        dynamicNfcAidGroup.addAll(nfcAidGroups);
         boolean requiresUnlock = false;
         int seId = 0;
         int powerstate = -1;
@@ -397,29 +397,29 @@ public class NxpNfcController {
         //Temp for SE conversion
         String secureElement = null;
         if((seName.equals("SIM")) || (seName.equals("SIM1"))) {
-            secureElement = NxpConstants.UICC_ID;
+            secureElement = NfcConstants.UICC_ID;
         } else if (seName.equals("SIM2")){
-            secureElement = NxpConstants.UICC2_ID;
+            secureElement = NfcConstants.UICC2_ID;
         } else if ((seName.equals("eSE1")) || (seName.equals("eSE"))){
-            secureElement = NxpConstants.SMART_MX_ID;
+            secureElement = NfcConstants.SMART_MX_ID;
         } else {
             Log.e(TAG,"wrong Se name");
         }
 
-        if(secureElement.equals(NxpConstants.UICC_ID)) {
-            seId = NxpConstants.UICC_ID_TYPE;
-        } else if (secureElement.equals(NxpConstants.UICC2_ID)) {
-            seId = NxpConstants.UICC2_ID_TYPE;
-        } else if (secureElement.equals(NxpConstants.SMART_MX_ID)) {
-            seId = NxpConstants.SMART_MX_ID_TYPE;
-        } else if (secureElement.equals(NxpConstants.HOST_ID)) {
-            seId = NxpConstants.HOST_ID_TYPE;
+        if(secureElement.equals(NfcConstants.UICC_ID)) {
+            seId = NfcConstants.UICC_ID_TYPE;
+        } else if (secureElement.equals(NfcConstants.UICC2_ID)) {
+            seId = NfcConstants.UICC2_ID_TYPE;
+        } else if (secureElement.equals(NfcConstants.SMART_MX_ID)) {
+            seId = NfcConstants.SMART_MX_ID_TYPE;
+        } else if (secureElement.equals(NfcConstants.HOST_ID)) {
+            seId = NfcConstants.HOST_ID_TYPE;
         } else {
             Log.e(TAG,"wrong Se name");
         }
 
-        NxpApduServiceInfo.ESeInfo mEseInfo = new NxpApduServiceInfo.ESeInfo(seId,powerstate);
-        NxpApduServiceInfo newService = new NxpApduServiceInfo(resolveInfo, onHost, description, staticNxpAidGroups, dynamicNxpAidGroup,
+        NfcApduServiceInfo.ESeInfo mEseInfo = new NfcApduServiceInfo.ESeInfo(seId,powerstate);
+        NfcApduServiceInfo newService = new NfcApduServiceInfo(resolveInfo, onHost, description, staticNfcAidGroups, dynamicNfcAidGroup,
                                                          requiresUnlock, bannerResId, userId, "Fixme: NXP:<Activity Name>", mEseInfo,
                                                          modifiable);
 
@@ -472,7 +472,7 @@ public class NxpNfcController {
         String seName = null;
         int seId=0;
 
-        List<NxpApduServiceInfo> apduServices = new ArrayList<NxpApduServiceInfo>();
+        List<NfcApduServiceInfo> apduServices = new ArrayList<NfcApduServiceInfo>();
         try {
             apduServices = mNfcControllerService.getOffHostServices(userId, packageName);
 
@@ -482,11 +482,11 @@ public class NxpNfcController {
                     isLast = true;
                 }
                 seId = apduServices.get(i).getSEInfo().getSeId();
-                if (NxpConstants.UICC_ID_TYPE == seId) {
+                if (NfcConstants.UICC_ID_TYPE == seId) {
                     seName = "SIM1";
-                } else if (NxpConstants.UICC2_ID_TYPE == seId) {
+                } else if (NfcConstants.UICC2_ID_TYPE == seId) {
                     seName = "SIM2";
-                } else if (NxpConstants.SMART_MX_ID_TYPE == seId) {
+                } else if (NfcConstants.SMART_MX_ID_TYPE == seId) {
                     seName = "eSE";
                 } else {
                     seName = null;
@@ -495,8 +495,8 @@ public class NxpNfcController {
 
                 Log.d(TAG, "getOffHostServices: seName = " + seName);
                 ArrayList<String> groupDescription = new ArrayList<String>();
-                for (NxpAidGroup nxpAidGroup : apduServices.get(i).getNxpAidGroups()) {
-                    groupDescription.add(nxpAidGroup.getDescription());
+                for (NfcAidGroup nfcAidGroup : apduServices.get(i).getNfcAidGroups()) {
+                    groupDescription.add(nfcAidGroup.getDescription());
                 }
 
                 callbacks.onGetOffHostService(isLast, apduServices.get(i).getDescription(), seName, apduServices.get(i).getBannerId(),
@@ -519,7 +519,7 @@ public class NxpNfcController {
 
         Log.d(TAG, "getDefaultOffHostService: Enter");
 
-        NxpApduServiceInfo apduService;
+        NfcApduServiceInfo apduService;
         boolean isLast = true;
         int userId = UserHandle.myUserId();
         String seName = null;
@@ -527,19 +527,19 @@ public class NxpNfcController {
         try {
             apduService = mNfcControllerService.getDefaultOffHostService(userId, packageName);
             seId = apduService.getSEInfo().getSeId();
-            if (NxpConstants.UICC_ID_TYPE == seId) {
+            if (NfcConstants.UICC_ID_TYPE == seId) {
                 seName = "SIM1";
-            } else if (NxpConstants.UICC2_ID_TYPE == seId) {
+            } else if (NfcConstants.UICC2_ID_TYPE == seId) {
                 seName = "SIM2";
-            } else if (NxpConstants.SMART_MX_ID_TYPE== seId) {
+            } else if (NfcConstants.SMART_MX_ID_TYPE== seId) {
                 seName = "eSE";
             } else {
                 Log.e(TAG,"Wrong SE ID");
             }
             Log.d(TAG, "getDefaultOffHostService: seName = " + seName);
             ArrayList<String> groupDescription = new ArrayList<String>();
-            for (NxpAidGroup nxpAidGroup : apduService.getNxpAidGroups()) {
-                groupDescription.add(nxpAidGroup.getDescription());
+            for (NfcAidGroup nfcAidGroup : apduService.getNfcAidGroups()) {
+                groupDescription.add(nfcAidGroup.getDescription());
             }
 
             callbacks.onGetOffHostService(isLast, apduService.getDescription(), seName, apduService.getBannerId(),
@@ -570,13 +570,13 @@ public class NxpNfcController {
 
     public boolean isStaticOffhostService(int userId, String packageName, NxpOffHostService service) {
         boolean isStatic = false;
-        List<NxpApduServiceInfo> nxpApduServices = new ArrayList<NxpApduServiceInfo>();
+        List<NfcApduServiceInfo> nxpApduServices = new ArrayList<NfcApduServiceInfo>();
 
         try {
             nxpApduServices = mNfcControllerService.getOffHostServices(userId, packageName);
 
             for(int i=0; i< nxpApduServices.size(); i++) {
-                NxpApduServiceInfo sService = nxpApduServices.get(i);
+                NfcApduServiceInfo sService = nxpApduServices.get(i);
                 if(sService.getModifiable() == false && service.getServiceName().compareTo((sService.getResolveInfo()).serviceInfo.name)==0){
                     isStatic = true;
                 }

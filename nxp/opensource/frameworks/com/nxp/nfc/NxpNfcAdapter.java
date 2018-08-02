@@ -281,17 +281,17 @@ public final class NxpNfcAdapter {
                 for(int i=0;i<activeSEList.length;i++)
                 {
                     Log.e(TAG, "getActiveSecureElementList activeSE[i]" + activeSEList[i]);
-                    if(activeSEList[i]==NxpConstants.SMART_MX_ID_TYPE)
+                    if(activeSEList[i]==NfcConstants.SMART_MX_ID_TYPE)
                     {
-                        arr[i]= NxpConstants.SMART_MX_ID;
+                        arr[i]= NfcConstants.SMART_MX_ID;
                     }
-                    else if(activeSEList[i]==NxpConstants.UICC_ID_TYPE)
+                    else if(activeSEList[i]==NfcConstants.UICC_ID_TYPE)
                     {
-                        arr[i]= NxpConstants.UICC_ID;
+                        arr[i]= NfcConstants.UICC_ID;
                     }
-                    else if(activeSEList[i]==NxpConstants.UICC2_ID_TYPE)
+                    else if(activeSEList[i]==NfcConstants.UICC2_ID_TYPE)
                     {
-                        arr[i]= NxpConstants.UICC2_ID;
+                        arr[i]= NfcConstants.UICC2_ID;
                     }
                     else {
                         throw new IOException("No Secure Element Activeted");

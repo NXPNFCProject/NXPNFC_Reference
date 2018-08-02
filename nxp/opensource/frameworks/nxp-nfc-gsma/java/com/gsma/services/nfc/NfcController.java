@@ -363,14 +363,14 @@ public class NfcController {
         }
         return null;
     }
-    private ArrayList<android.nfc.cardemulation.NxpAidGroup> convertToCeAidGroupList(List<com.gsma.services.nfc.AidGroup> mAidGroups) {
-        ArrayList<android.nfc.cardemulation.NxpAidGroup> mApduAidGroupList = new ArrayList<android.nfc.cardemulation.NxpAidGroup>();
-        android.nfc.cardemulation.NxpAidGroup mCeAidGroup = null;
+    private ArrayList<android.nfc.cardemulation.NfcAidGroup> convertToCeAidGroupList(List<com.gsma.services.nfc.AidGroup> mAidGroups) {
+        ArrayList<android.nfc.cardemulation.NfcAidGroup> mApduAidGroupList = new ArrayList<android.nfc.cardemulation.NfcAidGroup>();
+        android.nfc.cardemulation.NfcAidGroup mCeAidGroup = null;
         List<String> aidList = new ArrayList<String>();
         for(com.gsma.services.nfc.AidGroup mGroup : mAidGroups) {
             if(!mGroup.getAidList().isEmpty())
             {
-                mCeAidGroup = new android.nfc.cardemulation.NxpAidGroup(mGroup.getCategory(), mGroup.getDescription());
+                mCeAidGroup = new android.nfc.cardemulation.NfcAidGroup(mGroup.getCategory(), mGroup.getDescription());
                 aidList = mCeAidGroup.getAids();
                 for(String aid :mGroup.getAidList()) {
                     aidList.add(aid);
@@ -381,12 +381,12 @@ public class NfcController {
     return mApduAidGroupList;
     }
     private NxpOffHostService convertToNxpOffhostService(OffHostService service) {
-         ArrayList<android.nfc.cardemulation.NxpAidGroup> mAidGroupList = convertToCeAidGroupList(service.mAidGroupList);
+         ArrayList<android.nfc.cardemulation.NfcAidGroup> mAidGroupList = convertToCeAidGroupList(service.mAidGroupList);
          NxpOffHostService mNxpOffHostService = new NxpOffHostService(service.mUserId,service.mDescription, service.mSEName, service.mPackageName, service.mServiceName, service.mModifiable);
          mNxpOffHostService.setBanner(service.mBanner);
          mNxpOffHostService.setContext(mContext);
          mNxpOffHostService.setBannerId(service.mBannerResId);
-         mNxpOffHostService.mNxpAidGroupList.addAll(mAidGroupList);
+         mNxpOffHostService.mNfcAidGroupList.addAll(mAidGroupList);
          return mNxpOffHostService;
     }
 }
