@@ -63,3 +63,4 @@ This Repo contains any additional information/files required to support the rele
 | aosp-master               |  9.00.03 (SN100x) |  NFC_NCIHALx_AR2000.09.00.03_OpnSrc |
 | android-p-preview 2              |  9.00.06 (SN100x) |  NFC_NCIHALx_AR2000.09.00.06_OpnSrc |
 | android-p-preview 2               |  9.00.07 (SN100x) |  NFC_NCIHALx_AR2000.09.00.07_OpnSrc |
+| android-p-preview 2               |  9.00.0A (SN100x) |  NFC_NCIHALx_AR2000.09.00.0A_OpnSrc |
