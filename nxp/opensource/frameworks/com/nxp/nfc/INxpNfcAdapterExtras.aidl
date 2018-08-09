@@ -27,4 +27,5 @@ interface INxpNfcAdapterExtras {
     int jcopOsDownload(in String pkg);
     boolean reset(in String pkg);
     Bundle getAtr(in String pkg);
+    int accessControlForCOSU (int mode);
 }

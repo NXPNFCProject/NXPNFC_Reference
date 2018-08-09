@@ -1,0 +1,11 @@
+#============= hal_secure_element_default ==============
+allow hal_secure_element_default hal_nfc_default:binder call;
+
+get_prop(hal_secure_element, vendor_secure_element_prop)
+
+allow hal_secure_element_default secure_element_device:chr_file { read write };
+allow hal_secure_element_default vendor_data_file:dir { add_name remove_name write };
+allow hal_secure_element_default vendor_data_file:file { create getattr open unlink write read append };
+
+allow hal_secure_element_default nxpnfc_hwservice:hwservice_manager { find add };
+add_hwservice(hal_secure_element_default, nxpese_hwservice)
