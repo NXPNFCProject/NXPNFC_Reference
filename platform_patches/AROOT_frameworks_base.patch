@@ -1,0 +1,102 @@
+diff --git a/core/java/android/os/Binder.java b/core/java/android/os/Binder.java
+index 5652d6d..95b3a5e 100644
+--- a/core/java/android/os/Binder.java
++++ b/core/java/android/os/Binder.java
+@@ -916,7 +916,7 @@ final class BinderProxy implements IBinder {
+                 Log.v(Binder.TAG, "BinderProxy map growth! bucket size = " + size
+                         + " total = " + totalSize);
+                 mWarnBucketSize += WARN_INCREMENT;
+-                if (Build.IS_DEBUGGABLE && totalSize >= CRASH_AT_SIZE) {
++                /*if (Build.IS_DEBUGGABLE && totalSize >= CRASH_AT_SIZE) {
+                     // Use the number of uncleared entries to determine whether we should
+                     // really report a histogram and crash. We don't want to fundamentally
+                     // change behavior for a debuggable process, so we GC only if we are
+@@ -933,7 +933,7 @@ final class BinderProxy implements IBinder {
+                                 + (totalSize - totalUnclearedSize) + " of " + totalSize
+                                 + " are cleared");
+                     }
+-                }
++                }*/
+             }
+         }
+ 
+diff --git a/core/res/res/values/attrs.xml b/core/res/res/values/attrs.xml
+index 9aca2de..f0b90b1 100644
+--- a/core/res/res/values/attrs.xml
++++ b/core/res/res/values/attrs.xml
+@@ -3615,6 +3615,25 @@
+         <attr name="name" />
+     </declare-styleable>
+ 
++    <!-- Specify one or more <code>apdu-pattern-group</code> elements inside a
++         <code>offhost-apdu-service</code>
++         element to define a group of APDU Pattern that
++         your service can handle.-->
++    <declare-styleable name="ApduPatternGroup">
++        <!-- Short description of what the ApduPatternGroup implements. This attribute is mandatory.-->
++        <attr name="description" />
++    </declare-styleable>
++
++    <!-- Specify one or more <code>apdu-pattern-filter</code> elements inside a
++         <code>apdu-pattern-group</code> element to specify an APDU Pattern
++         your service can handle. -->
++    <declare-styleable name="ApduPatternFilter">
++        <!-- The APDU Pattern Group. This attribute is mandatory. -->
++        <attr name="referenceData" format="string" />
++        <attr name="apduMask" format="string" />
++        <attr name="description" />
++    </declare-styleable>
++
+     <!-- Use <code>host-nfcf-service</code> as the root tag of the XML resource that
+          describes an {@link android.nfc.cardemulation.HostNfcFService} service, which
+          is referenced from its {@link android.nfc.cardemulation.HostNfcFService#SERVICE_META_DATA}
+diff --git a/core/res/res/values/public.xml b/core/res/res/values/public.xml
+index bbd29c5..9ee7bf0 100644
+--- a/core/res/res/values/public.xml
++++ b/core/res/res/values/public.xml
+@@ -2849,7 +2849,8 @@
+     <public type="attr" name="navigationBarDividerColor" id="0x0101056d" />
+ 
+     <public type="string" name="autofill" id="0x0104001a"/>
+-
++    <public type="attr" name="referenceData" id="0x0101056e" />
++    <public type="attr" name="apduMask" id="0x0101056f" />
+   <!-- ===============================================================
+        DO NOT ADD UN-GROUPED ITEMS HERE
+ 
+diff --git a/services/core/java/com/android/server/Watchdog.java b/services/core/java/com/android/server/Watchdog.java
+index 155febd..41ae01b 100644
+--- a/services/core/java/com/android/server/Watchdog.java
++++ b/services/core/java/com/android/server/Watchdog.java
+@@ -113,7 +113,7 @@ public class Watchdog extends Thread {
+ 
+     int mPhonePid;
+     IActivityController mController;
+-    boolean mAllowRestart = true;
++    boolean mAllowRestart = false;
+     final OpenFdMonitor mOpenFdMonitor;
+ 
+     /**
+@@ -309,7 +309,8 @@ public class Watchdog extends Thread {
+ 
+     public void setAllowRestart(boolean allowRestart) {
+         synchronized (this) {
+-            mAllowRestart = allowRestart;
++            //mAllowRestart = allowRestart;
++            mAllowRestart = false;
+         }
+     }
+ 
+diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
+index 7da3adb..658ee3c 100644
+--- a/services/core/java/com/android/server/am/ActivityManagerService.java
++++ b/services/core/java/com/android/server/am/ActivityManagerService.java
+@@ -495,7 +495,7 @@ public class ActivityManagerService extends IActivityManager.Stub
+     /** Control over CPU and battery monitoring */
+     // write battery stats every 30 minutes.
+     static final long BATTERY_STATS_TIME = 30 * 60 * 1000;
+-    static final boolean MONITOR_CPU_USAGE = true;
++    static final boolean MONITOR_CPU_USAGE = false;
+     // don't sample cpu less than every 5 seconds.
+     static final long MONITOR_CPU_MIN_TIME = 5 * 1000;
+     // wait possibly forever for next cpu sample.

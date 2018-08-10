@@ -1,0 +1,586 @@
+diff --git a/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts b/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
+index 5d0981e..d103d94 100644
+--- a/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
++++ b/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
+@@ -24,7 +24,6 @@
+ #include <dt-bindings/interrupt-controller/irq.h>
+ #include "hi3660-drm.dtsi"
+ #include "hi3660-ion.dtsi"
+-#include "hi3660-coresight.dtsi"
+ 
+ / {
+ 	model = "HiKey960";
+@@ -84,16 +83,6 @@
+ 				};
+ 			};
+ 		};
+-		hardware_cfg_argonkey {
+-			overlay_0 {
+-				fragment@0 {
+-					target-path="/soc/spi@ffd68000/argonkey@0";
+-					__overlay__ {
+-						status = "ok";
+-					};
+-				};
+-			};
+-		};
+ 		hardware_cfg_disable_bt {
+ 			overlay_0 {
+ 				fragment@0 {
+@@ -104,16 +93,6 @@
+ 				};
+ 			};
+ 		};
+-		hardware_cfg_disable_wlan {
+-			overlay_0 {
+-				fragment@0 {
+-					target-path="/soc/dwmmc2@ff3ff000";
+-					__overlay__ {
+-						status = "disabled";
+-					};
+-				};
+-			};
+-		};
+ 	};
+ 
+ 	memory@0 {
+@@ -143,12 +122,9 @@
+ 			no-map;
+ 		};
+ 
+-		ramoops: ramoops@20A00000 {
+-			compatible = "ramoops";
++		pstore: pstore@20A00000 {
++			no-map;
+ 			reg = <0x0 0x20A00000 0x0 0x00100000>;  /* pstore/ramoops buffer */
+-			record-size	= <0x00020000>;
+-			console-size	= <0x00020000>;
+-			ftrace-size	= <0x00020000>;
+ 		};
+ 
+ 		hifi-base {
+@@ -186,6 +162,13 @@
+ 		};
+ 	};
+ 
++	ramoops {
++		compatible = "ramoops";
++		memory-region = <&pstore>;
++		record-size	= <0x0 0x00020000>;
++		console-size	= <0x0 0x00020000>;
++		ftrace-size	= <0x0 0x00020000>;
++	};
+ 
+ 	pclk: apb_pclk {
+ 		compatible = "fixed-clock";
+@@ -283,9 +266,9 @@
+ 
+ 			ldo11: LDO11 { /* Low Speed Connector */
+ 				regulator-name = "VOUT11_1V8_2V95";
+-				regulator-min-microvolt = <1750000>;
++				regulator-min-microvolt = <1825000>;
+ 				regulator-max-microvolt = <3300000>;
+-				regulator-always-on;
++                                regulator-always-on;
+ 				regulator-enable-ramp-delay = <240>;
+ 			};
+ 
+@@ -432,48 +415,14 @@
+ 		sensorhub,spi-cs-gpio = <&gpio27 2 0>;
+ 		sensorhub,bl-addr = <0x08000000>;
+ 		sensorhub,kernel-addr = <0x0800C000>;
+-		sensorhub,num-flash-banks = <4>;
+-		sensorhub,flash-banks =		<0 0x08000000 0x04000>,
+-						<3 0x0800C000 0x04000>,
+-						<4 0x08010000 0x10000>,
+-						<5 0x08020000 0x20000>;
+-		sensorhub,shared-addr = <0x08040000>;
+-		sensorhub,num-shared-flash-banks = <2>;
+-		sensorhub,shared-flash-banks =	<6 0x08040000 0x20000>,
+-						<7 0x08060000 0x20000>;
+-
+-		status = "disabled";
+-	};
+-
+-	argonkey@0 {
+-		compatible = "nanohub";
+-		reg = <0>;
+-		spi-max-frequency = <500000>;
+-
+-		sensorhub,irq1-gpio = <&gpio26 0 0>;   /* Gpio_208 -> PA1 */
+-		sensorhub,irq2-gpio = <&gpio6 4 0>;    /* Gpio_052 -> PA3 */
+-		sensorhub,wakeup-gpio = <&gpio2 3 0>;  /* Gpio_019 -> PA0 */
+-		sensorhub,spi-cs-gpio = <&gpio27 2 0>; /* Gpio_218 */
+-		sensorhub,nreset-gpio = <&gpio26 3 0>; /* Gpio_211 -> Nreset */
+-		sensorhub,boot0-gpio = <&gpio5 0 0>;   /* Gpio_040 -> Boot0 */
+-		sensorhub,bl-addr = <0x08000000>;
+-		sensorhub,kernel-addr = <0x0800C000>;
+-		sensorhub,num-flash-banks = <4>;
+-		sensorhub,flash-banks =
+-			<0 0x08000000 0x04000>,
+-			<3 0x0800C000 0x04000>,
+-			<4 0x08010000 0x10000>,
+-			<5 0x08020000 0x20000>;
+ 		sensorhub,shared-addr = <0x08040000>;
+-		sensorhub,num-shared-flash-banks = <6>;
+-		sensorhub,shared-flash-banks =
+-			<6 0x08040000 0x20000>,
+-			<7 0x08060000 0x20000>,
+-			<8 0x08080000 0x20000>,
+-			<9 0x080A0000 0x20000>,
+-			<10 0x080C0000 0x20000>,
+-			<11 0x080E0000 0x20000>;
+-
++		sensorhub,flash-banks = <0 0x08000000 0x04000>,
++					<3 0x0800C000 0x04000>,
++					<4 0x08010000 0x10000>,
++					<5 0x08020000 0x20000>,
++					<6 0x08040000 0x20000>,
++					<7 0x08060000 0x20000>;
++		sensorhub,num-flash-banks = <6>;
+ 		status = "disabled";
+ 	};
+ };
+diff --git a/arch/arm64/boot/dts/hisilicon/hi3660.dtsi b/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
+index c98aade..aa651830 100644
+--- a/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
++++ b/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
+@@ -112,7 +112,11 @@
+ 			reg = <0x0 0x100>;
+ 			enable-method = "psci";
+ 			next-level-cache = <&A73_L2>;
+-			cpu-idle-states = <&CPU_SLEEP &CLUSTER_SLEEP_1>;
++			cpu-idle-states = <
++					&CPU_NAP
++					&CPU_SLEEP
++					&CLUSTER_SLEEP_1
++			>;
+ 			clocks = <&stub_clock HI3660_CLK_STUB_CLUSTER1>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			cooling-min-level = <4>;
+@@ -128,7 +132,11 @@
+ 			reg = <0x0 0x101>;
+ 			enable-method = "psci";
+ 			next-level-cache = <&A73_L2>;
+-			cpu-idle-states = <&CPU_SLEEP &CLUSTER_SLEEP_1>;
++			cpu-idle-states = <
++					&CPU_NAP
++					&CPU_SLEEP
++					&CLUSTER_SLEEP_1
++			>;
+ 			clocks = <&stub_clock HI3660_CLK_STUB_CLUSTER1>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			sched-energy-costs = <&CPU_COST_A72 &CLUSTER_COST_A72>;
+@@ -140,7 +148,11 @@
+ 			reg = <0x0 0x102>;
+ 			enable-method = "psci";
+ 			next-level-cache = <&A73_L2>;
+-			cpu-idle-states = <&CPU_SLEEP &CLUSTER_SLEEP_1>;
++			cpu-idle-states = <
++					&CPU_NAP
++					&CPU_SLEEP
++					&CLUSTER_SLEEP_1
++			>;
+ 			clocks = <&stub_clock HI3660_CLK_STUB_CLUSTER1>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			sched-energy-costs = <&CPU_COST_A72 &CLUSTER_COST_A72>;
+@@ -152,7 +164,11 @@
+ 			reg = <0x0 0x103>;
+ 			enable-method = "psci";
+ 			next-level-cache = <&A73_L2>;
+-			cpu-idle-states = <&CPU_SLEEP &CLUSTER_SLEEP_1>;
++			cpu-idle-states = <
++					&CPU_NAP
++					&CPU_SLEEP
++					&CLUSTER_SLEEP_1
++			>;
+ 			clocks = <&stub_clock HI3660_CLK_STUB_CLUSTER1>;
+ 			operating-points-v2 = <&cluster1_opp>;
+ 			sched-energy-costs = <&CPU_COST_A72 &CLUSTER_COST_A72>;
+@@ -161,6 +177,14 @@
+ 		idle-states {
+ 			entry-method = "psci";
+ 
++			CPU_NAP: cpu-nap {
++				compatible = "arm,idle-state";
++				arm,psci-suspend-param = <0x0000001>;
++				entry-latency-us = <7>;
++				exit-latency-us = <2>;
++				min-residency-us = <15>;
++			};
++
+ 			CPU_SLEEP: cpu-sleep {
+ 				compatible = "arm,idle-state";
+ 				local-timer-stop;
+@@ -430,7 +454,32 @@
+ 			pinctrl-0 = <&i2c0_pmx_func &i2c0_cfg_func>;
+ 			status = "disabled";
+ 		};
++/* NXP i2c0 config
++		i2c0: i2c@ffd71000 {
++			compatible = "snps,designware-i2c";
++			reg = <0x0 0xffd71000 0x0 0x1000>;
++			interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			clock-frequency = <3400000>;
++			clocks = <&crg_ctrl HI3660_CLK_GATE_I2C0>;
++			resets = <&iomcu_rst 0x20 3>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&i2c0_pmx_func &i2c0_cfg_func>;
++			status = "ok";
+ 
++                       pn544: pn544@28 {
++                       compatible = "nxp,pn544";
++                       reg = <0x28>;
++                       //As per Hi960 mapping ex:GPIO208
++                       nxp,pn544-irq = <&gpio26 0 0>;
++                       nxp,pn544-ven = <&gpio26 2 0>;
++                       nxp,pn544-fw-dwnld = <&gpio26 4 0>;
++                       nxp,pn544-iso-pwr-rst = <&gpio6 4 0>;
++                       nxp,pn544-ese-pwr = <&gpio26 1 0>;
++                      };
++		};
++*/
+ 		i2c1: i2c@ffd72000 {
+ 			compatible = "snps,designware-i2c";
+ 			reg = <0x0 0xffd72000 0x0 0x1000>;
+@@ -559,6 +608,32 @@
+ 			status = "disabled";
+ 		};
+ 
++        i2c7: i2c@fdf0b000 {
++            compatible = "snps,designware-i2c";
++            reg = <0x0 0xfdf0b000 0x0 0x1000>;
++            interrupts = <GIC_SPI 314 IRQ_TYPE_LEVEL_HIGH>;
++            #address-cells = <1>;
++            #size-cells = <0>;
++            clock-frequency = <1000000>;
++            clocks = <&crg_ctrl HI3660_CLK_GATE_I2C7>;
++            resets = <&crg_rst 0x60 14>;
++            pinctrl-names = "default";
++            pinctrl-0 = <&i2c7_pmx_func &i2c7_cfg_func>;
++            status = "ok";
++
++                       pn544: pn544@28 {
++                       compatible = "nxp,pn544";
++                       reg = <0x28>;
++                       //As per Hi960 mapping ex:GPIO208
++                       nxp,pn544-irq = <&gpio26 0 0>;
++                       nxp,pn544-ven = <&gpio26 1 0>;
++                       nxp,pn544-fw-dwnld = <&gpio26 2 0>;
++                       nxp,pn544-iso-pwr-rst = <&gpio6 4 0>;
++                       nxp,pn544-ese-pwr = <&gpio26 4 0>;
++                      };
++        };
++
++/*
+ 		i2c7: i2c@fdf0b000 {
+ 			compatible = "snps,designware-i2c";
+ 			reg = <0x0 0xfdf0b000 0x0 0x1000>;
+@@ -572,7 +647,7 @@
+ 			pinctrl-0 = <&i2c7_pmx_func &i2c7_cfg_func>;
+ 			status = "disabled";
+ 		};
+-
++*/
+ 		uart0: serial@fdf02000 {
+ 			compatible = "arm,pl011", "arm,primecell";
+ 			reg = <0x0 0xfdf02000 0x0 0x1000>;
+@@ -1072,11 +1147,23 @@
+ 			pinctrl-0 = <&spi3_pmx_func>;
+ 			num-cs = <1>;
+ 			cs-gpios = <&gpio18 5 0>;
+-			status = "disabled";
++			status = "ok";
++
++            p61@0 {
++                      /*      compatible = "linux,spidev";
++                      //      spi-max-frequency = <500000>;
++                      //      reg = <0>;
++                      //      status = "disabled"; */
++                      compatible = "nxp,p61";
++                      reg = <0>;
++                      nxp,p61-irq = <&gpio2 3 0>;
++                      nxp,p61-rst = <&gpio2 5 0>;
++                      spi-max-frequency = <20000000>;
++                    };
+ 		};
+ 
+ 		pcie@f4000000 {
+-			compatible = "hisilicon,kirin-pcie";
++			compatible = "hisilicon,kirin960-pcie";
+ 			reg = <0x0 0xf4000000 0x0 0x1000>,
+ 			      <0x0 0xff3fe000 0x0 0x1000>,
+ 			      <0x0 0xf3f20000 0x0 0x40000>,
+@@ -1091,8 +1178,6 @@
+ 				  0x0 0x02000000>;
+ 			num-lanes = <1>;
+ 			#interrupt-cells = <1>;
+-			interrupts = <0 283 4>;
+-			interrupt-names = "msi";
+ 			interrupt-map-mask = <0xf800 0 0 7>;
+ 			interrupt-map = <0x0 0 0 1
+ 					 &gic GIC_SPI 282 IRQ_TYPE_LEVEL_HIGH>,
+@@ -1110,30 +1195,7 @@
+ 			clock-names = "pcie_phy_ref", "pcie_aux",
+ 				      "pcie_apb_phy", "pcie_apb_sys",
+ 				      "pcie_aclk";
+-			reset-gpio = <&gpio11 1 0 >;
+-		};
+-
+-		/* vcodec */
+-		vdec {
+-			compatible = "hisi,kirin960-vdec";
+-			reg = <0x0 0xe8800000 0x0 0x20000>;
+-			interrupts = <0 290 4>, <0 291 4>, <0 292 4>, <0 293 4>;
+-			clocks = <&crg_ctrl HI3660_CLK_GATE_VDEC>;
+-			clock-names = "clk_gate_vdec";
+-			dec_clk_rate = <400000000>, <200000000>;
+-			vdec_fpga = <0x1>;
+-			status = "ok";
+-		};
+-
+-		venc {
+-			compatible = "hisi,kirin960-venc";
+-			reg = <0x0 0xe8900000 0x0 0x20000>;
+-			interrupts = <0 298 4>, <0 299 4>;
+-			clocks = <&crg_ctrl HI3660_CLK_GATE_VENC>, <&crg_ctrl HI3660_VENC_VOLT_HOLD>;
+-			clock-names = "clk_gate_venc", "venc_volt_hold";
+-			enc_clk_rate = <645000000>, <534000000>;
+-			venc_fpga = <0x1>;
+-			status = "ok";
++			reset-gpios = <&gpio11 1 0 >;
+ 		};
+ 
+ 		/* SD */
+@@ -1196,10 +1258,9 @@
+ 			status = "disabled";
+ 		};
+ 
+-		tsensor: tsensor@fff30000 {
+-			compatible = "hisilicon,hi3660-tsensor";
++		tsensor: tsensor {
++			compatible = "hisilicon,hi3660-thermal";
+ 			reg = <0x0 0xfff30000 0x0 0x1000>;
+-			interrupts = <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>;
+ 			#thermal-sensor-cells = <1>;
+ 		};
+ 
+@@ -1275,11 +1336,11 @@
+ 
+ 			cls0: cls0 {
+ 				polling-delay = <1000>;
+-				polling-delay-passive = <25>;
+-				sustainable-power = <4000>;
++				polling-delay-passive = <100>;
++				sustainable-power = <4500>;
+ 
+ 				/* sensor ID */
+-				thermal-sensors = <&tsensor 1>;
++				thermal-sensors = <&tsensor 4>;
+ 
+ 				trips {
+ 					threshold: trip-point@0 {
+@@ -1315,23 +1376,14 @@
+ 			};
+ 		};
+ 
+-		hii2s: hisi_i2s {
++		i2s2: hisi_i2s {
+ 			compatible = "hisilicon,hisi-i2s";
+-			reg = <0x0 0xe804f000 0x0 0xc00>,
++			reg = <0x0 0xe804f800 0x0 0x400>,
+ 			      <0x0 0xe804e000 0x0 0x400>;
+ 			pinctrl-names = "default";
+-			pinctrl-0 = <&i2s2_pmx_func &i2s2_cfg_func
+-						&i2s0_pmx_func &i2s0_cfg_func>;
+-			dmas = <&asp_dmac 22 &asp_dmac 23
+-					&asp_dmac 18 &asp_dmac 19>;
+-			dma-names = "rx0", "tx0", "rx2", "tx2";
+-			#sound-dai-cells = <1>;
+-		};
+-
+-		hii2splat: hisi_i2s_plat {
+-			compatible = "hisilicon,hisi-i2s-plat";
+-			dmas = <&asp_dmac 22 &asp_dmac 23>;
+-			dma-names = "rx0", "tx0";
++			pinctrl-0 = <&i2s2_pmx_func &i2s2_cfg_func>;
++			dmas = <&asp_dmac 18 &asp_dmac 19>;
++			dma-names = "rx", "tx";
+ 			#sound-dai-cells = <0>;
+ 		};
+ 
+@@ -1342,7 +1394,7 @@
+ 			dma-channels = <16>;
+ 			dma-requests = <32>;
+ 			dma-min-chan = <0>;
+-			dma-used-chans = <0xFFF0>;
++			dma-used-chans = <0xFFFE>;
+ 			dma-share;
+ 			interrupts = <0 216 4>;
+ 			interrupt-names = "asp_dma_irq";
+@@ -1351,32 +1403,19 @@
+ 
+ 		sound {
+ 			compatible = "simple-audio-card";
+-			simple-audio-card,name = "hikey-sndcard";
++			simple-audio-card,name = "hikey-hdmi";
++			simple-audio-card,format = "i2s";
+ 
+-			simple-audio-card,dai-link@0 {
+-				format = "i2s";
+-				cpu {
+-					sound-dai = <&hii2s 1>;
+-				};
+-				codec {
+-					sound-dai = <&adv7533>;
+-				};
+-			};
++			simple-audio-card,bitclock-master = <&sound_master>;
++			simple-audio-card,frame-master = <&sound_master>;
+ 
+-			simple-audio-card,dai-link@1 {
+-				format = "i2s";
+-				cpu {
+-					sound-dai = <&hii2s 0>;
+-				};
+-				codec {
+-					sound-dai = <&hii2splat>;
+-				};
+-				plat {
+-					sound-dai = <&hii2splat>;
+-				};
++			sound_master: simple-audio-card,cpu {
++				sound-dai = <&i2s2>;
+ 			};
+ 
+-
++			simple-audio-card,codec {
++				sound-dai = <&adv7533>;
++			};
+ 		};
+ 	};
+ };
+diff --git a/drivers/Kconfig b/drivers/Kconfig
+index c08136a..b96c333 100755
+--- a/drivers/Kconfig
++++ b/drivers/Kconfig
+@@ -214,4 +214,6 @@ source "drivers/fpga/Kconfig"
+ 
+ source "drivers/tee/Kconfig"
+ 
++source "drivers/nxp/Kconfig"
++
+ endmenu
+diff --git a/drivers/Makefile b/drivers/Makefile
+index 1f81b25..d8636a9 100755
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -66,7 +66,7 @@ obj-$(CONFIG_FB_INTEL)          += video/fbdev/intelfb/
+ 
+ obj-$(CONFIG_PARPORT)		+= parport/
+ obj-$(CONFIG_NVM)		+= lightnvm/
+-obj-y				+= base/ block/ misc/ mfd/ nfc/
++obj-y				+= base/ block/ misc/ mfd/
+ obj-$(CONFIG_LIBNVDIMM)		+= nvdimm/
+ obj-$(CONFIG_DEV_DAX)		+= dax/
+ obj-$(CONFIG_DMA_SHARED_BUFFER) += dma-buf/
+@@ -179,4 +179,5 @@ obj-$(CONFIG_FPGA)		+= fpga/
+ obj-$(CONFIG_HI_VCODEC_VENC) += vcodec/venc/
+ obj-$(CONFIG_HI_VCODEC_VDEC) += vcodec/vdec/
+ obj-$(CONFIG_TEE)		+= tee/
+-obj-$(CONFIG_HISILICON_PLATFORM)+= hisi/
++obj-$(CONFIG_HISILICON_PLATFORM) += hisi/
++obj-$(CONFIG_NXP_NFC)	        += nxp/
+diff --git a/drivers/i2c/busses/i2c-designware-platdrv.c b/drivers/i2c/busses/i2c-designware-platdrv.c
+index e630d4f..7cbd417 100644
+--- a/drivers/i2c/busses/i2c-designware-platdrv.c
++++ b/drivers/i2c/busses/i2c-designware-platdrv.c
+@@ -234,7 +234,8 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
+ 
+ 	dev->master_cfg = DW_IC_CON_MASTER | DW_IC_CON_SLAVE_DISABLE |
+ 			  DW_IC_CON_RESTART_EN;
+-
++    dev_err(&pdev->dev,
++            "#################################### SPEED freq = %d", dev->clk_freq);
+ 	switch (dev->clk_freq) {
+ 	case 100000:
+ 		dev->master_cfg |= DW_IC_CON_SPEED_STD;
+@@ -279,6 +280,63 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
+ 		pm_runtime_enable(&pdev->dev);
+ 	}
+ 
++	/* Manually configuring I2C controller "high-level and low-level duration (in tick count" count */
++	switch (dev->clk_freq) {
++	case 1000000:
++	/*  target:1Mhz Frequency with i2c0 controller (32Mhz oscillator):
++		cnt = 32Mhz / 1Mhz = 32
++		hcnt + lcnt = 32
++		hcnt ~= lnct = 32/2 ~= 16
++		hcnt = hcnt - Controller specific adjustment
++		lcnt = lcnt - Controller Specific adjustment
++		dev->fp_hcnt = 10;
++        dev->fp_lcnt =  8; */
++
++	/*  target:1Mhz Frequency with i2c1 controller (100Mhz oscillator):
++        cnt = 100Mhz / 1Mhz = 100
++        hcnt + lcnt = 100
++        hcnt ~= lnct = 100/2 ~= 50
++		hcnt = hcnt - Controller specific adjustment
++		lcnt = lcnt - Controller Specific adjustment
++		dev->fp_hcnt = 50;
++        dev->fp_lcnt =  50; */
++        dev->fp_hcnt = 45;
++        dev->fp_lcnt = 43;
++        dev_err(&pdev->dev,
++            "##### Fast mode plus set: freq = %d", dev->clk_freq);
++		break;
++	case 3400000:
++		/*  target:3.4Mhz Frequency with i2c0 controller (32Mhz oscillator):
++		Did not work */
++
++		/*  target:3.4Mhz Frequency with i2c1 controller (100Mhz oscillator):
++		cnt = 106Mhz / 3.4Mhz = ~30
++		hcnt + lcnt = ~30
++		hcnt ~= lnct = 3/2 ~= 15
++		hcnt = hcnt - Controller specific adjustment
++		lcnt = lcnt - Controller Specific adjustment
++		*/
++        dev->hs_hcnt = 9;
++        dev->hs_lcnt = 7;
++        dev_err(&pdev->dev,
++            "##### High speed mode set: freq = %d", dev->clk_freq);
++		break;
++	case 400000:
++		/*  target:400KHz Frequency with i2c1 controller (100Mhz oscillator):
++		cnt = 100Mhz / .4Mhz = 250
++		hcnt + lcnt = 250
++		hcnt ~= lnct = 250/2 ~= 125
++		hcnt = hcnt - Controller specific adjustment
++		lcnt = lcnt - Controller Specific adjustment
++		*/
++		dev->fs_hcnt = 125;
++		dev->fs_lcnt = 123;
++		break;
++	default:
++		dev_err(&pdev->dev,
++            "##### Standard mode set: freq = %d", dev->clk_freq);
++		break;
++	}
+ 	r = i2c_dw_probe(dev);
+ 	if (r)
+ 		goto exit_probe;
+diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
+index 5927da5..aa286db 100644
+--- a/kernel/irq/manage.c
++++ b/kernel/irq/manage.c
+@@ -616,7 +616,7 @@ int irq_set_irq_wake(unsigned int irq, unsigned int on)
+ 		}
+ 	} else {
+ 		if (desc->wake_depth == 0) {
+-			WARN(1, "Unbalanced IRQ %d wake disable\n", irq);
++			WARN(0, "Unbalanced IRQ %d wake disable\n", irq);
+ 		} else if (--desc->wake_depth == 0) {
+ 			ret = set_irq_wake_real(irq, on);
+ 			if (ret)
