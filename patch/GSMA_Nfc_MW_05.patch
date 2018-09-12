@@ -1,0 +1,52 @@
+From 94d8624e000984dbd4700e725855cfa7231b910e Mon Sep 17 00:00:00 2001
+From: Ayush <ayush.raj@nxp.com>
+Date: Mon, 10 Sep 2018 12:33:22 +0530
+Subject: [PATCH 16/19] :[artf607213]GSMA - Event_Transaction action intent is
+ not triggered
+
+---
+ src/com/android/nfc/NfcService.java | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/src/com/android/nfc/NfcService.java b/src/com/android/nfc/NfcService.java
+index 7f62d20..0375b66 100755
+--- a/src/com/android/nfc/NfcService.java
++++ b/src/com/android/nfc/NfcService.java
+@@ -725,6 +725,16 @@ public class NfcService implements DeviceHostListener {
+                 Log.e(TAG, "Failed to register VR mode state listener: " + e);
+             }
+         }
++        mSEService = ISecureElementService.Stub.asInterface(ServiceManager.getService(
++                Context.SECURE_ELEMENT_SERVICE));
++    }
++
++    private boolean isSEServiceAvailable() {
++        if (mSEService == null) {
++            mSEService = ISecureElementService.Stub.asInterface(ServiceManager.getService(
++                    Context.SECURE_ELEMENT_SERVICE));
++        }
++        return (mSEService != null);
+     }
+ 
+     void initSoundPool() {
+@@ -3406,7 +3416,7 @@ public class NfcService implements DeviceHostListener {
+         }
+ 
+         private void sendOffHostTransactionEvent(byte[] aid, byte[] data, byte[] readerByteArray) {
+-            if (mSEService == null || mNfcEventInstalledPackages.isEmpty()) {
++            if (!isSEServiceAvailable() || mNfcEventInstalledPackages.isEmpty()) {
+                 return;
+             }
+ 
+@@ -3446,7 +3456,7 @@ public class NfcService implements DeviceHostListener {
+ 
+         /* Returns the list of packages that have access to NFC Events on any SE */
+         private ArrayList<String> getSEAccessAllowedPackages() {
+-            if (mSEService == null || mNfcEventInstalledPackages.isEmpty()) {
++            if (!isSEServiceAvailable() || mNfcEventInstalledPackages.isEmpty()) {
+                 return null;
+             }
+             String[] readers = null;
+-- 
+2.7.4
+

@@ -1,0 +1,44 @@
+From bbe0579b1afc53721415157015d5f74721359efd Mon Sep 17 00:00:00 2001
+From: Suraj Uday Kotharkar <suraj.uday.kotharkar@nxp.com>
+Date: Fri, 31 Aug 2018 13:05:34 +0530
+Subject: [PATCH 11/19] [artf603722] Prefix AIDs coming from application are
+ getting corrupted while updating in routing table
+
+---
+ src/com/android/nfc/cardemulation/AidRoutingManager.java | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/com/android/nfc/cardemulation/AidRoutingManager.java b/src/com/android/nfc/cardemulation/AidRoutingManager.java
+index d6b9a30..9f27519 100644
+--- a/src/com/android/nfc/cardemulation/AidRoutingManager.java
++++ b/src/com/android/nfc/cardemulation/AidRoutingManager.java
+@@ -292,12 +292,14 @@ public class AidRoutingManager {
+                                 /*
+                                 NfcService.getInstance().routeAids(aid.substring(0,
+                                                 aid.length() - 1), route, infoForAid.get(aid),powerForAid.get(aid)); */
+-                                routeCache.put(aid, aidMap.get(aid));
++                                routeCache.put(aid.substring(0,
++                                                aid.length() - 1), aidMap.get(aid));
+                             } else if (mAidMatchingSupport == AID_MATCHING_EXACT_OR_PREFIX ||
+                               mAidMatchingSupport == AID_MATCHING_EXACT_OR_SUBSET_OR_PREFIX) {
+                                 if (DBG) Log.d(TAG, "Routing prefix AID " + aid + " to route "
+                                         + Integer.toString(route));
+-                                 routeCache.put(aid, aidMap.get(aid));
++                                 routeCache.put(aid.substring(0,
++                                                aid.length() - 1), aidMap.get(aid));
+                                 /*
+                                 NfcService.getInstance().routeAids(aid.substring(0,aid.length() - 1),
+                                         route, infoForAid.get(aid),powerForAid.get(aid));
+@@ -314,7 +316,8 @@ public class AidRoutingManager {
+                             } else if (mAidMatchingSupport == AID_MATCHING_EXACT_OR_SUBSET_OR_PREFIX) {
+                                 if (DBG) Log.d(TAG, "Routing subset AID " + aid + " to route "
+                                         + Integer.toString(route));
+-                                  routeCache.put(aid, aidMap.get(aid));
++                                  routeCache.put(aid.substring(0,
++                                                aid.length() - 1), aidMap.get(aid));
+                                   /*
+                                   NfcService.getInstance().routeAids(aid.substring(0,aid.length() - 1),
+                                           route, infoForAid.get(aid),powerForAid.get(aid));
+-- 
+2.7.4
+

@@ -1,0 +1,27 @@
+From 69475fd498f6e6face60419f40308976e071cb08 Mon Sep 17 00:00:00 2001
+From: Ayush <ayush.raj@nxp.com>
+Date: Thu, 6 Sep 2018 12:02:56 +0530
+Subject: [PATCH 15/19] [artf607226]GSMA getActiveSecurelementList is not
+ retriveing the list properly.
+
+Retrieving of filled array list was wrong.
+---
+ nci/SN100x/jni/SecureElement.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nci/SN100x/jni/SecureElement.cpp b/nci/SN100x/jni/SecureElement.cpp
+index 083cf1d..e60d249 100755
+--- a/nci/SN100x/jni/SecureElement.cpp
++++ b/nci/SN100x/jni/SecureElement.cpp
+@@ -900,7 +900,7 @@ jintArray SecureElement::getActiveSecureElementList (JNIEnv* e)
+ 
+     jintArray list = e->NewIntArray (num_of_nfcee_present); //allocate array
+ 
+-    for(i = 1; i<= num_of_nfcee_present ; i++)
++    for(i = 0; i< num_of_nfcee_present ; i++)
+     {
+         nfcee_handle[i] = mNfceeData_t.mNfceeHandle[i];
+         nfcee_status[i] = mNfceeData_t.mNfceeStatus[i];
+-- 
+2.7.4
+
