@@ -1,0 +1,3 @@
+# secure element subsystem
+#============= secure_element ==============
+allow secure_element nxpese_hwservice:hwservice_manager find;

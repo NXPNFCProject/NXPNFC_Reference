@@ -17,9 +17,11 @@
         <version>1.0</version>
         <interface>
             <name>ISecureElement</name>
+            <instance>eSE1</instance>
             <instance>eSE2</instance>
         </interface>
     </hal>
+    <!-- >
     <hal format="hidl">
         <name>android.hardware.wired_se</name>
         <transport>hwbinder</transport>
@@ -30,7 +32,6 @@
             <instance>default</instance>
         </interface>
     </hal>
-    <!-- >
     <hal format="hidl">
         <name>android.hardware.nfc</name>
         <transport>hwbinder</transport>
@@ -48,18 +49,30 @@
         <transport>hwbinder</transport>
         <impl level="generic"></impl>
         <version>1.0</version>
+        <interface>
+            <name>INxpNfc</name>
+            <instance>default</instance>
+        </interface>
     </hal>
     <hal format="hidl">
         <name>vendor.nxp.nxpese</name>
         <transport>hwbinder</transport>
         <impl level="generic"></impl>
         <version>1.0</version>
+        <interface>
+            <name>INxpEse</name>
+            <instance>default</instance>
+        </interface>
     </hal>
     <hal format="hidl">
         <name>vendor.nxp.nxpwiredse</name>
         <transport>hwbinder</transport>
         <impl level="generic"></impl>
         <version>1.0</version>
+        <interface>
+            <name>INxpWiredSe</name>
+            <instance>default</instance>
+        </interface>
     </hal>
     <sepolicy>
         <version>0.0</version>

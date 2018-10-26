@@ -4,6 +4,7 @@
 
 NXP_NFC_HOST := $(TARGET_PRODUCT)
 NXP_NFC_HW := pn81T
+NXP_RF_REQ := true
 NXP_NFC_PLATFORM := pn8x
 NXP_VENDOR_DIR := nxp
 
@@ -12,14 +13,35 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
     frameworks/native/data/etc/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
-    frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml
+    frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+    vendor/nxp/pn8xt/manifest.xml:vendor/manifest.xml
 
-# NFC config files
+# SE config files
 PRODUCT_COPY_FILES += \
-    vendor/$(NXP_VENDOR_DIR)/pn8xt/hw/$(NXP_NFC_HW)/libnfc-nci.conf:system/etc/libnfc-nci.conf \
-    vendor/$(NXP_VENDOR_DIR)/pn8xt/hw/$(NXP_NFC_HW)/libnfc-nxp.conf:vendor/etc/libnfc-nxp.conf \
-    vendor/$(NXP_VENDOR_DIR)/pn8xt/hw/$(NXP_NFC_HW)/libnfc-nxp_RF.conf:vendor/libnfc-nxp_RF.conf \
-    vendor/$(NXP_VENDOR_DIR)/pn8xt/hw/$(NXP_NFC_HW)/libese-nxp-P73.conf:vendor/etc/libese-nxp.conf
+    hardware/nxp/secure_element/libese-spi/p73/libese-nxp-P73.conf:vendor/etc/libese-nxp.conf
+
+
+ifeq ($(NXP_NFC_HW),pn81T)
+PRODUCT_COPY_FILES += \
+    hardware/nxp/nfc/halimpl/libnfc-nci_NCI2_0.conf:system/etc/libnfc-nci.conf \
+    hardware/nxp/nfc/halimpl/libnfc-nxp-PN81T_example.conf:vendor/etc/libnfc-nxp.conf
+
+    ifeq ($(NXP_RF_REQ),true)
+    PRODUCT_COPY_FILES += \
+        hardware/nxp/nfc/halimpl/libnfc-nxp_RF-PN81T_example.conf:vendor/libnfc-nxp_RF.conf
+    endif
+
+else
+PRODUCT_COPY_FILES += \
+    hardware/nxp/nfc/halimpl/libnfc-nci.conf:system/etc/libnfc-nci.conf
+    hardware/nxp/nfc/halimpl/libnfc-nxp-PN80T_example.conf:vendor/etc/libnfc-nxp.conf \
+
+    ifeq ($(NXP_RF_REQ),true)
+    PRODUCT_COPY_FILES += \
+        hardware/nxp/nfc/halimpl/libnfc-nxp_RF-PN80T_example.conf:vendor/libnfc-nxp_RF.conf
+    endif
+
+endif
 
 # NFC Init Files
 PRODUCT_COPY_FILES += \
