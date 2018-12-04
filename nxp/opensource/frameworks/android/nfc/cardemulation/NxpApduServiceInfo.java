@@ -886,7 +886,7 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
         }
 
         public int setServiceState(String category ,int state) {
-            if(category != CardEmulation.CATEGORY_OTHER) {
+            if(!category.equals(CardEmulation.CATEGORY_OTHER)) {
                 return NxpConstants.SERVICE_STATE_ENABLED;
             }
 
@@ -902,7 +902,7 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
          *        TRUE if the commit was successful
          */
         public void updateServiceCommitStatus(String category ,boolean commitStatus) {
-            if(category != CardEmulation.CATEGORY_OTHER) {
+            if(!category.equals(CardEmulation.CATEGORY_OTHER)) {
                 return;
             }
             Log.d(TAG, "updateServiceCommitStatus:Description:" + mDescription + ":InternalState:" + mServiceState + ":commitStatus:"+ commitStatus);
@@ -942,6 +942,20 @@ public final class NxpApduServiceInfo extends ApduServiceInfo implements Parcela
                     return "UNKNOWN";
             }
         }
+
+        public String getOtherAidGroupDescription(){
+            String otherAidGroupDescription = null;
+            if(mStaticNxpAidGroups.containsKey(CardEmulation.CATEGORY_OTHER))
+                otherAidGroupDescription = mStaticNxpAidGroups.get(CardEmulation.CATEGORY_OTHER).description;
+            else if (mDynamicNxpAidGroups.containsKey(CardEmulation.CATEGORY_OTHER))
+                otherAidGroupDescription = mDynamicNxpAidGroups.get(CardEmulation.CATEGORY_OTHER).description;
+            else
+                Log.e(TAG, "getOtherAidGroupDescription: " + "Aid Group with OTHER category not available");
+
+            Log.d(TAG, "getOtherAidGroupDescription: " + otherAidGroupDescription);
+            return otherAidGroupDescription;
+        }
+
         public void dump(FileDescriptor fd, PrintWriter pw, String[] args) {
             super.dump(fd,pw,args);
             pw.println("    Routing Destination: " + (mOnHost ? "host" : "secure element"));

@@ -31,6 +31,7 @@ import java.io.IOException;
 import android.os.UserHandle;
 import android.os.RemoteException;
 import com.nxp.nfc.gsma.internal.INxpNfcController;
+import java.util.List;
 
 import android.util.Log;
 
@@ -277,6 +278,70 @@ public final class NxpNfcAdapter {
     }
 
     /**
+     * Set listen mode routing table configuration for MifareCLTRouteSet.
+     * routeLoc is parameter which fetch the text from UI and compare
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     *
+     * @throws IOException If a failure occurred during Mifare CLT Route set.
+     */
+    public void MifareCLTRouteSet(String routeLoc, boolean fullPower, boolean lowPower, boolean noPower )
+            throws IOException {
+        try {
+            int seID=0;
+            boolean result = false;
+            if (routeLoc.equals(NxpConstants.UICC_ID)) {
+            seID = NxpConstants.UICC_ID_TYPE;
+            } else if (routeLoc.equals(NxpConstants.UICC2_ID)) {
+            seID= NxpConstants.UICC2_ID_TYPE;
+            } else if (routeLoc.equals(NxpConstants.SMART_MX_ID)) {
+            seID= NxpConstants.SMART_MX_ID_TYPE;
+            } else if (routeLoc.equals(NxpConstants.HOST_ID)) {
+            seID = NxpConstants.HOST_ID_TYPE;
+            } else {
+                Log.e(TAG, "confMifareCLT: wrong default route ID");
+                throw new IOException("confMifareCLT failed: Wrong default route ID");
+            }
+            sNxpService.MifareCLTRouteSet(seID, fullPower, lowPower, noPower);
+        } catch (RemoteException e) {
+            Log.e(TAG, "confMifareCLT failed", e);
+            attemptDeadServiceRecovery(e);
+            throw new IOException("confMifareCLT failed");
+        }
+    }
+
+    /**
+     * Set listen mode routing table configuration for Mifare Desfire Route.
+     * routeLoc is parameter which fetch the text from UI and compare
+     * <p>Requires {@link android.Manifest.permission#NFC} permission.
+     *
+     * @throws IOException If a failure occurred during Mifare Desfire Route set.
+     */
+    public void MifareDesfireRouteSet(String routeLoc, boolean fullPower, boolean lowPower, boolean noPower)
+            throws IOException {
+        try{
+            int seID=0;
+            boolean result = false;
+            if (routeLoc.equals(NxpConstants.UICC_ID)) {
+            seID = NxpConstants.UICC_ID_TYPE;
+            } else if (routeLoc.equals(NxpConstants.UICC2_ID)) {
+            seID= NxpConstants.UICC2_ID_TYPE;
+            } else if (routeLoc.equals(NxpConstants.SMART_MX_ID)) {
+            seID= NxpConstants.SMART_MX_ID_TYPE;
+            } else if (routeLoc.equals(NxpConstants.HOST_ID)) {
+                seID = NxpConstants.HOST_ID_TYPE;
+            } else {
+                Log.e(TAG, "confMifareDesfireProtoRoute: wrong default route ID");
+                throw new IOException("confMifareProtoRoute failed: Wrong default route ID");
+            }
+            Log.i(TAG, "calling Services");
+            sNxpService.MifareDesfireRouteSet(seID, fullPower, lowPower, noPower);
+            } catch (RemoteException e) {
+            Log.e(TAG, "confMifareDesfireProtoRoute failed", e);
+            attemptDeadServiceRecovery(e);
+            throw new IOException("confMifareDesfireProtoRoute failed");
+            }
+    }
+    /**
      * This api returns the CATEGORY_OTHER (non Payment)Services registered by the user
      * along with the size of the registered aid group.
      * This api has to be called when aid routing full intent is broadcast by the system.
@@ -292,12 +357,11 @@ public final class NxpNfcAdapter {
      * </ul>
      * @param UserID  The user id of current user
      * @param category The category i.e. CATEGORY_PAYMENT , CATEGORY_OTHER
-     * @return The hashMap of Component Name of Non Payment Services and size of the
-     *         registered aid group
+     * @return The List of NxpAidServiceInfo objects
      */
-    public Map<String, Integer> getServicesAidCacheSize (int UserID , String category) throws IOException{
+    public List<NxpAidServiceInfo> getServicesAidInfo (int UserID , String category) throws IOException{
         try {
-            return sNxpService.getServicesAidCacheSize(UserID ,category);
+            return sNxpService.getServicesAidInfo(UserID ,category);
         }catch(RemoteException e)
         {
             e.printStackTrace();

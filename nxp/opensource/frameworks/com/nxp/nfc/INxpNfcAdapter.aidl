@@ -17,6 +17,7 @@ package com.nxp.nfc;
 
 import com.nxp.nfc.INfcVzw;
 import com.nxp.nfc.gsma.internal.INxpNfcController;
+import com.nxp.nfc.NxpAidServiceInfo;
 
 /**
  * @hide
@@ -27,8 +28,10 @@ interface INxpNfcAdapter
     INxpNfcController getNxpNfcControllerInterface();
     int setEmvCoPollProfile(boolean enable, int route);
     void DefaultRouteSet(int routeLoc, boolean fullPower, boolean lowPower, boolean noPower);
+    void MifareDesfireRouteSet(int routeLoc, boolean fullPower, boolean lowPower, boolean noPower);
+    void MifareCLTRouteSet(int routeLoc, boolean fullPower, boolean lowPower, boolean noPower);
     byte[]  getFWVersion();
-    Map getServicesAidCacheSize(int userId, String category);
+    List<NxpAidServiceInfo> getServicesAidInfo(int userId, String category);
     int getMaxAidRoutingTableSize();
     int getCommittedAidRoutingTableSize();
     int[] getActiveSecureElementList(String pkg);
