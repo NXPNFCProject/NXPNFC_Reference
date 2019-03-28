@@ -2,6 +2,7 @@
 /dev/pn54x             u:object_r:nfc_device:s0
 /data/nfc(/.*)?        u:object_r:nfc_data_file:s0
 /data/vendor/nfc(/.*)? u:object_r:nfc_vendor_data_file:s0
+/data/vendor/secure_element(/.*)? u:object_r:secure_element_vendor_data_file:s0
 /dev/pn553             u:object_r:nfc_device:s0
 /dev/p73               u:object_r:secure_element_device:s0
 
