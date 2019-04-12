@@ -11,9 +11,11 @@ NXP_VENDOR_DIR := nxp
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
     frameworks/native/data/etc/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
+    frameworks/native/data/etc/android.hardware.nfc.ese.xml:system/etc/permissions/android.hardware.nfc.ese.xml \
+    frameworks/native/data/etc/android.hardware.nfc.uicc.xml:system/etc/permissions/android.hardware.nfc.uicc.xml \
+    frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    vendor/$(NXP_VENDOR_DIR)/frameworks/nxp-nfc-gsma/com.gsma.services.nfc.xml:system/etc/permissions/com.gsma.services.nfc.xml
 
 # NFC config files
 PRODUCT_COPY_FILES += \
@@ -37,8 +39,8 @@ PRODUCT_PACKAGES += \
     nfc_nci.$(NXP_NFC_PLATFORM) \
 
 PRODUCT_PACKAGES += \
-	android.hardware.nfc@1.1-service \
-	android.hardware.secure_element@1.0-service \
+	android.hardware.nfc@1.2-service \
+	android.hardware.secure_element@1.1-service \
 	android.hardware.wired_se@1.0-service \
 
 ifeq ($(ENABLE_TREBLE), true)
