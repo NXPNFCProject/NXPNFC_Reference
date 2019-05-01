@@ -47,3 +47,7 @@ This Repo contains any additional information/files required to support the rele
 | android-p-preview 2               |  9.00.16 (SN100x) |  NFC_NCIHALx_AR2000.09.00.16_OpnSrc |
 | android-p-preview 2               |  9.00.17 (SN100x) |  NFC_NCIHALx_AR2000.09.00.17_OpnSrc |
 | android-p-preview 2               |  9.00.18 (SN100x) |  NFC_NCIHALx_AR2000.09.00.18_OpnSrc |
+| android-p-preview 2               |  9.00.19 (SN100x) |  NFC_NCIHALx_AR2000.09.00.19_OpnSrc |
+
+
+
