@@ -6,10 +6,16 @@ get_prop(hal_secure_element, vendor_secure_element_prop)
 allow hal_secure_element_default secure_element_device:chr_file { read write };
 allow hal_secure_element_default vendor_data_file:dir { add_name remove_name write };
 allow hal_secure_element_default vendor_data_file:file { create getattr open unlink write read append };
+#=========================================================
+#allow hal_secure_element_default nfc_data_file:dir search;
+allow hal_secure_element_default nfc_vendor_data_file:dir { add_name read write search remove_name};
+allow hal_secure_element_default nfc_vendor_data_file:file { append getattr open create read write unlink};
+#=========================================================
 
 allow hal_secure_element_default nxpnfc_hwservice:hwservice_manager { find add };
+allow hal_secure_element_default nxpese_hwservice:hwservice_manager { find add };
 allow hal_secure_element_default nfc_vendor_data_file:dir search;
 allow hal_secure_element_default secure_element_vendor_data_file:dir { search write add_name remove_name };
 allow hal_secure_element_default secure_element_vendor_data_file:file { create read open getattr unlink write setattr append };
 allow hal_secure_element_default nfc_vendor_data_file:file { read open getattr unlink write setattr};
-add_hwservice(hal_secure_element_default, nxpese_hwservice)
+#add_hwservice(hal_secure_element_default, nxpese_hwservice)

@@ -1,9 +1,11 @@
 #============= hal_nfc_default ==============
 allow hal_nfc_default hal_secure_element_default:binder call;
+allow hal_nfc_default hal_trusted_se_default:binder { call };
 
 allow hal_nfc_default nxpese_hwservice:hwservice_manager find;
-allow hal_nfc_default nxpnfc_hwservice:hwservice_manager add;
+allow hal_nfc_default nxpnfc_hwservice:hwservice_manager { find add };
 allow hal_nfc_default hal_wired_se_hwservice:hwservice_manager find;
+allow hal_nfc_default hal_trusted_se_hwservice:hwservice_manager find;
 #allow hal_nfc_default nxpwiredse_hwservice:hwservice_manager find;
 
 allow hal_nfc_default nfc_device:chr_file { read write };

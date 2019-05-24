@@ -42,6 +42,7 @@ PRODUCT_PACKAGES += \
 	android.hardware.nfc@1.2-service \
 	android.hardware.secure_element@1.1-service \
 	android.hardware.wired_se@1.0-service \
+    android.hardware.trusted_se@1.1-service\
 
 ifeq ($(ENABLE_TREBLE), true)
 PRODUCT_PACKAGES += \
@@ -57,3 +58,4 @@ BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SN100x/sepolicy \
                        vendor/$(NXP_VENDOR_DIR)/SN100x/sepolicy/nfc \
                        vendor/$(NXP_VENDOR_DIR)/SN100x/sepolicy/se \
                        vendor/$(NXP_VENDOR_DIR)/SN100x/sepolicy/wiredse \
+                       vendor/$(NXP_VENDOR_DIR)/SN100x/sepolicy/trustedse \

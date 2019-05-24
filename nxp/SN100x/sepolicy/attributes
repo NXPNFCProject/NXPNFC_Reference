@@ -1,3 +1,7 @@
 attribute hal_wired_se_client;
 attribute hal_wired_se_server;
 attribute hal_wired_se;
+
+attribute hal_trusted_se_client;
+attribute hal_trusted_se_server;
+attribute hal_trusted_se;
