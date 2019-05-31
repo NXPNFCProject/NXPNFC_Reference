@@ -1,0 +1,43 @@
+diff --git a/core/res/res/values/attrs.xml b/core/res/res/values/attrs.xml
+index b4d74af..3943794 100644
+--- a/core/res/res/values/attrs.xml
++++ b/core/res/res/values/attrs.xml
+@@ -3726,6 +3726,25 @@
+         <attr name="name" />
+     </declare-styleable>
+ 
++    <!-- Specify one or more <code>apdu-pattern-group</code> elements inside a
++         <code>offhost-apdu-service</code>
++         element to define a group of APDU Pattern that
++         your service can handle.-->
++    <declare-styleable name="ApduPatternGroup">
++        <!-- Short description of what the ApduPatternGroup implements. This attribute is mandatory.-->
++        <attr name="description" />
++    </declare-styleable>
++
++    <!-- Specify one or more <code>apdu-pattern-filter</code> elements inside a
++         <code>apdu-pattern-group</code> element to specify an APDU Pattern
++         your service can handle. -->
++    <declare-styleable name="ApduPatternFilter">
++        <!-- The APDU Pattern Group. This attribute is mandatory. -->
++        <attr name="referenceData" format="string" />
++        <attr name="apduMask" format="string" />
++        <attr name="description" />
++    </declare-styleable>
++
+     <!-- Use <code>host-nfcf-service</code> as the root tag of the XML resource that
+          describes an {@link android.nfc.cardemulation.HostNfcFService} service, which
+          is referenced from its {@link android.nfc.cardemulation.HostNfcFService#SERVICE_META_DATA}
+
+diff --git a/core/res/res/values/public.xml b/core/res/res/values/public.xml
+index 48ba067..f4cb2e2 100644
+--- a/core/res/res/values/public.xml
++++ b/core/res/res/values/public.xml
+@@ -2919,6 +2919,8 @@
+     <public-group type="string" first-id="0x0104001b">
+     </public-group>
+
++    <public type="attr" name="secureElementName" id="0x01010587" />
++
+   <!-- ===============================================================
+        DO NOT ADD UN-GROUPED ITEMS HERE
