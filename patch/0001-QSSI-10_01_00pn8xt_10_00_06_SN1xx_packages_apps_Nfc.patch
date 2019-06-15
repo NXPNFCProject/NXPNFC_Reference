@@ -1,0 +1,106 @@
+diff --git a/nci/jni/NativeNfcManager.cpp b/nci/jni/NativeNfcManager.cpp
+index 0c2991a..b5eaeeb 100755
+--- a/nci/jni/NativeNfcManager.cpp
++++ b/nci/jni/NativeNfcManager.cpp
+@@ -183,6 +183,7 @@ bool nfcManager_isTransanctionOnGoing(bool isInstallRequest);
+ bool nfcManager_isRequestPending(void);
+ static jboolean nfcManager_doPartialInitForEseCosUpdate(JNIEnv* e, jobject o);
+ static jboolean nfcManager_doPartialDeinitForEseCosUpdate(JNIEnv* e, jobject o);
++static void nfcManager_doResonantFrequency(JNIEnv* e, jobject o, jboolean modeOn);
+ extern tNFA_STATUS enableSWPInterface();
+ extern tNFA_STATUS NxpNfc_Send_CoreResetInit_Cmd(void);
+ extern tNFA_STATUS SendAGCDebugCommand();
+@@ -4619,6 +4620,8 @@ static void restartUiccListen(jint uiccSlot) {
+      (void*)nfcManager_getDefaultFelicaCLTPowerState},
+     {"getDefaultFelicaCLTRoute", "()I",
+      (void*)nfcManager_getDefaultFelicaCLTRoute},
++    {"doResonantFrequency", "(Z)V",
++              (void *)nfcManager_doResonantFrequency},
+ #endif
+     {"commitRouting", "()Z", (void*)nfcManager_doCommitRouting},
+     {"doGetActiveSecureElementList", "()[I",
+@@ -7042,6 +7045,19 @@ static jboolean nfcManager_doPartialDeinitForEseCosUpdate(JNIEnv* e, jobject o)
+   return true;
+ }
+ 
++/*******************************************************************************
++ **
++ ** Function:        nfcManager_doResonantFrequency
++ **
++ ** Description:     factory mode to measure resonance frequency
++ **
++ ** Returns:         void
++ **
++ *******************************************************************************/
++static void nfcManager_doResonantFrequency(JNIEnv* e, jobject o,
++                                               jboolean modeOn) {
++  /*Nothing to be done. dummy Funtion to support SSI*/
++}
+ #endif
+ 
+   /*******************************************************************************
+diff --git a/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java b/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java
+index 1d6ad62..37b4342 100755
+--- a/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java
++++ b/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java
+@@ -176,7 +176,7 @@ public class NativeNfcManager implements DeviceHost {
+     public boolean setRoutingEntry(int type, int value, int route, int power) {
+         return(doSetRoutingEntry(type, value, route, power));
+     }
+-    
++
+     @Override
+     public native boolean routeAid(byte[] aid, int route, int aidInfo, int powerState);
+ 
+@@ -186,7 +186,7 @@ public class NativeNfcManager implements DeviceHost {
+ 
+     @Override
+     public native boolean routeApduPattern(int route, int powerState, byte[] apduData, byte[] apduMask);
+-    
++
+     @Override
+     public native int getAidTableSize();
+ 
+@@ -203,6 +203,9 @@ public class NativeNfcManager implements DeviceHost {
+     public native int   getDefaultFelicaCLTRoute();
+ 
+     @Override
++    public native void doResonantFrequency(boolean isResonantFreq);
++
++    @Override
+     public native int   getDefaultAidPowerState();
+ 
+     @Override
+diff --git a/src/com/android/nfc/DeviceHost.java b/src/com/android/nfc/DeviceHost.java
+index 631f0b9..8ab53a4 100755
+--- a/src/com/android/nfc/DeviceHost.java
++++ b/src/com/android/nfc/DeviceHost.java
+@@ -247,6 +247,8 @@ public interface DeviceHost {
+ 
+     public int getDefaultFelicaCLTRoute();
+ 
++    public void doResonantFrequency(boolean isResonantFreq);
++
+     public int getDefaultAidPowerState();
+ 
+     public int getDefaultDesfirePowerState();
+diff --git a/src/com/android/nfc/NfcService.java b/src/com/android/nfc/NfcService.java
+index 8d3b047..44f694d 100755
+--- a/src/com/android/nfc/NfcService.java
++++ b/src/com/android/nfc/NfcService.java
+@@ -1148,6 +1148,15 @@ public class NfcService implements DeviceHostListener {
+             return true;
+         }
+ 
++       public void resonantFrequency(int isResonantFreq)
++       {
++            Log.d(TAG, "resonantFrequency");
++            if(0x00 != isResonantFreq)
++                mDeviceHost.doResonantFrequency(true);
++            else
++                mDeviceHost.doResonantFrequency(false);
++       }
++
+         @Override
+         public boolean disable(boolean saveState) throws RemoteException {
+           NfcPermissions.enforceAdminPermissions(mContext);
