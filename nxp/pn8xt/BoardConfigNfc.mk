@@ -19,7 +19,4 @@ BOARD_KERNEL_CMDLINE += video=HDMI-A-1:1280x800@60
 
 DEVICE_MANIFEST_FILE += vendor/nxp/pn8xt/manifest.xml
 
-#PRODUCT_SHIPPING_API_LEVEL indicates the first api level, this feature is based on.
-PRODUCT_SHIPPING_API_LEVEL := 25
-
 -include vendor/nxp/$(LOCAL_STEM)
