@@ -1,0 +1,188 @@
+From 7d1af2ebe31eb4fa218331ef44f3393474823929 Mon Sep 17 00:00:00 2001
+From: Ayush Raj <ayush.raj@nxp.com>
+Date: Wed, 12 Jun 2019 15:33:13 +0530
+Subject: [PATCH] [artf666292][NFC ON/OFF]: Fix for I2C write recovery.
+
+a. Removed timed window where early response for command sent from HAL was causing response timeout.
+b. I2C write recovery is corrected.
+---
+ SN100x/halimpl/hal/phNxpNciHal.cc              | 28 +++++++++++++++++++-------
+ SN100x/halimpl/hal/phNxpNciHal.h               |  5 ++++-
+ SN100x/halimpl/hal/phNxpNciHal_NfcDepSWPrio.cc | 17 +++++++++-------
+ SN100x/halimpl/hal/phNxpNciHal_ext.cc          |  4 +---
+ 4 files changed, 36 insertions(+), 18 deletions(-)
+
+diff --git a/SN100x/halimpl/hal/phNxpNciHal.cc b/SN100x/halimpl/hal/phNxpNciHal.cc
+index fcd1c4d..d904d86 100755
+--- a/SN100x/halimpl/hal/phNxpNciHal.cc
++++ b/SN100x/halimpl/hal/phNxpNciHal.cc
+@@ -687,12 +687,13 @@ init_retry:
+     NXPLOG_NCIHAL_E("NCI_CORE_RESET: Failed");
+     if (init_retry_cnt < 3) {
+       init_retry_cnt++;
+-      (void)phNxpNciHal_power_cycle();
+       goto init_retry;
+     } else if(init_retry_cnt < MAX_RETRY_COUNT) {
+           NXPLOG_NCIHAL_E("invlaid core reset rsp received. Trying Force FW download");
++          (void)phNxpNciHal_power_cycle();
+           goto force_download;
+-      } else init_retry_cnt = 0;
++    } else
++      init_retry_cnt = 0;
+     wConfigStatus = phTmlNfc_Shutdown_CleanUp();
+     wConfigStatus = NFCSTATUS_FAILED;
+     goto clean_and_return;
+@@ -713,12 +714,21 @@ init_retry:
+       }
+     }
+   }
+-  if (status != NFCSTATUS_SUCCESS) {
+-    NXPLOG_NCIHAL_E("NCI_CORE_INIT : Failed");
++  if ((status != NFCSTATUS_SUCCESS) &&
++      (nxpncihal_ctrl.retry_cnt >= MAX_RETRY_COUNT)) {
++    NXPLOG_NCIHAL_E("Force FW Download, NFCC not coming out from Standby");
++    wConfigStatus = NFCSTATUS_FAILED;
++    goto force_download;
++  } else if (status != NFCSTATUS_SUCCESS) {
++    NXPLOG_NCIHAL_E("NCI_CORE_INIT: Failed");
+     if (init_retry_cnt < 3) {
+       init_retry_cnt++;
+-      (void)phNxpNciHal_power_cycle();
+       goto init_retry;
++    } else if (init_retry_cnt < MAX_RETRY_COUNT) {
++      NXPLOG_NCIHAL_E(
++          "invlaid core init rsp received. Trying Force FW download");
++      (void)phNxpNciHal_power_cycle();
++      goto force_download;
+     } else
+       init_retry_cnt = 0;
+     wConfigStatus = phTmlNfc_Shutdown_CleanUp();
+@@ -1022,7 +1032,7 @@ int phNxpNciHal_write(uint16_t data_len, const uint8_t* p_data) {
+ 
+   CONCURRENCY_LOCK();
+   data_len = phNxpNciHal_write_unlocked(nxpncihal_ctrl.cmd_len,
+-                                        nxpncihal_ctrl.p_cmd_data);
++                                        nxpncihal_ctrl.p_cmd_data, ORIG_LIBNFC);
+   CONCURRENCY_UNLOCK();
+ 
+   if (nfcFL.chipType != sn100u && icode_send_eof == 1) {
+@@ -1050,7 +1060,8 @@ clean_and_return:
+  * Returns          It returns number of bytes successfully written to NFCC.
+  *
+  ******************************************************************************/
+-int phNxpNciHal_write_unlocked(uint16_t data_len, const uint8_t* p_data) {
++int phNxpNciHal_write_unlocked(uint16_t data_len, const uint8_t *p_data,
++                               int origin) {
+   NFCSTATUS status = NFCSTATUS_INVALID_PARAMETER;
+   phNxpNciHal_Sem_t cb_data;
+   nxpncihal_ctrl.retry_cnt = 0;
+@@ -1076,6 +1087,9 @@ int phNxpNciHal_write_unlocked(uint16_t data_len, const uint8_t* p_data) {
+     goto clean_and_return;
+   }
+ 
++  if (origin == ORIG_NXPHAL)
++    HAL_ENABLE_EXT();
++
+ retry:
+ 
+   data_len = nxpncihal_ctrl.cmd_len;
+diff --git a/SN100x/halimpl/hal/phNxpNciHal.h b/SN100x/halimpl/hal/phNxpNciHal.h
+index baa3713..a6f8b5a 100755
+--- a/SN100x/halimpl/hal/phNxpNciHal.h
++++ b/SN100x/halimpl/hal/phNxpNciHal.h
+@@ -68,6 +68,8 @@ typedef void(phNxpNciHal_control_granted_callback_t)();
+ #if (NXP_EXTNS == TRUE)
+ /* GID: Group Identifier (byte 0) */
+ #define NCI_GID_MASK                 0x0F
++#define ORIG_NXPHAL 0x01
++#define ORIG_LIBNFC 0x02
+ #endif
+ #define NXP_PROPCMD_GID              0x2F
+ #define NXP_FLUSH_SRAM_AO_TO_FLASH   0x21
+@@ -272,7 +274,8 @@ int phNxpNciHal_check_ncicmd_write_window(uint16_t cmd_len, uint8_t* p_cmd);
+ void phNxpNciHal_request_control(void);
+ void phNxpNciHal_release_control(void);
+ NFCSTATUS phNxpNciHal_send_get_cfgs();
+-int phNxpNciHal_write_unlocked(uint16_t data_len, const uint8_t* p_data);
++int phNxpNciHal_write_unlocked(uint16_t data_len, const uint8_t *p_data,
++                               int origin);
+ NFCSTATUS request_EEPROM(phNxpNci_EEPROM_info_t* mEEPROM_info);
+ NFCSTATUS phNxpNciHal_send_nfcee_pwr_cntl_cmd(uint8_t type);
+ /*******************************************************************************
+diff --git a/SN100x/halimpl/hal/phNxpNciHal_NfcDepSWPrio.cc b/SN100x/halimpl/hal/phNxpNciHal_NfcDepSWPrio.cc
+index b3fde71..9bf5a5b 100644
+--- a/SN100x/halimpl/hal/phNxpNciHal_NfcDepSWPrio.cc
++++ b/SN100x/halimpl/hal/phNxpNciHal_NfcDepSWPrio.cc
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2012-2018 NXP Semiconductors
++ * Copyright (C) 2012-2019 NXP Semiconductors
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -419,7 +419,8 @@ void* tmp_thread(void* tmp) {
+   switch (*((int*)tmp)) {
+     case START_POLLING: {
+       CONCURRENCY_LOCK();
+-      data_len = phNxpNciHal_write_unlocked(cmd_poll_len, cmd_poll);
++      data_len =
++          phNxpNciHal_write_unlocked(cmd_poll_len, cmd_poll, ORIG_NXPHAL);
+       CONCURRENCY_UNLOCK();
+ 
+       if (data_len != cmd_poll_len) {
+@@ -430,8 +431,9 @@ void* tmp_thread(void* tmp) {
+ 
+     case RESUME_POLLING: {
+       CONCURRENCY_LOCK();
+-      data_len = phNxpNciHal_write_unlocked(sizeof(cmd_resume_rf_discovery),
+-                                            cmd_resume_rf_discovery);
++      data_len =
++          phNxpNciHal_write_unlocked(sizeof(cmd_resume_rf_discovery),
++                                     cmd_resume_rf_discovery, ORIG_NXPHAL);
+       CONCURRENCY_UNLOCK();
+ 
+       if (data_len != sizeof(cmd_resume_rf_discovery)) {
+@@ -443,7 +445,7 @@ void* tmp_thread(void* tmp) {
+     case STOP_POLLING: {
+       CONCURRENCY_LOCK();
+       data_len = phNxpNciHal_write_unlocked(sizeof(cmd_stop_rf_discovery),
+-                                            cmd_stop_rf_discovery);
++                                            cmd_stop_rf_discovery, ORIG_NXPHAL);
+       CONCURRENCY_UNLOCK();
+ 
+       if (data_len != sizeof(cmd_stop_rf_discovery)) {
+@@ -454,8 +456,9 @@ void* tmp_thread(void* tmp) {
+ 
+     case DISCOVER_SELECT: {
+       CONCURRENCY_LOCK();
+-      data_len = phNxpNciHal_write_unlocked(sizeof(cmd_select_rf_discovery),
+-                                            cmd_select_rf_discovery);
++      data_len =
++          phNxpNciHal_write_unlocked(sizeof(cmd_select_rf_discovery),
++                                     cmd_select_rf_discovery, ORIG_NXPHAL);
+       CONCURRENCY_UNLOCK();
+ 
+       if (data_len != sizeof(cmd_resume_rf_discovery)) {
+diff --git a/SN100x/halimpl/hal/phNxpNciHal_ext.cc b/SN100x/halimpl/hal/phNxpNciHal_ext.cc
+index 09740a8..01e2ee6 100755
+--- a/SN100x/halimpl/hal/phNxpNciHal_ext.cc
++++ b/SN100x/halimpl/hal/phNxpNciHal_ext.cc
+@@ -544,14 +544,12 @@ static NFCSTATUS phNxpNciHal_process_ext_cmd_rsp(uint16_t cmd_len,
+   nxpncihal_ctrl.ext_cb_data.status = NFCSTATUS_SUCCESS;
+ 
+   /* Send ext command */
+-  data_written = phNxpNciHal_write_unlocked(cmd_len, p_cmd);
++  data_written = phNxpNciHal_write_unlocked(cmd_len, p_cmd, ORIG_NXPHAL);
+   if (data_written != cmd_len) {
+     NXPLOG_NCIHAL_D("phNxpNciHal_write failed for hal ext");
+     goto clean_and_return;
+   }
+ 
+-  HAL_ENABLE_EXT();
+-
+   /* Start timer */
+   status = phOsalNfc_Timer_Start(timeoutTimerId, HAL_EXTNS_WRITE_RSP_TIMEOUT,
+                                  &hal_extns_write_rsp_timeout_cb, NULL);
+-- 
+2.7.4
+
