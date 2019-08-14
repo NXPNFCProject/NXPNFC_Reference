@@ -16,6 +16,8 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
+    vendor/nxp/frameworks/com.nxp.nfc.xml:system/etc/permissions/com.nxp.nfc.xml \
+    vendor/nxp/SN100x/manifest.xml:vendor/manifest.xml
 
 # NFC config files
 PRODUCT_COPY_FILES += \
