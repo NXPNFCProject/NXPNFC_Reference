@@ -1,8 +1,8 @@
-diff --git a/core/java/android/os/Binder.java b/core/java/android/os/Binder.java
-index 5652d6d..95b3a5e 100644
---- a/core/java/android/os/Binder.java
-+++ b/core/java/android/os/Binder.java
-@@ -916,7 +916,7 @@ final class BinderProxy implements IBinder {
+diff --git a/core/java/android/os/BinderProxy.java b/core/java/android/os/BinderProxy.java
+index c35b05f..56d8ff6 100644
+--- a/core/java/android/os/BinderProxy.java
++++ b/core/java/android/os/BinderProxy.java
+@@ -213,7 +213,7 @@ public final class BinderProxy implements IBinder {
                  Log.v(Binder.TAG, "BinderProxy map growth! bucket size = " + size
                          + " total = " + totalSize);
                  mWarnBucketSize += WARN_INCREMENT;
@@ -11,7 +11,7 @@ index 5652d6d..95b3a5e 100644
                      // Use the number of uncleared entries to determine whether we should
                      // really report a histogram and crash. We don't want to fundamentally
                      // change behavior for a debuggable process, so we GC only if we are
-@@ -933,7 +933,7 @@ final class BinderProxy implements IBinder {
+@@ -231,7 +231,7 @@ public final class BinderProxy implements IBinder {
                                  + (totalSize - totalUnclearedSize) + " of " + totalSize
                                  + " are cleared");
                      }
@@ -20,55 +20,65 @@ index 5652d6d..95b3a5e 100644
              }
          }
  
-diff --git a/core/res/res/values/attrs.xml b/core/res/res/values/attrs.xml
-index 9aca2de..f0b90b1 100644
---- a/core/res/res/values/attrs.xml
-+++ b/core/res/res/values/attrs.xml
-@@ -3615,6 +3615,25 @@
-         <attr name="name" />
-     </declare-styleable>
- 
-+    <!-- Specify one or more <code>apdu-pattern-group</code> elements inside a
-+         <code>offhost-apdu-service</code>
-+         element to define a group of APDU Pattern that
-+         your service can handle.-->
-+    <declare-styleable name="ApduPatternGroup">
-+        <!-- Short description of what the ApduPatternGroup implements. This attribute is mandatory.-->
-+        <attr name="description" />
-+    </declare-styleable>
-+
-+    <!-- Specify one or more <code>apdu-pattern-filter</code> elements inside a
-+         <code>apdu-pattern-group</code> element to specify an APDU Pattern
-+         your service can handle. -->
-+    <declare-styleable name="ApduPatternFilter">
-+        <!-- The APDU Pattern Group. This attribute is mandatory. -->
-+        <attr name="referenceData" format="string" />
-+        <attr name="apduMask" format="string" />
-+        <attr name="description" />
-+    </declare-styleable>
-+
-     <!-- Use <code>host-nfcf-service</code> as the root tag of the XML resource that
-          describes an {@link android.nfc.cardemulation.HostNfcFService} service, which
-          is referenced from its {@link android.nfc.cardemulation.HostNfcFService#SERVICE_META_DATA}
-diff --git a/core/res/res/values/public.xml b/core/res/res/values/public.xml
-index bbd29c5..9ee7bf0 100644
---- a/core/res/res/values/public.xml
-+++ b/core/res/res/values/public.xml
-@@ -2849,7 +2849,8 @@
-     <public type="attr" name="navigationBarDividerColor" id="0x0101056d" />
- 
-     <public type="string" name="autofill" id="0x0104001a"/>
+diff --git a/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk b/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk
+deleted file mode 100644
+index cc2d8d2..0000000
+--- a/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk
++++ /dev/null
+@@ -1,48 +0,0 @@
+-# Copyright (C) 2014 The Android Open Source Project
+-#
+-# Licensed under the Apache License, Version 2.0 (the "License");
+-# you may not use this file except in compliance with the License.
+-# You may obtain a copy of the License at
+-#
+-#      http://www.apache.org/licenses/LICENSE-2.0
+-#
+-# Unless required by applicable law or agreed to in writing, software
+-# distributed under the License is distributed on an "AS IS" BASIS,
+-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-# See the License for the specific language governing permissions and
+-# limitations under the License.
 -
-+    <public type="attr" name="referenceData" id="0x0101056e" />
-+    <public type="attr" name="apduMask" id="0x0101056f" />
-   <!-- ===============================================================
-        DO NOT ADD UN-GROUPED ITEMS HERE
- 
+-LOCAL_PATH:= $(call my-dir)
+-
+-
+-## The application with a minimal main dex
+-include $(CLEAR_VARS)
+-
+-LOCAL_STATIC_JAVA_LIBRARIES := android-support-multidex android-support-multidex-instrumentation androidx.test.rules
+-LOCAL_MODULE_TAGS := tests
+-
+-LOCAL_SRC_FILES := $(call all-java-files-under, src)
+-
+-LOCAL_SDK_VERSION := 8
+-
+-LOCAL_PACKAGE_NAME := MultiDexLegacyAndException
+-
+-LOCAL_DEX_PREOPT := false
+-
+-LOCAL_JAVACFLAGS := -nowarn
+-
+-mainDexList:= \
+-    $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME),$(LOCAL_IS_HOST_MODULE),common)/maindex.list
+-
+-LOCAL_DX_FLAGS := --multi-dex --main-dex-list=$(mainDexList) --minimal-main-dex
+-
+-LOCAL_MIN_SDK_VERSION := 8
+-
+-include $(BUILD_PACKAGE)
+-
+-$(mainDexList): $(full_classes_pre_proguard_jar) $(MAINDEXCLASSES) $(PROGUARD_DEPS)
+-	$(hide) mkdir -p $(dir $@)
+-	PROGUARD_HOME=$(PROGUARD_HOME) $(MAINDEXCLASSES) $< 1>$@
+-	echo "com/android/multidexlegacyandexception/Test.class" >> $@
+-
+-$(built_dex_intermediate): $(mainDexList)
 diff --git a/services/core/java/com/android/server/Watchdog.java b/services/core/java/com/android/server/Watchdog.java
-index 155febd..41ae01b 100644
+index 454941c..1eb1eb3 100644
 --- a/services/core/java/com/android/server/Watchdog.java
 +++ b/services/core/java/com/android/server/Watchdog.java
-@@ -113,7 +113,7 @@ public class Watchdog extends Thread {
+@@ -130,7 +130,7 @@ public class Watchdog extends Thread {
  
      int mPhonePid;
      IActivityController mController;
@@ -77,21 +87,19 @@ index 155febd..41ae01b 100644
      final OpenFdMonitor mOpenFdMonitor;
  
      /**
-@@ -309,7 +309,8 @@ public class Watchdog extends Thread {
- 
+@@ -372,6 +372,7 @@ public class Watchdog extends Thread {
      public void setAllowRestart(boolean allowRestart) {
          synchronized (this) {
--            mAllowRestart = allowRestart;
-+            //mAllowRestart = allowRestart;
+             mAllowRestart = allowRestart;
 +            mAllowRestart = false;
          }
      }
  
 diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
-index 7da3adb..658ee3c 100644
+index d07ec48..508c820 100644
 --- a/services/core/java/com/android/server/am/ActivityManagerService.java
 +++ b/services/core/java/com/android/server/am/ActivityManagerService.java
-@@ -495,7 +495,7 @@ public class ActivityManagerService extends IActivityManager.Stub
+@@ -438,7 +438,7 @@ public class ActivityManagerService extends IActivityManager.Stub
      /** Control over CPU and battery monitoring */
      // write battery stats every 30 minutes.
      static final long BATTERY_STATS_TIME = 30 * 60 * 1000;
