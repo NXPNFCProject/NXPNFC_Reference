@@ -1,5 +1,5 @@
 diff --git a/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts b/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
-index 5d0981e..d103d94 100644
+index 05a88f3..24e18ff 100644
 --- a/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
 +++ b/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
 @@ -24,7 +24,6 @@
@@ -10,7 +10,7 @@ index 5d0981e..d103d94 100644
  
  / {
  	model = "HiKey960";
-@@ -84,16 +83,6 @@
+@@ -68,16 +67,6 @@
  				};
  			};
  		};
@@ -27,7 +27,7 @@ index 5d0981e..d103d94 100644
  		hardware_cfg_disable_bt {
  			overlay_0 {
  				fragment@0 {
-@@ -104,16 +93,6 @@
+@@ -88,16 +77,6 @@
  				};
  			};
  		};
@@ -41,10 +41,10 @@ index 5d0981e..d103d94 100644
 -				};
 -			};
 -		};
- 	};
- 
- 	memory@0 {
-@@ -143,12 +122,9 @@
+ 		hardware_cfg_enable_android_fstab {
+ 			overlay_0 {
+ 				fragment@0 {
+@@ -154,12 +133,9 @@
  			no-map;
  		};
  
@@ -59,7 +59,7 @@ index 5d0981e..d103d94 100644
  		};
  
  		hifi-base {
-@@ -186,6 +162,13 @@
+@@ -197,6 +173,13 @@
  		};
  	};
  
@@ -73,7 +73,7 @@ index 5d0981e..d103d94 100644
  
  	pclk: apb_pclk {
  		compatible = "fixed-clock";
-@@ -283,9 +266,9 @@
+@@ -294,9 +277,9 @@
  
  			ldo11: LDO11 { /* Low Speed Connector */
  				regulator-name = "VOUT11_1V8_2V95";
@@ -85,7 +85,7 @@ index 5d0981e..d103d94 100644
  				regulator-enable-ramp-delay = <240>;
  			};
  
-@@ -432,48 +415,14 @@
+@@ -466,48 +449,14 @@
  		sensorhub,spi-cs-gpio = <&gpio27 2 0>;
  		sensorhub,bl-addr = <0x08000000>;
  		sensorhub,kernel-addr = <0x0800C000>;
@@ -142,7 +142,7 @@ index 5d0981e..d103d94 100644
  	};
  };
 diff --git a/arch/arm64/boot/dts/hisilicon/hi3660.dtsi b/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
-index c98aade..03f256c 100644
+index d66f34f..db51a9f 100644
 --- a/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
 +++ b/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
 @@ -112,7 +112,11 @@
@@ -287,7 +287,15 @@ index c98aade..03f256c 100644
  		uart0: serial@fdf02000 {
  			compatible = "arm,pl011", "arm,primecell";
  			reg = <0x0 0xfdf02000 0x0 0x1000>;
-@@ -1072,11 +1147,23 @@
+@@ -686,6 +761,7 @@
+ 			#dma-cells = <1>;
+ 			dma-channels = <16>;
+ 			dma-requests = <32>;
++			dma-used-chans = <0xFFFE>;
+ 			interrupts = <GIC_SPI 216 IRQ_TYPE_LEVEL_HIGH>;
+ 			interrupt-names = "asp_dma_irq";
+ 		};
+@@ -1105,11 +1181,24 @@
  			pinctrl-0 = <&spi3_pmx_func>;
  			num-cs = <1>;
  			cs-gpios = <&gpio18 5 0>;
@@ -303,6 +311,7 @@ index c98aade..03f256c 100644
 +                      reg = <0>;
 +                      nxp,p61-irq = <&gpio2 3 0>;
 +                      nxp,p61-rst = <&gpio2 5 0>;
++                      nxp,trusted-se = <&gpio26 4 0>;
 +                      spi-max-frequency = <20000000>;
 +                    };
  		};
@@ -313,7 +322,7 @@ index c98aade..03f256c 100644
  			reg = <0x0 0xf4000000 0x0 0x1000>,
  			      <0x0 0xff3fe000 0x0 0x1000>,
  			      <0x0 0xf3f20000 0x0 0x40000>,
-@@ -1091,8 +1178,6 @@
+@@ -1124,8 +1213,6 @@
  				  0x0 0x02000000>;
  			num-lanes = <1>;
  			#interrupt-cells = <1>;
@@ -322,7 +331,7 @@ index c98aade..03f256c 100644
  			interrupt-map-mask = <0xf800 0 0 7>;
  			interrupt-map = <0x0 0 0 1
  					 &gic GIC_SPI 282 IRQ_TYPE_LEVEL_HIGH>,
-@@ -1110,30 +1195,7 @@
+@@ -1143,30 +1230,7 @@
  			clock-names = "pcie_phy_ref", "pcie_aux",
  				      "pcie_apb_phy", "pcie_apb_sys",
  				      "pcie_aclk";
@@ -354,7 +363,7 @@ index c98aade..03f256c 100644
  		};
  
  		/* SD */
-@@ -1196,10 +1258,9 @@
+@@ -1229,10 +1293,9 @@
  			status = "disabled";
  		};
  
@@ -367,7 +376,7 @@ index c98aade..03f256c 100644
  			#thermal-sensor-cells = <1>;
  		};
  
-@@ -1275,11 +1336,11 @@
+@@ -1308,11 +1371,11 @@
  
  			cls0: cls0 {
  				polling-delay = <1000>;
@@ -382,7 +391,7 @@ index c98aade..03f256c 100644
  
  				trips {
  					threshold: trip-point@0 {
-@@ -1315,23 +1376,14 @@
+@@ -1348,54 +1411,32 @@
  			};
  		};
  
@@ -410,17 +419,6 @@ index c98aade..03f256c 100644
 +			dma-names = "rx", "tx";
  			#sound-dai-cells = <0>;
  		};
- 
-@@ -1342,7 +1394,7 @@
- 			dma-channels = <16>;
- 			dma-requests = <32>;
- 			dma-min-chan = <0>;
--			dma-used-chans = <0xFFF0>;
-+			dma-used-chans = <0xFFFE>;
- 			dma-share;
- 			interrupts = <0 216 4>;
- 			interrupt-names = "asp_dma_irq";
-@@ -1351,32 +1403,19 @@
  
  		sound {
  			compatible = "simple-audio-card";
@@ -572,7 +570,7 @@ index e630d4f..7cbd417 100644
  	if (r)
  		goto exit_probe;
 diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index 5927da5..aa286db 100644
+index cf94460..dd16268 100644
 --- a/kernel/irq/manage.c
 +++ b/kernel/irq/manage.c
 @@ -616,7 +616,7 @@ int irq_set_irq_wake(unsigned int irq, unsigned int on)

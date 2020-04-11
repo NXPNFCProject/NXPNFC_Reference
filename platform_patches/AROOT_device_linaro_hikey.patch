@@ -1,17 +1,33 @@
 diff --git a/hikey960.mk b/hikey960.mk
-index 1b9799b..a1ba4dc 100644
+index 232150b..fd48117 100644
 --- a/hikey960.mk
 +++ b/hikey960.mk
-@@ -16,6 +16,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
+@@ -1,5 +1,5 @@
+ ifndef TARGET_KERNEL_USE
+-TARGET_KERNEL_USE=4.14
++TARGET_KERNEL_USE=4.9
+ endif
+ TARGET_PREBUILT_KERNEL := device/linaro/hikey-kernel/Image.gz-dtb-hikey960-$(TARGET_KERNEL_USE)
+ TARGET_PREBUILT_DTB := device/linaro/hikey-kernel/hi3660-hikey960.dtb-$(TARGET_KERNEL_USE)
+@@ -22,6 +22,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
  $(call inherit-product, device/linaro/hikey/hikey960/device-hikey960.mk)
  $(call inherit-product, device/linaro/hikey/device-common.mk)
  $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
 +$(call inherit-product, vendor/nxp/SN100x/device-nfc.mk)
  
+ #setup dm-verity configs
+ PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/soc/ff3b0000.ufs/by-name/system
+@@ -31,6 +32,8 @@ PRODUCT_SUPPORTS_BOOT_SIGNER := false
+ PRODUCT_SUPPORTS_VERITY_FEC := false
+ 
+ PRODUCT_PROPERTY_OVERRIDES += ro.opengles.version=196608
++PRODUCT_PROPERTY_OVERRIDES += ro.product.first_api_level=28
++PRODUCT_PROPERTY_OVERRIDES += ro.config.low_ram=false
+ 
  #
  # Overrides
 diff --git a/hikey960/BoardConfig.mk b/hikey960/BoardConfig.mk
-index 122fc67..30c6f57 100644
+index d382d42..3f4d61a 100644
 --- a/hikey960/BoardConfig.mk
 +++ b/hikey960/BoardConfig.mk
 @@ -1,4 +1,5 @@
@@ -20,3 +36,14 @@ index 122fc67..30c6f57 100644
  
  TARGET_BOOTLOADER_BOARD_NAME := hikey960
  TARGET_BOARD_PLATFORM := hikey960
+diff --git a/hikey960/init.hikey960.rc b/hikey960/init.hikey960.rc
+index b767134..bf2f7c4 100644
+--- a/hikey960/init.hikey960.rc
++++ b/hikey960/init.hikey960.rc
+@@ -3,4 +3,5 @@ import init.common.rc
+ on post-fs
+     # Set supported opengles version
+     setprop ro.hardware.hwcomposer drm_hikey960
+-
++    setprop ro.hardware.hwcomposer drm
++    setprop ro.boot.hardware.sku "hikey960"
