@@ -63,7 +63,7 @@ PRODUCT_PACKAGES += \
 
 PRODUCT_PACKAGES += \
 	android.hardware.nfc@1.2-service \
-	android.hardware.secure_element@1.1-service \
+	android.hardware.secure_element@1.2-service \
 	android.hardware.wired_se@1.0-service \
 
 ifeq ($(ENABLE_TREBLE), true)

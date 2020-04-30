@@ -8,5 +8,6 @@ allow hal_wired_se_default secure_element_device:chr_file rw_file_perms;
 allow hal_wired_se_default hal_wired_se_hwservice:hwservice_manager add ;
 allow hal_wired_se_default hal_secure_element_hwservice:hwservice_manager add;
 allow hal_wired_se_default nfc_vendor_data_file:dir search;
+allow hal_wired_se_default hal_wired_se_hwservice:hwservice_manager find;
 
 init_daemon_domain(hal_wired_se_default)
