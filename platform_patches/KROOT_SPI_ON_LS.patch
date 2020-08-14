@@ -1,5 +1,5 @@
 diff --git a/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts b/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
-index 5c8cbd73..c981818 100644
+index 5c8cbd7382e2..c981818643cf 100644
 --- a/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
 +++ b/arch/arm64/boot/dts/hisilicon/hi3660-hikey960.dts
 @@ -202,8 +202,9 @@
@@ -14,7 +14,7 @@ index 5c8cbd73..c981818 100644
  			};
  
 diff --git a/arch/arm64/boot/dts/hisilicon/hi3660.dtsi b/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
-index 80334e5..f88b37a8 100644
+index 80334e50064d..cbb0e050012a 100644
 --- a/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
 +++ b/arch/arm64/boot/dts/hisilicon/hi3660.dtsi
 @@ -475,12 +475,22 @@
@@ -35,15 +35,19 @@ index 80334e5..f88b37a8 100644
 +				//As per Hi960 mapping ex:GPIO208
 +				nxp,pn544-irq = <&gpio26 0 0>;
 +				nxp,pn544-ven = <&gpio26 1 0>;
-+				nxp,pn544-fw-dwnld = <&gpio26 2 0>;
++                                nxp,pn544-fw-dwnld = <&gpio26 2 0>;
 +				nxp,pn544-iso-pwr-rst = <&gpio6 4 0>;
 +				nxp,pn544-ese-pwr = <&gpio26 4 0>;
 +			};
  		};
  
  		uart0: serial@fdf02000 {
-@@ -1000,7 +1010,16 @@
- 			pinctrl-0 = <&spi2_pmx_func>;
+@@ -997,10 +1007,19 @@
+ 			clocks = <&crg_ctrl HI3660_CLK_GATE_SPI2>;
+ 			clock-names = "apb_pclk";
+ 			pinctrl-names = "default";
+-			pinctrl-0 = <&spi2_pmx_func>;
++			pinctrl-0 = <&spi2_pmx_func &spi2_cfg_func>;
  			num-cs = <1>;
  			cs-gpios = <&gpio27 2 0>;
 -			status = "disabled";
@@ -60,11 +64,37 @@ index 80334e5..f88b37a8 100644
  		};
  
  		spi3: spi@ff3b3000 {
+diff --git a/arch/arm64/boot/dts/hisilicon/hikey960-pinctrl.dtsi b/arch/arm64/boot/dts/hisilicon/hikey960-pinctrl.dtsi
+index d11efc81958c..2980adced30f 100644
+--- a/arch/arm64/boot/dts/hisilicon/hikey960-pinctrl.dtsi
++++ b/arch/arm64/boot/dts/hisilicon/hikey960-pinctrl.dtsi
+@@ -1031,7 +1031,7 @@
+ 					PULL_UP
+ 				>;
+ 				pinctrl-single,drive-strength = <
+-					DRIVE7_02MA DRIVE6_MASK
++					DRIVE7_04MA DRIVE6_MASK
+ 				>;
+ 			};
+ 
+diff --git a/arch/arm64/configs/hikey960_defconfig b/arch/arm64/configs/hikey960_defconfig
+index 52c5d51d2e8b..4dc7b31fc564 100644
+--- a/arch/arm64/configs/hikey960_defconfig
++++ b/arch/arm64/configs/hikey960_defconfig
+@@ -596,3 +596,8 @@ CONFIG_CORESIGHT=y
+ CONFIG_CORESIGHT_LINK_AND_SINK_TMC=y
+ CONFIG_CORESIGHT_SINK_TPIU=y
+ CONFIG_CORESIGHT_SOURCE_ETM4X=y
++CONFIG_NXP_NFC=y
++CONFIG_NXP_PN80T=y
++CONFIG_NFC_PN553_DEVICES=y
++CONFIG_NXP_P73_DEVICES=y
++CONFIG_SUSPEND=n
 diff --git a/drivers/Kconfig b/drivers/Kconfig
-index ef7084b..ac2a2d1 100644
+index ff09d476655a..f33a44d17813 100644
 --- a/drivers/Kconfig
 +++ b/drivers/Kconfig
-@@ -222,4 +222,6 @@ source "drivers/siox/Kconfig"
+@@ -224,4 +224,6 @@ source "drivers/siox/Kconfig"
  source "drivers/slimbus/Kconfig"
  
  source "drivers/energy_model/Kconfig"
@@ -72,7 +102,7 @@ index ef7084b..ac2a2d1 100644
 +source "drivers/nxp/Kconfig"
  endmenu
 diff --git a/drivers/Makefile b/drivers/Makefile
-index 1e847e2..b65e1f5 100644
+index 1e847e29661c..ee005942f2b5 100644
 --- a/drivers/Makefile
 +++ b/drivers/Makefile
 @@ -69,7 +69,7 @@ obj-$(CONFIG_FB_INTEL)          += video/fbdev/intelfb/
@@ -88,12 +118,81 @@ index 1e847e2..b65e1f5 100644
  obj-$(CONFIG_UNISYS_VISORBUS)	+= visorbus/
  obj-$(CONFIG_SIOX)		+= siox/
  obj-$(CONFIG_GNSS)		+= gnss/
-+obj-$(CONFIG_NXP_NFC)            += nxp/
++obj-y			        += nxp/
+diff --git a/drivers/i2c/busses/i2c-designware-platdrv.c b/drivers/i2c/busses/i2c-designware-platdrv.c
+index b5750fd85125..ae996853b475 100644
+--- a/drivers/i2c/busses/i2c-designware-platdrv.c
++++ b/drivers/i2c/busses/i2c-designware-platdrv.c
+@@ -353,6 +353,64 @@ static int dw_i2c_plat_probe(struct platform_device *pdev)
+ 
+ 	pm_runtime_enable(&pdev->dev);
+ 
++       /* Manually configuring I2C controller "high-level and low-level duration (in tick count" count */
++       switch (t->bus_freq_hz) {
++       case 1000000:
++       /*  target:1Mhz Frequency with i2c0 controller (32Mhz oscillator):
++               cnt = 32Mhz / 1Mhz = 32
++               hcnt + lcnt = 32
++               hcnt ~= lnct = 32/2 ~= 16
++               hcnt = hcnt - Controller specific adjustment
++               lcnt = lcnt - Controller Specific adjustment
++               dev->fp_hcnt = 10;
++			   dev->fp_lcnt =  8; */
++
++       /*  target:1Mhz Frequency with i2c1 controller (100Mhz oscillator):
++        cnt = 100Mhz / 1Mhz = 100
++        hcnt + lcnt = 100
++        hcnt ~= lnct = 100/2 ~= 50
++               hcnt = hcnt - Controller specific adjustment
++               lcnt = lcnt - Controller Specific adjustment
++               dev->fp_hcnt = 50;
++        dev->fp_lcnt =  50; */
++        dev->fp_hcnt = 45;
++        dev->fp_lcnt = 43;
++        dev_err(&pdev->dev,
++            "##### Fast mode plus set: freq = %d", t->bus_freq_hz);
++               break;
++       case 3400000:
++               /*  target:3.4Mhz Frequency with i2c0 controller (32Mhz oscillator):
++               Did not work */
++
++               /*  target:3.4Mhz Frequency with i2c1 controller (100Mhz oscillator):
++               cnt = 106Mhz / 3.4Mhz = ~30
++               hcnt + lcnt = ~30
++               hcnt ~= lnct = 3/2 ~= 15
++               hcnt = hcnt - Controller specific adjustment
++               lcnt = lcnt - Controller Specific adjustment
++               */
++        dev->hs_hcnt = 8;
++        dev->hs_lcnt = 8;
++        dev_err(&pdev->dev,
++           "##### High speed mode set: freq = %d", t->bus_freq_hz);
++               break;
++       case 400000:
++               /*  target:400KHz Frequency with i2c1 controller (100Mhz oscillator):
++               cnt = 100Mhz / .4Mhz = 250
++               hcnt + lcnt = 250
++               hcnt ~= lnct = 250/2 ~= 125
++               hcnt = hcnt - Controller specific adjustment
++               lcnt = lcnt - Controller Specific adjustment
++               */
++               dev->fs_hcnt = 125;
++               dev->fs_lcnt = 123;
++               break;
++       default:
++               dev_err(&pdev->dev,
++            "##### Standard mode set: freq = %d", t->bus_freq_hz);
++               break;
++       }
++
+ 	if (dev->mode == DW_IC_SLAVE)
+ 		ret = i2c_dw_probe_slave(dev);
+ 	else
 diff --git a/drivers/usb/dwc3/core.c b/drivers/usb/dwc3/core.c
-index 68c9c91..1c90d9b 100644
+index 5e33fd4f7a7d..f5c9130747ba 100644
 --- a/drivers/usb/dwc3/core.c
 +++ b/drivers/usb/dwc3/core.c
-@@ -1814,8 +1814,7 @@ static int dwc3_runtime_idle(struct device *dev)
+@@ -1822,8 +1822,7 @@ static int dwc3_runtime_idle(struct device *dev)
  }
  #endif /* CONFIG_PM */
  
@@ -103,7 +202,7 @@ index 68c9c91..1c90d9b 100644
  {
  	struct dwc3	*dwc = dev_get_drvdata(dev);
  	int		ret;
-@@ -1829,7 +1828,7 @@ static int dwc3_suspend(struct device *dev)
+@@ -1837,7 +1836,7 @@ static int dwc3_suspend(struct device *dev)
  	return 0;
  }
  
@@ -112,7 +211,7 @@ index 68c9c91..1c90d9b 100644
  {
  	struct dwc3	*dwc = dev_get_drvdata(dev);
  	int		ret;
-@@ -1847,7 +1846,7 @@ static int dwc3_resume(struct device *dev)
+@@ -1855,7 +1854,7 @@ static int dwc3_resume(struct device *dev)
  	return 0;
  }
  
@@ -121,7 +220,7 @@ index 68c9c91..1c90d9b 100644
  {
  	struct dwc3	*dwc = dev_get_drvdata(dev);
  	u32		reg;
-@@ -1860,11 +1859,12 @@ static void dwc3_complete(struct device *dev)
+@@ -1868,11 +1867,12 @@ static void dwc3_complete(struct device *dev)
  		dwc3_writel(dwc->regs, DWC3_GUCTL3, reg);
  	}
  }
@@ -136,10 +235,10 @@ index 68c9c91..1c90d9b 100644
  			dwc3_runtime_idle)
  };
 diff --git a/kernel/irq/manage.c b/kernel/irq/manage.c
-index 23bcfa7..fc59c18 100644
+index ad295ba00b0d..c1f183e3cc81 100644
 --- a/kernel/irq/manage.c
 +++ b/kernel/irq/manage.c
-@@ -685,7 +685,7 @@ int irq_set_irq_wake(unsigned int irq, unsigned int on)
+@@ -679,7 +679,7 @@ int irq_set_irq_wake(unsigned int irq, unsigned int on)
  		}
  	} else {
  		if (desc->wake_depth == 0) {

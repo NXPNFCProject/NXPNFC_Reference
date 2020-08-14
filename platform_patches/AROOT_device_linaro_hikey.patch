@@ -1,5 +1,5 @@
 diff --git a/hikey960.mk b/hikey960.mk
-index 2e338e9..033049d 100644
+index 7a31e095..5f4c6323 100644
 --- a/hikey960.mk
 +++ b/hikey960.mk
 @@ -11,7 +11,7 @@ else
@@ -29,7 +29,7 @@ index 2e338e9..033049d 100644
  #
  # Overrides
 diff --git a/hikey960/BoardConfig.mk b/hikey960/BoardConfig.mk
-index 3cd7a63..e2078bf 100644
+index 3cd7a632..4244a677 100644
 --- a/hikey960/BoardConfig.mk
 +++ b/hikey960/BoardConfig.mk
 @@ -1,4 +1,5 @@
@@ -38,3 +38,49 @@ index 3cd7a63..e2078bf 100644
  
  TARGET_BOOTLOADER_BOARD_NAME := hikey960
  TARGET_BOARD_PLATFORM := hikey960
+@@ -11,6 +12,7 @@ TARGET_NO_DTIMAGE := false
+ BOARD_KERNEL_CMDLINE := androidboot.hardware=hikey960 firmware_class.path=/vendor/firmware efi=noruntime init=/init
+ BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/ff3b0000.ufs
+ BOARD_KERNEL_CMDLINE += loglevel=15
++BOARD_KERNEL_CMDLINE += video=HDMI-A-1:1024x768@60e
+ 
+ ifeq ($(TARGET_BUILTIN_EDID), true)
+ BOARD_KERNEL_CMDLINE += drm_kms_helper.edid_firmware=edid/1920x1080.bin
+diff --git a/hikey960/fstab.hikey960 b/hikey960/fstab.hikey960
+index 86970040..c26130d9 100644
+--- a/hikey960/fstab.hikey960
++++ b/hikey960/fstab.hikey960
+@@ -8,6 +8,8 @@
+ #/dev/block/platform/soc/ff3b0000.ufs/by-name/userdata    /data      ext4    discard,noauto_da_alloc,data=ordered,user_xattr,barrier=1    wait
+ /dev/block/by-name/userdata    /data      f2fs    discard,noatime,nosuid,nodev                                 wait,check,fileencryption=software,quota
+ /dev/block/by-name/userdata    /data      ext4    discard,noatime,nosuid,nodev,noauto_da_alloc,data=ordered,user_xattr,barrier=1,inlinecrypt    wait,formattable,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized
++/dev/block/by-name/system /system ext4 ro,errors=panic wait,first_stage_mount
++/dev/block/by-name/vendor /vendor ext4 ro,errors=panic wait,first_stage_mount
+ /devices/platform/soc/ff37f000.dwmmc1/mmc_host/mmc*      auto       auto    defaults    voldmanaged=sdcard1:auto,encryptable=userdata
+ /devices/platform/soc/ff200000.hisi_usb/ff100000.dwc3/xhci-hcd.*.auto/usb*               auto               auto      defaults  voldmanaged=usbdisk:auto,encryptable=userdata
+ /devices/platform/soc/f4000000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0/nvme/nvme*      auto       auto    defaults    voldmanaged=nvmedisk:auto,encryptable=userdata
+diff --git a/hikey960/init.hikey960.rc b/hikey960/init.hikey960.rc
+index b7671340..40cd619d 100644
+--- a/hikey960/init.hikey960.rc
++++ b/hikey960/init.hikey960.rc
+@@ -2,5 +2,6 @@ import init.common.rc
+ 
+ on post-fs
+     # Set supported opengles version
+-    setprop ro.hardware.hwcomposer drm_hikey960
++    setprop ro.hardware.hwcomposer drm
++    setprop ro.boot.hardware.sku "hikey960"
+ 
+diff --git a/ueventd.common.rc b/ueventd.common.rc
+index 7f37c25c..88879509 100644
+--- a/ueventd.common.rc
++++ b/ueventd.common.rc
+@@ -21,6 +21,8 @@ subsystem usbmisc
+ /dev/dma_heap/system	0666 system graphics
+ /dev/dma_heap/linux,cma	0666 system graphics
+ /dev/graphics/fb0	0666 system graphics
++/dev/ttyACM0     0666 nfc nfc
++/dev/ttyACM1     0666 nfc nfc
+ 
+ /sys/devices/platform/ddr_devfreq/devfreq/ddr_devfreq		min_freq	0644	system	system
+ /sys/devices/platform/e82c0000.mali/devfreq/e82c0000.mali	min_freq	0644	system	system

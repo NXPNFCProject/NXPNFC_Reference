@@ -19,7 +19,7 @@ index c35b05f..56d8ff6 100644
 +                }*/
              }
          }
- 
+
 diff --git a/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk b/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk
 deleted file mode 100644
 index cc2d8d2..0000000
@@ -96,7 +96,7 @@ index 454941c..1eb1eb3 100644
      }
  
 diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
-index d07ec48..508c820 100644
+index 1c4f1e3..9fedbb7 100644
 --- a/services/core/java/com/android/server/am/ActivityManagerService.java
 +++ b/services/core/java/com/android/server/am/ActivityManagerService.java
 @@ -438,7 +438,7 @@ public class ActivityManagerService extends IActivityManager.Stub
