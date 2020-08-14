@@ -1,0 +1,68 @@
+From 81af5aa4def226f5a9c981369a58d4c7d7df1a41 Mon Sep 17 00:00:00 2001
+From: nxf63550 <bhautik.ardeshana@nxp.com>
+Date: Thu, 13 Aug 2020 16:39:22 +0530
+Subject: [PATCH] [artf752031]:Create ApduServiceInfo object with valid offHost
+ Info
+
+Whenever application calls
+getRouteDestinationForPreferredPaymentService API,
+a new ApduserviceInfo object is created from already
+available preferredPaymentService. For offHost services
+non null offHostName to be used for object construction.
+But this parameter is getting set as null for OffHost/OnHost.
+This causes application to wrongly find it as Host application.
+To avoid this problem, valid offHost information is updated.
+
+Test:
+1. Install offhost payment app,
+2. Select the app in Tap & Pay.
+3. call getRouteDestinationForPreferredPaymentService
+---
+ .../nfc/cardemulation/NfcApduServiceInfo.java   | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/android/nfc/cardemulation/NfcApduServiceInfo.java b/android/nfc/cardemulation/NfcApduServiceInfo.java
+index 5aac979..439aa9e 100644
+--- a/android/nfc/cardemulation/NfcApduServiceInfo.java
++++ b/android/nfc/cardemulation/NfcApduServiceInfo.java
+@@ -108,6 +108,8 @@ public final class NfcApduServiceInfo
+    */
+   int mServiceState;
+ 
++  /*Holds value of statically defined (in application xml) secureElementName of offHostService*/
++  static String mNfcStaticOffHostName;
+   /**
+    * nxp se extension
+    */
+@@ -164,6 +166,19 @@ public final class NfcApduServiceInfo
+           throw new XmlPullParserException(
+               "No " + OffHostApduService.SERVICE_META_DATA + " meta-data");
+         }
++        AttributeSet attrs = Xml.asAttributeSet(parser);
++        Resources res = pm.getResourcesForApplication(si.applicationInfo);
++        TypedArray sa =
++            res.obtainAttributes(attrs, com.android.internal.R.styleable.OffHostApduService);
++        mNfcStaticOffHostName =
++            sa.getString(com.android.internal.R.styleable.OffHostApduService_secureElementName);
++        if (mNfcStaticOffHostName != null) {
++          if (mNfcStaticOffHostName.equals("eSE")) {
++            mNfcStaticOffHostName = "eSE1";
++          } else if (mNfcStaticOffHostName.equals("SIM")) {
++            mNfcStaticOffHostName = "SIM1";
++          }
++        }
+ 
+         /* load se extension xml */
+         extParser = si.loadXmlMetaData(pm, NXP_NFC_EXT_META_DATA);
+@@ -370,7 +385,7 @@ public final class NfcApduServiceInfo
+         nfcAidGroups2AidGroups(this.getStaticNfcAidGroups()),
+         nfcAidGroups2AidGroups(this.getDynamicNfcAidGroups()),
+         this.requiresUnlock(), this.getBannerId(), this.getUid(),
+-        this.getSettingsActivityName(), null, null);
++        this.getSettingsActivityName(), this.getOffHostSecureElement(), mNfcStaticOffHostName);
+   }
+ 
+   /**
+-- 
+2.17.1
+
