@@ -20,7 +20,7 @@ PRODUCT_COPY_FILES += \
 
 # NFC config files
 PRODUCT_COPY_FILES += \
-    vendor/$(NXP_VENDOR_DIR)/SN100x/hw/$(NXP_NFC_HW)/libnfc-nci.conf:system/etc/libnfc-nci.conf \
+    vendor/$(NXP_VENDOR_DIR)/SN100x/hw/$(NXP_NFC_HW)/libnfc-nci.conf:system/product/etc/libnfc-nci.conf \
     vendor/$(NXP_VENDOR_DIR)/SN100x/hw/$(NXP_NFC_HW)/libnfc-nxp-SN100U_example.conf:vendor/etc/libnfc-nxp.conf \
     vendor/$(NXP_VENDOR_DIR)/SN100x/hw/$(NXP_NFC_HW)/libese-nxp-P73.conf:vendor/etc/libese-nxp.conf \
     vendor/$(NXP_VENDOR_DIR)/SN100x/hw/$(NXP_NFC_HW)/libnfc-nxp_RF-SN100U_example_IguanaLite.conf:vendor/libnfc-nxp_RF.conf
