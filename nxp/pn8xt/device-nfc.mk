@@ -17,8 +17,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    vendor/nxp/frameworks/com.nxp.nfc.xml:system/etc/permissions/com.nxp.nfc.xml \
-    vendor/nxp/pn8xt/manifest.xml:vendor/manifest.xml
+    vendor/nxp/frameworks/com.nxp.nfc.xml:system/etc/permissions/com.nxp.nfc.xml
 
 # SE config files
 PRODUCT_COPY_FILES += \
@@ -27,7 +26,7 @@ PRODUCT_COPY_FILES += \
 
 ifeq ($(NXP_NFC_HW),pn81T)
 PRODUCT_COPY_FILES += \
-    hardware/nxp/nfc/halimpl/libnfc-nci_NCI2_0.conf:system/etc/libnfc-nci.conf \
+    hardware/nxp/nfc/halimpl/libnfc-nci_NCI2_0.conf:system/product/etc/libnfc-nci.conf \
     hardware/nxp/nfc/halimpl/libnfc-nxp-PN81T_example.conf:vendor/etc/libnfc-nxp.conf
 
     ifeq ($(NXP_RF_REQ),true)
@@ -37,7 +36,7 @@ PRODUCT_COPY_FILES += \
 
 else
 PRODUCT_COPY_FILES += \
-    hardware/nxp/nfc/halimpl/libnfc-nci.conf:system/etc/libnfc-nci.conf
+    hardware/nxp/nfc/halimpl/libnfc-nci.conf:system/product/etc/libnfc-nci.conf
     hardware/nxp/nfc/halimpl/libnfc-nxp-PN80T_example.conf:vendor/etc/libnfc-nxp.conf \
 
     ifeq ($(NXP_RF_REQ),true)

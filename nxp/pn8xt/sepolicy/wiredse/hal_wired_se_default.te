@@ -1,6 +1,9 @@
 type hal_wired_se_default, domain;
 hal_server_domain(hal_wired_se_default, hal_wired_se)
 hal_server_domain(hal_wired_se_default, hal_secure_element)
+
+set_prop(hal_wired_se, vendor_nfc_prop)
+
 type hal_wired_se_default_exec, exec_type, vendor_file_type, file_type;
 
 #============= hal_wired_se_default ==============

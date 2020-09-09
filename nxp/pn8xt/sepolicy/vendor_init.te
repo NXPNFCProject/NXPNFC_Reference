@@ -1,0 +1,4 @@
+set_prop(vendor_init, vendor_nfc_prop)
+
+#============= vendor_init ==============
+allow vendor_init vendor_nfc_prop:property_service set;

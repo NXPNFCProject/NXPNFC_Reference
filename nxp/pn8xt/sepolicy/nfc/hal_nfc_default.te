@@ -1,6 +1,8 @@
 #============= hal_nfc_default ==============
 allow hal_nfc_default hal_secure_element_default:binder call;
 
+set_prop(hal_nfc, vendor_nfc_prop)
+
 allow hal_nfc_default nxpese_hwservice:hwservice_manager find;
 allow hal_nfc_default eventprocessor_hwservice:hwservice_manager find;
 allow hal_nfc_default nxpnfc_hwservice:hwservice_manager { add find};
@@ -9,6 +11,10 @@ allow hal_nfc_default hal_wired_se_hwservice:hwservice_manager find;
 
 allow hal_nfc_default nfc_device:chr_file { read write };
 allow hal_nfc_default nfc_data_file:file getattr;
+
+allow hal_nfc_default vendor_nfc_prop:file { read open map getattr };
+allow hal_nfc_default vendor_nfc_prop:property_service set;
+
 
 #allow hal_nfc_default nfc_data_file:dir search;
 allow hal_nfc_default nfc_vendor_data_file:dir { getattr add_name read write search remove_name };
