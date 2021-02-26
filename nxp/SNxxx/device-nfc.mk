@@ -17,13 +17,17 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
     frameworks/native/data/etc/android.hardware.nfc.ese.xml:system/etc/permissions/android.hardware.nfc.ese.xml \
     frameworks/native/data/etc/android.hardware.nfc.uicc.xml:system/etc/permissions/android.hardware.nfc.uicc.xml \
-    frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
     vendor/nxp/frameworks/com.nxp.nfc.xml:system/etc/permissions/com.nxp.nfc.xml \
     vendor/nxp/frameworks/sems/com.nxp.sems.xml:vendor/etc/permissions/com.nxp.sems.xml \
     vendor/nxp/frameworks/secOSuJar/com.nxp.osu.xml:vendor/etc/permissions/com.nxp.osu.xml
 
+
+ifneq ($(NXP_NFC_HW),SN220)
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml
+endif
 
 # NFC config files
 ifeq ($(NXP_NFC_HW),SN1xx)
