@@ -61,6 +61,7 @@ PRODUCT_PACKAGES += \
     Tag \
     android.hardware.nfc@1.0-impl \
     com.nxp.nfc.jar \
+    SBUpdateApp \
 
 PRODUCT_PACKAGES += \
 	android.hardware.nfc@1.2-service \

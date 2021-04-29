@@ -14,6 +14,7 @@ allow hal_secure_element_default nfc_vendor_data_file:file { append getattr open
 
 allow hal_secure_element_default nxpnfc_hwservice:hwservice_manager { find add };
 allow hal_secure_element_default nxpese_hwservice:hwservice_manager { find add };
+hal_client_domain(hal_secure_element_default, hal_nfc);
 allow hal_secure_element_default nfc_vendor_data_file:dir search;
 allow hal_secure_element_default secure_element_vendor_data_file:dir { search write add_name remove_name };
 allow hal_secure_element_default secure_element_vendor_data_file:file { create read open getattr unlink write setattr append };
