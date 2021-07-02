@@ -1,3 +1,6 @@
 type vendor_secure_element_prop, vendor_property_type;
 type vendor_wired_se_prop, vendor_property_type;
 type vendor_trusted_se_prop, vendor_property_type;
+type vendor_nfc_prop, vendor_property_type;
+vendor_internal_prop(vendor_strongbox_prop)
+

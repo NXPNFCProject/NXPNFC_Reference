@@ -1,6 +1,2 @@
-type hal_weaver_default, domain;
-type hal_weaver_default_exec, exec_type, vendor_file_type, file_type;
-hal_server_domain(hal_weaver_default, hal_weaver)
 hal_client_domain(hal_weaver_default, hal_secure_element);
 allow hal_weaver_default hal_secure_element_default:binder call;
-init_daemon_domain(hal_weaver_default)
