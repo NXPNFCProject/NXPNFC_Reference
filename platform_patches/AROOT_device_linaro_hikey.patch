@@ -1,40 +1,238 @@
 diff --git a/hikey960.mk b/hikey960.mk
-index 2e338e9..033049d 100644
+index 243b002..0a29b14 100644
 --- a/hikey960.mk
 +++ b/hikey960.mk
-@@ -11,7 +11,7 @@ else
-   ifeq ($(TARGET_KERNEL_USE), 4.9)
-     HIKEY_USE_DRM_HWCOMPOSER := false
-   else
+@@ -5,20 +5,8 @@ LOCAL_KERNEL_HOME ?= device/linaro/hikey-kernel/hikey960/$(TARGET_KERNEL_USE)
+ TARGET_PREBUILT_KERNEL := $(LOCAL_KERNEL_HOME)/Image.gz-dtb
+ TARGET_PREBUILT_DTB := $(LOCAL_KERNEL_HOME)/hi3660-hikey960.dtb
+ 
+-ifeq ($(TARGET_KERNEL_USE), 4.4)
+-  HIKEY_USE_DRM_HWCOMPOSER := false
+-  HIKEY_USE_LEGACY_TI_BLUETOOTH := true
+-else
+-  ifeq ($(TARGET_KERNEL_USE), 4.9)
+-    HIKEY_USE_DRM_HWCOMPOSER := false
+-  else
 -    HIKEY_USE_DRM_HWCOMPOSER := true
-+    HIKEY_USE_DRM_HWCOMPOSER := false
+-  endif
+-  HIKEY_USE_LEGACY_TI_BLUETOOTH := false
+-endif
+-
+ ifndef HIKEY_USES_GKI
+-  ifeq ($(TARGET_KERNEL_USE), 5.4)
++  ifeq ($(TARGET_KERNEL_USE), 4.19)
+     HIKEY_USES_GKI := true
    endif
-   HIKEY_USE_LEGACY_TI_BLUETOOTH := false
  endif
-@@ -22,6 +22,7 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
+@@ -28,6 +16,14 @@ endif
+ $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
  $(call inherit-product, device/linaro/hikey/hikey960/device-hikey960.mk)
  $(call inherit-product, device/linaro/hikey/device-common.mk)
- $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base.mk)
-+$(call inherit-product, vendor/nxp/SN100x/device-nfc.mk)
- 
- #setup dm-verity configs
- PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/soc/ff3b0000.ufs/by-name/system
-@@ -31,6 +32,8 @@ PRODUCT_SUPPORTS_BOOT_SIGNER := false
- PRODUCT_SUPPORTS_VERITY_FEC := false
++$(call inherit-product, vendor/nxp/SNxxx/device-nfc.mk)
++
++#setup dm-verity configs
++PRODUCT_SYSTEM_VERITY_PARTITION := /dev/block/platform/soc/ff3b0000.ufs/by-name/system
++PRODUCT_VENDOR_VERITY_PARTITION := /dev/block/platform/soc/ff3b0000.ufs/by-name/vendor
++$(call inherit-product, build/target/product/verity.mk)
++PRODUCT_SUPPORTS_BOOT_SIGNER := false
++PRODUCT_SUPPORTS_VERITY_FEC := false
  
  PRODUCT_PROPERTY_OVERRIDES += ro.opengles.version=196608
-+PRODUCT_PROPERTY_OVERRIDES += ro.product.first_api_level=28
-+PRODUCT_PROPERTY_OVERRIDES += ro.config.low_ram=false
  
- #
- # Overrides
+@@ -41,20 +37,11 @@ PRODUCT_MODEL := AOSP on hikey960
+ ifneq ($(HIKEY_USES_GKI),)
+   HIKEY_MOD_DIR := $(LOCAL_KERNEL_HOME)
+   HIKEY_MODS := $(wildcard $(HIKEY_MOD_DIR)/*.ko)
+-  SDCARDFS_KO := $(wildcard $(HIKEY_MOD_DIR)/sdcardfs*.ko)
+-  CMA_HEAP_KO := $(wildcard $(HIKEY_MOD_DIR)/cma_heap.ko)
+-  DEFERRED_FREE_KO := $(wildcard $(HIKEY_MOD_DIR)/deferred-free-helper.ko)
+-  PAGE_POOL_KO := $(wildcard $(HIKEY_MOD_DIR)/page_pool.ko)
+-  SYSTEM_HEAP_KO := $(wildcard $(HIKEY_MOD_DIR)/system_heap.ko)
+-  ION_CMA_HEAP_KO := $(wildcard $(HIKEY_MOD_DIR)/ion_cma_heap*.ko)
++  HIKEY_ONLY_VENDOR := $(wildcard $(HIKEY_MOD_DIR)/pn553_i2c.ko)
++  HIKEY_ONLY_VENDOR += $(wildcard $(HIKEY_MOD_DIR)/p73.ko)
++
+   ifneq ($(HIKEY_MODS),)
+-    BOARD_VENDOR_KERNEL_MODULES += $(HIKEY_MODS)
+-    BOARD_VENDOR_RAMDISK_KERNEL_MODULES += \
+-        $(CMA_HEAP_KO) \
+-        $(SYSTEM_HEAP_KO) \
+-        $(DEFERRED_FREE_KO) \
+-        $(PAGE_POOL_KO) \
+-        $(ION_CMA_HEAP_KO) \
+-        $(SDCARDFS_KO)
++    BOARD_VENDOR_KERNEL_MODULES += $(HIKEY_ONLY_VENDOR)
++    BOARD_VENDOR_RAMDISK_KERNEL_MODULES += $(filter-out $(HIKEY_ONLY_VENDOR),$(HIKEY_MODS))
+   endif
+ endif
 diff --git a/hikey960/BoardConfig.mk b/hikey960/BoardConfig.mk
-index 3cd7a63..e2078bf 100644
+index 515cce6..b7bf12b 100644
 --- a/hikey960/BoardConfig.mk
 +++ b/hikey960/BoardConfig.mk
 @@ -1,4 +1,5 @@
  include device/linaro/hikey/BoardConfigCommon.mk
-+include vendor/nxp/SN100x/BoardConfigNfc.mk
++include vendor/nxp/SNxxx/BoardConfigNfc.mk
  
  TARGET_BOOTLOADER_BOARD_NAME := hikey960
  TARGET_BOARD_PLATFORM := hikey960
+@@ -10,30 +11,13 @@ TARGET_NO_DTIMAGE := false
+ 
+ BOARD_KERNEL_CMDLINE := androidboot.hardware=hikey960 firmware_class.path=/vendor/firmware efi=noruntime init=/init
+ BOARD_KERNEL_CMDLINE += androidboot.boot_devices=soc/ff3b0000.ufs
+-BOARD_KERNEL_CMDLINE += loglevel=15 androidboot.slot_suffix=_a
++BOARD_KERNEL_CMDLINE += loglevel=15
++BOARD_KERNEL_CMDLINE += video=HDMI-A-1:1980x1080@60e drm.edid_firmware=edid/1920x1080.bin
+ 
+ ifeq ($(TARGET_BUILTIN_EDID), true)
+ BOARD_KERNEL_CMDLINE += drm_kms_helper.edid_firmware=edid/1920x1080.bin
+ endif
+ 
+-# On kernels before 4.19, enable dtb fstab. On kernels >= 4.19, both dtb
+-# fstab and android-verity are deprecated, so until we have avb2 support
+-# in the bootloader, don't enable either feature. The ramdisk fstab
+-# needed for the new mechanism will be installed unconditionally; if dtb
+-# fstab is present, it will override it automatically.
+-ifneq ($(TARGET_KERNEL_USE),4.19)
+-# Enable treble dtb fstab with verity
+-ifneq ($(TARGET_ANDROID_VERITY),)
+-BOARD_KERNEL_CMDLINE += overlay_mgr.overlay_dt_entry=hardware_cfg_enable_android_fstab_v2
+-BOARD_KERNEL_CMDLINE += rootwait ro root=/dev/dm-0
+-BOARD_KERNEL_CMDLINE += dm=\"system none ro,0 1 android-verity 8:58\"
+-BOARD_BUILD_SYSTEM_ROOT_IMAGE := true
+-else
+-# Enable treble dtb fstab without verity
+-BOARD_KERNEL_CMDLINE += overlay_mgr.overlay_dt_entry=hardware_cfg_enable_android_fstab
+-endif
+-endif
+-
+ ifneq ($(TARGET_SENSOR_MEZZANINE),)
+ BOARD_KERNEL_CMDLINE += overlay_mgr.overlay_dt_entry=hardware_cfg_$(TARGET_SENSOR_MEZZANINE)
+ endif
+@@ -41,26 +25,15 @@ endif
+ BOARD_MKBOOTIMG_ARGS := --base 0x0 --tags_offset 0x07a00000 --kernel_offset 0x00080000 --ramdisk_offset 0x07c00000
+ 
+ BOARD_BOOTIMAGE_PARTITION_SIZE := 67108864
++BOARD_SYSTEMIMAGE_PARTITION_SIZE := 4915724288    # 4688MB
+ BOARD_USERDATAIMAGE_PARTITION_SIZE := 25845301248 # 24648MB
+ BOARD_FLASH_BLOCK_SIZE := 512
+ 
+-# Vendor/system_ext/product partition definitions
++# Vendor partition definitions
+ TARGET_COPY_OUT_VENDOR := vendor
++BOARD_VENDORIMAGE_PARTITION_SIZE := 822083584     # 784MB
+ BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
+-TARGET_COPY_OUT_SYSTEM_EXT := system_ext
+-BOARD_SYSTEM_EXTIMAGE_FILE_SYSTEM_TYPE := ext4
+-TARGET_COPY_OUT_PRODUCT := product
+-BOARD_PRODUCTIMAGE_FILE_SYSTEM_TYPE := ext4
+-BOARD_USES_METADATA_PARTITION := true
+-
+-#Dynamic Partition details
+-TARGET_USE_DYNAMIC_PARTITIONS := true
+-BOARD_BUILD_SUPER_IMAGE_BY_DEFAULT := true
+-BOARD_SUPER_PARTITION_SIZE := 4915724288
+-BOARD_SUPER_PARTITION_GROUPS := hikey960_dynamic_partitions
+-BOARD_HIKEY960_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor system_ext product
+-BOARD_HIKEY960_DYNAMIC_PARTITIONS_SIZE := 4911529984  # Reserve 4M for DAP metadata
+-BOARD_SUPER_PARTITION_METADATA_DEVICE := super
+-BOARD_SUPER_IMAGE_IN_UPDATE_PACKAGE := true
++BOARD_VENDORIMAGE_JOURNAL_SIZE := 0
++BOARD_VENDORIMAGE_EXTFS_INODE_COUNT := 2048
+ 
+ TARGET_RECOVERY_FSTAB := device/linaro/hikey/hikey960/fstab.hikey960
+diff --git a/hikey960/device-hikey960.mk b/hikey960/device-hikey960.mk
+index 46ffbe7..8fc8fd0 100644
+--- a/hikey960/device-hikey960.mk
++++ b/hikey960/device-hikey960.mk
+@@ -14,21 +14,11 @@
+ # limitations under the License.
+ #
+ 
+-# Enable Virtual A/B
+-AB_OTA_UPDATER := true
+-AB_OTA_PARTITIONS += \
+-    product \
+-    system \
+-    system_ext \
+-    vendor
+-
+-$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
+-
+ PRODUCT_COPY_FILES +=	$(TARGET_PREBUILT_KERNEL):kernel \
+ 			$(TARGET_PREBUILT_DTB):hi3660-hikey960.dtb
+ 
+ PRODUCT_COPY_FILES +=	$(LOCAL_PATH)/fstab.hikey960:$(TARGET_COPY_OUT_VENDOR)/etc/fstab.hikey960 \
+-			$(LOCAL_PATH)/fstab.hikey960:$(TARGET_COPY_OUT_RAMDISK)/fstab.hikey960 \
++			device/linaro/hikey/fstab.ramdisk:$(TARGET_COPY_OUT_RAMDISK)/fstab.hikey960 \
+ 			device/linaro/hikey/hikey960/init.hikey960.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.hikey960.rc \
+ 			device/linaro/hikey/init.hikey960.power.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.hikey960.power.rc \
+ 			device/linaro/hikey/hikey960/init.hikey960.usb.rc:$(TARGET_COPY_OUT_VENDOR)/etc/init/init.hikey960.usb.rc \
+@@ -38,10 +28,6 @@ PRODUCT_COPY_FILES +=	$(LOCAL_PATH)/fstab.hikey960:$(TARGET_COPY_OUT_VENDOR)/etc
+ 			frameworks/native/data/etc/android.hardware.vulkan.version-1_0_3.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.vulkan.version.xml \
+ 			frameworks/native/data/etc/android.software.vulkan.deqp.level-2020-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.vulkan.deqp.level.xml
+ 
+-PRODUCT_BUILD_SUPER_PARTITION := true
+-PRODUCT_USE_DYNAMIC_PARTITIONS := true
+-PRODUCT_USE_DYNAMIC_PARTITION_SIZE :=true
+-
+ # Copy BT firmware
+ PRODUCT_COPY_FILES += \
+ 	device/linaro/hikey/bt-wifi-firmware-util/TIInit_11.8.32-pcm-960.bts:$(TARGET_COPY_OUT_VENDOR)/firmware/ti-connectivity/TIInit_11.8.32.bts
+@@ -92,9 +78,7 @@ PRODUCT_DEFAULT_PROPERTY_OVERRIDES += sys.usb.controller=ff100000.dwc3
+ 
+ PRODUCT_PACKAGES += sensors.hikey960
+ 
+-ifeq ($(HIKEY_USE_DRM_HWCOMPOSER), true)
+-  PRODUCT_PACKAGES += hwcomposer.drm_hikey960
+-endif
++PRODUCT_PACKAGES += hwcomposer.drm_hikey960
+ 
+ ifneq ($(TARGET_NO_RECOVERY),true)
+ PRODUCT_COPY_FILES += \
+diff --git a/hikey960/fstab.hikey960 b/hikey960/fstab.hikey960
+index 63326f6..7586a97 100644
+--- a/hikey960/fstab.hikey960
++++ b/hikey960/fstab.hikey960
+@@ -6,13 +6,12 @@
+ #/dev/block/platform/soc/ff3b0000.ufs/by-name/system_a    /system    ext4    ro                                                                   wait
+ #/dev/block/platform/soc/ff3b0000.ufs/by-name/cache       /cache     ext4    discard,noauto_da_alloc,data=ordered,user_xattr,barrier=1    wait
+ #/dev/block/platform/soc/ff3b0000.ufs/by-name/userdata    /data      ext4    discard,noauto_da_alloc,data=ordered,user_xattr,barrier=1    wait
+-/dev/block/by-name/userdata    /data      f2fs    discard,noatime,nosuid,nodev                                 wait,check,fileencryption=software,quota
+-/dev/block/by-name/userdata    /data      ext4    discard,noatime,nosuid,nodev,noauto_da_alloc,data=ordered,user_xattr,barrier=1,inlinecrypt    wait,formattable,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized,quota
+-/dev/block/by-name/cache	/metadata       ext4    noatime,nosuid,nodev,discard                                    wait,formattable
++/dev/block/by-name/userdata    /data      f2fs    discard,noatime,nosuid,nodev                                 wait,check,quota
++#,fileencryption=software,
++/dev/block/by-name/userdata    /data      ext4    discard,noatime,nosuid,nodev,noauto_da_alloc,data=ordered,user_xattr,barrier=1,inlinecrypt    wait,formattable,quota
++#,fileencryption=aes-256-xts:aes-256-cts:v2+inlinecrypt_optimized
+ /devices/platform/soc/ff37f000.dwmmc1/mmc_host/mmc*      auto       auto    defaults    voldmanaged=sdcard1:auto,encryptable=userdata
+ /devices/platform/soc/ff200000.hisi_usb/ff100000.dwc3/xhci-hcd.*.auto/usb*               auto               auto      defaults  voldmanaged=usbdisk:auto,encryptable=userdata
+ /devices/platform/soc/f4000000.pcie/pci0000:00/0000:00:00.0/0000:01:00.0/nvme/nvme*      auto       auto    defaults    voldmanaged=nvmedisk:auto,encryptable=userdata
+-system /system ext4 noatime,ro,errors=panic wait,logical,first_stage_mount,slotselect
+-vendor /vendor ext4 noatime,ro,errors=panic wait,logical,first_stage_mount,slotselect
+-system_ext /system_ext ext4 noatime,ro,errors=panic wait,logical,first_stage_mount,slotselect
+-product /product ext4 noatime,ro,errors=panic wait,logical,first_stage_mount,slotselect
++/dev/block/by-name/system /system ext4 ro,errors=panic wait,first_stage_mount
++/dev/block/by-name/vendor /vendor ext4 ro,errors=panic wait,first_stage_mount
+diff --git a/hikey960/init.hikey960.rc b/hikey960/init.hikey960.rc
+index b767134..3e807d3 100644
+--- a/hikey960/init.hikey960.rc
++++ b/hikey960/init.hikey960.rc
+@@ -3,4 +3,4 @@ import init.common.rc
+ on post-fs
+     # Set supported opengles version
+     setprop ro.hardware.hwcomposer drm_hikey960
+-
++    write /sys/power/wake_lock nosleep
+diff --git a/ueventd.common.rc b/ueventd.common.rc
+index 8065263..5d31406 100644
+--- a/ueventd.common.rc
++++ b/ueventd.common.rc
+@@ -16,6 +16,8 @@ subsystem usbmisc
+ /dev/ion	 0666 system graphics
+ /dev/dma_heap/linux,cma	0666 system graphics
+ /dev/graphics/fb0	0666 system graphics
++/dev/ttyACM0     0666 nfc nfc
++/dev/ttyACM1     0666 nfc nfc
+ 
+ /sys/devices/platform/ddr_devfreq/devfreq/ddr_devfreq		min_freq	0644	system	system
+ /sys/devices/platform/e82c0000.mali/devfreq/e82c0000.mali	min_freq	0644	system	system

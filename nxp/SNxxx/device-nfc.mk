@@ -19,9 +19,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.uicc.xml:system/etc/permissions/android.hardware.nfc.uicc.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    vendor/nxp/frameworks/com.nxp.nfc.xml:system/etc/permissions/com.nxp.nfc.xml \
-    vendor/nxp/frameworks/sems/com.nxp.sems.xml:vendor/etc/permissions/com.nxp.sems.xml \
-    vendor/nxp/frameworks/secOSuJar/com.nxp.osu.xml:vendor/etc/permissions/com.nxp.osu.xml
 
 
 ifneq ($(NXP_NFC_HW),SN220)
@@ -60,14 +57,14 @@ PRODUCT_PACKAGES += \
     NfcNci \
     Tag \
     android.hardware.nfc@1.0-impl \
-    com.nxp.nfc.jar \
+    com.nxp.nfc \
     SBUpdateApp \
 
 PRODUCT_PACKAGES += \
-	android.hardware.nfc@1.2-service \
-	android.hardware.secure_element@1.2-service \
-	android.hardware.wired_se@1.0-service \
-    android.hardware.trusted_se@1.2-service\
+    android.hardware.nfc@1.2-service \
+    android.hardware.secure_element@1.2-service \
+    android.hardware.wired_se@1.0-service \
+    android.hardware.trusted_se@1.2-service \
 
 ifeq ($(ENABLE_TREBLE), true)
 PRODUCT_PACKAGES += \

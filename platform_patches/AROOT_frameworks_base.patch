@@ -1,8 +1,8 @@
 diff --git a/core/java/android/os/BinderProxy.java b/core/java/android/os/BinderProxy.java
-index c35b05f..56d8ff6 100644
+index 3d466a0b..0c4aa15d 100644
 --- a/core/java/android/os/BinderProxy.java
 +++ b/core/java/android/os/BinderProxy.java
-@@ -213,7 +213,7 @@ public final class BinderProxy implements IBinder {
+@@ -218,7 +218,7 @@ public final class BinderProxy implements IBinder {
                  Log.v(Binder.TAG, "BinderProxy map growth! bucket size = " + size
                          + " total = " + totalSize);
                  mWarnBucketSize += WARN_INCREMENT;
@@ -11,7 +11,7 @@ index c35b05f..56d8ff6 100644
                      // Use the number of uncleared entries to determine whether we should
                      // really report a histogram and crash. We don't want to fundamentally
                      // change behavior for a debuggable process, so we GC only if we are
-@@ -231,7 +231,7 @@ public final class BinderProxy implements IBinder {
+@@ -236,7 +236,7 @@ public final class BinderProxy implements IBinder {
                                  + (totalSize - totalUnclearedSize) + " of " + totalSize
                                  + " are cleared");
                      }
@@ -20,91 +20,25 @@ index c35b05f..56d8ff6 100644
              }
          }
  
-diff --git a/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk b/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk
-deleted file mode 100644
-index cc2d8d2..0000000
---- a/core/tests/hosttests/test-apps/MultiDexLegacyAndException/Android.mk
-+++ /dev/null
-@@ -1,48 +0,0 @@
--# Copyright (C) 2014 The Android Open Source Project
--#
--# Licensed under the Apache License, Version 2.0 (the "License");
--# you may not use this file except in compliance with the License.
--# You may obtain a copy of the License at
--#
--#      http://www.apache.org/licenses/LICENSE-2.0
--#
--# Unless required by applicable law or agreed to in writing, software
--# distributed under the License is distributed on an "AS IS" BASIS,
--# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
--# See the License for the specific language governing permissions and
--# limitations under the License.
--
--LOCAL_PATH:= $(call my-dir)
--
--
--## The application with a minimal main dex
--include $(CLEAR_VARS)
--
--LOCAL_STATIC_JAVA_LIBRARIES := android-support-multidex android-support-multidex-instrumentation androidx.test.rules
--LOCAL_MODULE_TAGS := tests
--
--LOCAL_SRC_FILES := $(call all-java-files-under, src)
--
--LOCAL_SDK_VERSION := 8
--
--LOCAL_PACKAGE_NAME := MultiDexLegacyAndException
--
--LOCAL_DEX_PREOPT := false
--
--LOCAL_JAVACFLAGS := -nowarn
--
--mainDexList:= \
--    $(call intermediates-dir-for,APPS,$(LOCAL_PACKAGE_NAME),$(LOCAL_IS_HOST_MODULE),common)/maindex.list
--
--LOCAL_DX_FLAGS := --multi-dex --main-dex-list=$(mainDexList) --minimal-main-dex
--
--LOCAL_MIN_SDK_VERSION := 8
--
--include $(BUILD_PACKAGE)
--
--$(mainDexList): $(full_classes_pre_proguard_jar) $(MAINDEXCLASSES) $(PROGUARD_DEPS)
--	$(hide) mkdir -p $(dir $@)
--	PROGUARD_HOME=$(PROGUARD_HOME) $(MAINDEXCLASSES) $< 1>$@
--	echo "com/android/multidexlegacyandexception/Test.class" >> $@
--
--$(built_dex_intermediate): $(mainDexList)
 diff --git a/services/core/java/com/android/server/Watchdog.java b/services/core/java/com/android/server/Watchdog.java
-index 454941c..1eb1eb3 100644
+index fcd049f1..0556cec1 100644
 --- a/services/core/java/com/android/server/Watchdog.java
 +++ b/services/core/java/com/android/server/Watchdog.java
-@@ -130,7 +130,7 @@ public class Watchdog extends Thread {
+@@ -158,7 +158,7 @@ public class Watchdog {
+     private ActivityManagerService mActivity;
  
-     int mPhonePid;
-     IActivityController mController;
--    boolean mAllowRestart = true;
-+    boolean mAllowRestart = false;
-     final OpenFdMonitor mOpenFdMonitor;
+     private IActivityController mController;
+-    private boolean mAllowRestart = true;
++    private boolean mAllowRestart = false;
+     private final List<Integer> mInterestingJavaPids = new ArrayList<>();
  
-     /**
-@@ -372,6 +372,7 @@ public class Watchdog extends Thread {
+     private final TraceErrorLogger mTraceErrorLogger;
+@@ -432,7 +432,7 @@ public class Watchdog {
+ 
      public void setAllowRestart(boolean allowRestart) {
-         synchronized (this) {
-             mAllowRestart = allowRestart;
+         synchronized (mLock) {
+-            mAllowRestart = allowRestart;
 +            mAllowRestart = false;
          }
      }
  
-diff --git a/services/core/java/com/android/server/am/ActivityManagerService.java b/services/core/java/com/android/server/am/ActivityManagerService.java
-index d07ec48..508c820 100644
---- a/services/core/java/com/android/server/am/ActivityManagerService.java
-+++ b/services/core/java/com/android/server/am/ActivityManagerService.java
-@@ -438,7 +438,7 @@ public class ActivityManagerService extends IActivityManager.Stub
-     /** Control over CPU and battery monitoring */
-     // write battery stats every 30 minutes.
-     static final long BATTERY_STATS_TIME = 30 * 60 * 1000;
--    static final boolean MONITOR_CPU_USAGE = true;
-+    static final boolean MONITOR_CPU_USAGE = false;
-     // don't sample cpu less than every 5 seconds.
-     static final long MONITOR_CPU_MIN_TIME = 5 * 1000;
-     // wait possibly forever for next cpu sample.
