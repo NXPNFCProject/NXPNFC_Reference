@@ -1,0 +1,3 @@
+type vendor_secure_element_prop, property_type;
+type vendor_wired_se_prop, property_type;
+type vendor_nfc_prop, property_type;
