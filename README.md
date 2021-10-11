@@ -18,7 +18,7 @@ This Repo contains any additional information/files required to support the rele
 | android-11.0.0_r3              |  11.51.01 (SN1xx) |  NFC_AR_00_6000_11.51.01_OpnSrc |
 | android-11.0.0_r3              |  11.57.00 (SN1xx) |  NFC_AR_00_6000_11.57.00_OpnSrc |
 | android-11.0.0_r3              |  11.59.00 (SN1xx) |  NFC_AR_00_6000_11.59.00_OpnSrc |
-
+| android-11.0.0_r3              |  11.62.00 (PN557/SN1xx) |  NFC_AR_00_6800_11.62.00_OpnSrc |
 
 
 
