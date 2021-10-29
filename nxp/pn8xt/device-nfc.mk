@@ -16,8 +16,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.uicc.xml:system/etc/permissions/android.hardware.nfc.uicc.xml \
     frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
-    frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    vendor/nxp/frameworks/com.nxp.nfc.xml:system/etc/permissions/com.nxp.nfc.xml
+    frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml 
 
 # SE config files
 PRODUCT_COPY_FILES += \
@@ -57,7 +56,7 @@ PRODUCT_PACKAGES += \
     NfcNci \
     Tag \
     android.hardware.nfc@1.0-impl \
-    com.nxp.nfc.jar \
+    com.nxp.nfc \
     nfc_nci.$(NXP_NFC_PLATFORM) \
 
 PRODUCT_PACKAGES += \
