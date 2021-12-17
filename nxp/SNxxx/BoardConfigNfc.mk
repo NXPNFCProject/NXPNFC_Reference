@@ -19,4 +19,6 @@ BOARD_KERNEL_CMDLINE += video=HDMI-A-1:1280x800@60
 
 DEVICE_MANIFEST_FILE += vendor/nxp/SNxxx/manifest.xml
 
+TARGET_FS_CONFIG_GEN += vendor/nxp/SNxxx/config.fs
+
 -include vendor/nxp/$(LOCAL_STEM)

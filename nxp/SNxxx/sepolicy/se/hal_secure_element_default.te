@@ -20,3 +20,6 @@ allow hal_secure_element_default secure_element_vendor_data_file:dir { search wr
 allow hal_secure_element_default secure_element_vendor_data_file:file { create read open getattr unlink write setattr append };
 allow hal_secure_element_default nfc_vendor_data_file:file { read open getattr unlink write setattr};
 #add_hwservice(hal_secure_element_default, nxpese_hwservice)
+
+#============= hal_secure_element_default ==============
+allow hal_secure_element_default hal_keymint_strongbox:binder call;

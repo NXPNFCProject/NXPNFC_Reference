@@ -13,3 +13,4 @@
 /(vendor|system/vendor)/bin/hw/android\.hardware\.wired_se@1\.0-service       u:object_r:hal_wired_se_default_exec:s0
 
 /(vendor|system/vendor)/bin/hw/android\.hardware\.trusted_se@1\.2-service       u:object_r:hal_trusted_se_default_exec:s0
+/vendor/bin/hw/android\.hardware\.security\.keymint-service\.strongbox  u:object_r:hal_keymint_strongbox_exec:s0
