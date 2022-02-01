@@ -9,9 +9,6 @@ vndbinder_use(hal_keymint_strongbox)
 get_prop(hal_keymint_strongbox, vendor_security_patch_level_prop);
 
 # Allow access to sockets
-allow hal_keymint_strongbox self:tcp_socket { connect create write read getattr getopt setopt };
-allow hal_keymint_strongbox port_type:tcp_socket name_connect;
-allow hal_keymint_strongbox port:tcp_socket { name_connect };
 allow hal_keymint_strongbox vendor_data_file:file { open read getattr };
 #============= hal_keymint_strongbox ==============
 allow hal_keymint_strongbox hal_secure_element_hwservice:hwservice_manager find;

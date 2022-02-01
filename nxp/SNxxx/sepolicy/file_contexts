@@ -3,13 +3,15 @@
 /data/nfc(/.*)?        u:object_r:nfc_data_file:s0
 /data/vendor/nfc(/.*)? u:object_r:nfc_vendor_data_file:s0
 /data/vendor/secure_element(/.*)? u:object_r:secure_element_vendor_data_file:s0
+/dev/nxp-nci           u:object_r:nfc_device:s0
 /dev/pn553             u:object_r:nfc_device:s0
 /dev/ttyACM0           u:object_r:nfc_device:s0
 /dev/ttyACM1           u:object_r:nfc_device:s0
 /dev/p73               u:object_r:secure_element_device:s0
 
 # NFC hal
-/(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element@1\.2-service       u:object_r:hal_secure_element_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.nfc_snxxx@1\.2-service       u:object_r:hal_nfc_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element_snxxx@1\.2-service       u:object_r:hal_secure_element_default_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.wired_se@1\.0-service       u:object_r:hal_wired_se_default_exec:s0
 
 /(vendor|system/vendor)/bin/hw/android\.hardware\.trusted_se@1\.2-service       u:object_r:hal_trusted_se_default_exec:s0
