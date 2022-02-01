@@ -1,0 +1,17 @@
+diff --git a/keystore2/src/km_compat/km_compat.cpp b/keystore2/src/km_compat/km_compat.cpp
+index 40ca554..974cda2 100644
+--- a/keystore2/src/km_compat/km_compat.cpp
++++ b/keystore2/src/km_compat/km_compat.cpp
+@@ -1314,9 +1314,11 @@ KeymasterDevices initializeKeymasters() {
+     CHECK(serviceManager.get()) << "Failed to get ServiceManager";
+     auto result = enumerateKeymasterDevices<Keymaster4>(serviceManager.get());
+     auto softKeymaster = result[SecurityLevel::SOFTWARE];
+-    if ((!result[SecurityLevel::TRUSTED_ENVIRONMENT]) && (!result[SecurityLevel::STRONGBOX])) {
++    auto strongBoxKM = result[SecurityLevel::STRONGBOX]; // Hikey doesn't have Software KM 4.0 running
++    if ((!result[SecurityLevel::TRUSTED_ENVIRONMENT])) {
+         result = enumerateKeymasterDevices<Keymaster3>(serviceManager.get());
+     }
++    if (strongBoxKM) result[SecurityLevel::STRONGBOX] = strongBoxKM;
+     if (softKeymaster) result[SecurityLevel::SOFTWARE] = softKeymaster;
+     if (result[SecurityLevel::SOFTWARE] && !result[SecurityLevel::TRUSTED_ENVIRONMENT]) {
+         LOG(WARNING) << "No secure Keymaster implementation found, but device offers insecure"
