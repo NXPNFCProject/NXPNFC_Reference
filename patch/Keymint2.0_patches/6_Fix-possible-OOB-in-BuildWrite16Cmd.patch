@@ -1,0 +1,37 @@
+From 638a76d762654f19c6154013fc0ecb0314a955b8 Mon Sep 17 00:00:00 2001
+From: nxf32288 <ganesh.deva_1@nxp.com>
+Date: Fri, 22 Apr 2022 14:51:11 +0530
+Subject: [PATCH 1/2] [artf957645]: Fix possible OOB in BuildWrite16Cmd()
+
+Fixed memcpy number bytes to copy argument value is exceeding the
+source buffer boundary address.
+---
+ snxxx/halimpl/mifare/NxpMfcReader.cc | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/snxxx/halimpl/mifare/NxpMfcReader.cc b/snxxx/halimpl/mifare/NxpMfcReader.cc
+index d024be5..7a510aa 100644
+--- a/snxxx/halimpl/mifare/NxpMfcReader.cc
++++ b/snxxx/halimpl/mifare/NxpMfcReader.cc
+@@ -1,6 +1,6 @@
+ /******************************************************************************
+  *
+- *  Copyright 2019-2021 NXP
++ *  Copyright 2019-2022 NXP
+  *
+  *  Licensed under the Apache License, Version 2.0 (the "License");
+  *  you may not use this file except in compliance with the License.
+@@ -222,8 +222,8 @@ void NxpMfcReader::BuildWrite16Cmd() {
+   mMfcTagCmdIntfData.sendBufLen = mMfcTagCmdIntfData.sendBufLen - 1;
+   uint8_t buff[mMfcTagCmdIntfData.sendBufLen];
+   memset(buff, 0, mMfcTagCmdIntfData.sendBufLen);
+-  memcpy(buff, mMfcTagCmdIntfData.sendBuf + 2, mMfcTagCmdIntfData.sendBufLen);
+-  memcpy(mMfcTagCmdIntfData.sendBuf + 1, buff, mMfcTagCmdIntfData.sendBufLen);
++  memcpy(buff, mMfcTagCmdIntfData.sendBuf + 2, (mMfcTagCmdIntfData.sendBufLen-1));
++  memcpy(mMfcTagCmdIntfData.sendBuf + 1, buff, (mMfcTagCmdIntfData.sendBufLen-1));
+ }
+ 
+ /*******************************************************************************
+-- 
+2.35.1
+
