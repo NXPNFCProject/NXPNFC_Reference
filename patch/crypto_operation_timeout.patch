@@ -1,0 +1,172 @@
+diff --git a/keymaster/libese_transport/AppletConnection.cpp b/keymaster/libese_transport/AppletConnection.cpp
+index 209674a..ef84fd8 100644
+--- a/keymaster/libese_transport/AppletConnection.cpp
++++ b/keymaster/libese_transport/AppletConnection.cpp
+@@ -30,7 +30,7 @@
+  ** See the License for the specific language governing permissions and
+  ** limitations under the License.
+  **
+- ** Copyright 2020-2021 NXP
++ ** Copyright 2020-2022 NXP
+  **
+  *********************************************************************************/
+ #define LOG_TAG "OmapiTransport"
+@@ -51,8 +51,9 @@ using ::android::hardware::secure_element::V1_0::SecureElementStatus;
+ using ::android::hardware::secure_element::V1_0::LogicalChannelResponse;
+ using android::base::StringPrintf;
+ 
+-
+ namespace se_transport {
++static bool g_IsCryptoOperationRunning = false;
++
+ class SecureElementCallback : public ISecureElementHalCallback {
+  public:
+     Return<void> onStateChange(bool state) override {
+@@ -85,9 +86,27 @@ class SEDeathRecipient : public android::hardware::hidl_death_recipient {
+ 
+ sp<SEDeathRecipient> mSEDeathRecipient = nullptr;
+ 
++static void CryptoOpTimerFunc(union sigval arg) {
++    (void)arg;  // unused
++    LOG(DEBUG) << "CryptoOperation timer expired";
++    g_IsCryptoOperationRunning = false;
++}
++
+ AppletConnection::AppletConnection(const std::vector<uint8_t>& aid) : kAppletAID(aid) {
+ }
+ 
++void AppletConnection::startTimer(bool isStart, IntervalTimer& t, int timeout,
++                                    void (*timerFunc)(union sigval)) {
++    t.kill();
++    if (isStart) {
++        t.set(timeout, this, timerFunc);
++    }
++}
++
++int AppletConnection::getSessionTimeout() {
++    return g_IsCryptoOperationRunning ? CRYPTO_OP_SESSION_TIMEOUT : REGULAR_SESSION_TIMEOUT;
++}
++
+ bool AppletConnection::connectToSEService() {
+     if (!SignalHandler::getInstance()->isHandlerRegistered()) {
+         LOG(INFO) << "register signal handler";
+@@ -153,9 +172,17 @@ bool AppletConnection::transmit(std::vector<uint8_t>& CommandApdu , std::vector<
+     LOGD_OMAPI("Channel number " << ::android::hardware::toString(mOpenChannel));
+ 
+     if (mSEClient == nullptr) return false;
++
++    if (cmd[APDU_INS_OFFSET] == BEGIN_OPERATION_CMD || cmd[APDU_INS_OFFSET] == UPDATE_OPERATION_CMD) {
++        g_IsCryptoOperationRunning = true;
++        startTimer(true, mTimerCrypto, CRYPTO_OP_SESSION_TIMEOUT, CryptoOpTimerFunc);
++    } else if (cmd[APDU_INS_OFFSET] == FINISH_OPERATION_CMD || cmd[APDU_INS_OFFSET] == ABORT_OPERATION_CMD) {
++        g_IsCryptoOperationRunning = false;
++        startTimer(false, mTimerCrypto, 0, nullptr);
++    }
++
+     // block any fatal signal delivery
+     SignalHandler::getInstance()->blockSignals();
+-
+     mSEClient->transmit(cmd, [&](hidl_vec<uint8_t> result) {
+         output = result;
+         LOG(INFO) << "recieved response size = " << ::android::hardware::toString(result.size()) << " data = " << result;
+diff --git a/keymaster/libese_transport/OmapiTransport.cpp b/keymaster/libese_transport/OmapiTransport.cpp
+index c8d4ae0..c5363dc 100644
+--- a/keymaster/libese_transport/OmapiTransport.cpp
++++ b/keymaster/libese_transport/OmapiTransport.cpp
+@@ -30,7 +30,7 @@
+  ** See the License for the specific language governing permissions and
+  ** limitations under the License.
+  **
+- ** Copyright 2020-2021 NXP
++ ** Copyright 2020-2022 NXP
+  **
+  *********************************************************************************/
+ #define LOG_TAG "OmapiTransport"
+@@ -81,8 +81,9 @@ bool OmapiTransport::sendData(const uint8_t* inData, const size_t inLen, std::ve
+         return mAppletConnection.close();
+     }
+ #ifdef INTERVAL_TIMER
+-     LOGD_OMAPI("Set the timer");
+-     mTimer.set(SESSION_TIMEOUT,this, SessionTimerFunc);
++     int timeout = mAppletConnection.getSessionTimeout();
++     LOGD_OMAPI("Set the timer with timeout " << timeout << " ms");
++     mTimer.set(timeout, this, SessionTimerFunc);
+ #endif
+     return status;
+ }
+ diff --git a/keymaster/libese_transport/include/AppletConnection.h b/keymaster/libese_transport/include/AppletConnection.h
+index 77cbea6..0d022ad 100644
+--- a/keymaster/libese_transport/include/AppletConnection.h
++++ b/keymaster/libese_transport/include/AppletConnection.h
+@@ -30,7 +30,7 @@
+  ** See the License for the specific language governing permissions and
+  ** limitations under the License.
+  **
+- ** Copyright 2020-2021 NXP
++ ** Copyright 2020-2022 NXP
+  **
+  *********************************************************************************/
+ #ifndef __APPLETCONNECTION_H__
+@@ -43,6 +43,15 @@
+ #include <hidl/Status.h>
+ #include <vector>
+ 
++#include <IntervalTimer.h>
++#define BEGIN_OPERATION_CMD (0x30)   // begin()
++#define UPDATE_OPERATION_CMD (0x30)  // update()
++#define FINISH_OPERATION_CMD (0x32)  // finish()
++#define ABORT_OPERATION_CMD (0x33)   // abort()
++
++#define REGULAR_SESSION_TIMEOUT (3 * 1000)     // 3 secs,default value
++#define CRYPTO_OP_SESSION_TIMEOUT (20 * 1000)  // 20 secs,for crypto operation
++
+ namespace se_transport {
+ 
+ using ::android::hardware::hidl_array;
+@@ -86,11 +95,25 @@ public:
+    */
+   bool isChannelOpen();
+ 
++  /**
++     * Provides session timeout value for Logical channel mgmt
++     * 1) CRYPTO_OP_SESSION_TIMEOUT for crypto begin()
++     * 2) REGULAR_SESSION_TIMEOUT for all other operations
++     * Params : void
++     * Returns : Session timeout value in ms
++     */
++    int getSessionTimeout();
++
++
+ private:
+     std::mutex channel_mutex_; // exclusive access to isChannelopen()/close()
+     sp<ISecureElement> mSEClient;
+     std::vector<uint8_t> kAppletAID;
++    IntervalTimer mTimerCrypto;  // track crypto operations
+     int8_t mOpenChannel = -1;
++
++    void startTimer(bool isStart, IntervalTimer& t, int timeout,
++                    void (*timerFunc)(union sigval arg));
+ };
+ 
+ }  // namespace se_transport
+diff --git a/keymaster/libese_transport/include/EseTransportUtils.h b/keymaster/libese_transport/include/EseTransportUtils.h
+index 2361089..0fe2087 100644
+--- a/keymaster/libese_transport/include/EseTransportUtils.h
++++ b/keymaster/libese_transport/include/EseTransportUtils.h
+@@ -11,7 +11,7 @@
+  ** See the License for the specific language governing permissions and
+  ** limitations under the License.
+  **
+- ** Copyright 2020-2021 NXP
++ ** Copyright 2020-2022 NXP
+  **
+  */
+ #ifndef __ESE_TRANSPORT_CONFIG__
+@@ -25,6 +25,7 @@ namespace se_transport {
+ #define SESSION_TIMEOUT 3*1000 // 3 secs
+ #define LOGICAL_CH_NOT_SUPPORTED_SW1 0x68
+ #define LOGICAL_CH_NOT_SUPPORTED_SW2 0x81
++#define APDU_INS_OFFSET 1      // INS offset in command APDU
+ // Helper method to dump vector contents
+ static bool debug_omapi = true;
+ #define LOGD_OMAPI(x) \
