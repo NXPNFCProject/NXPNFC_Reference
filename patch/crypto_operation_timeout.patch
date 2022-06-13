@@ -1,3 +1,15 @@
+commit 25a495dd4bcc3c81496509f8c5c5f3b4218d348d
+Author: Sourav Kumar <sourav.kumar@nxp.com>
+Date:   Mon Jun 13 14:57:25 2022 +0530
+
+    Channel mgmt timeout value to be set based on operation type
+
+    Set channel mgmt timeout value to 20 secs if crypto operation is in
+    progress else set the value to 3 secs.
+
+    Signed-off-by: Sourav Kumar <sourav.kumar@nxp.com>
+    Change-Id: I30010df7605fc344bd9132324098637bddd60b8e
+
 diff --git a/keymaster/libese_transport/AppletConnection.cpp b/keymaster/libese_transport/AppletConnection.cpp
 index 209674a..ef84fd8 100644
 --- a/keymaster/libese_transport/AppletConnection.cpp
@@ -94,7 +106,7 @@ index c8d4ae0..c5363dc 100644
  #endif
      return status;
  }
- diff --git a/keymaster/libese_transport/include/AppletConnection.h b/keymaster/libese_transport/include/AppletConnection.h
+diff --git a/keymaster/libese_transport/include/AppletConnection.h b/keymaster/libese_transport/include/AppletConnection.h
 index 77cbea6..0d022ad 100644
 --- a/keymaster/libese_transport/include/AppletConnection.h
 +++ b/keymaster/libese_transport/include/AppletConnection.h
