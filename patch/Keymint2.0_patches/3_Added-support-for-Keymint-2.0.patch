@@ -7,6 +7,7 @@ Subject: [PATCH 4/6] [artf955603]: Added support for Keymint 2.0
 2) RKP getHardwareInfo API aligned with KM 2.0 version.
 
 Change-Id: Iab957f8fe2a51bdebf7147eebd1d5f44e2278b33
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
 ---
  keymint/JavacardKeyMintDevice.cpp             | 13 +++++++
  keymint/JavacardKeyMintDevice.h               |  7 ++++

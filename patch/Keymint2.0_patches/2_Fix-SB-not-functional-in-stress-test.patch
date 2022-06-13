@@ -7,6 +7,7 @@ Avoid channel close invoked multiple times when transmit returned
 with SW 6881 (Logical channel not supported) & Interval Timer timed out.
 
 Change-Id: I35cd4406f315027fbc73d4f9d677207bbba801dd
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
 ---
  keymint/transport/OmapiTransport.cpp | 24 ++++++++++--------------
  1 file changed, 10 insertions(+), 14 deletions(-)

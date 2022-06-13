@@ -4,6 +4,7 @@ Date: Wed, 27 Apr 2022 16:39:54 +0530
 Subject: [PATCH 6/6] [artf957643]: ROT related INS value updated.
 
 getRotChallenge, getRot, sendRot INS values are aligned with AOSP.
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
 ---
  keymint/JavacardSecureElement.h | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

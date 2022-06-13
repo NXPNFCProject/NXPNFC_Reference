@@ -5,6 +5,7 @@ Subject: [PATCH 1/2] [artf957645]: Fix possible OOB in BuildWrite16Cmd()
 
 Fixed memcpy number bytes to copy argument value is exceeding the
 source buffer boundary address.
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
 ---
  snxxx/halimpl/mifare/NxpMfcReader.cc | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)

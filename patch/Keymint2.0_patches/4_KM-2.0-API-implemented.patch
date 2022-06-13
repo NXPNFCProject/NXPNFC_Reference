@@ -5,6 +5,8 @@ Subject: [PATCH 5/6] [artf957643]: KM 2.0 API implemented.
 
 1) getRootOfTrustChallenge command mapped with INS 0xD0.
 2) sendRootOfTrust command mapped with INS 0xD1.
+
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
 ---
  keymint/JavacardKeyMintDevice.cpp | 28 +++++++++++++++++++++++-----
  keymint/JavacardSecureElement.h   | 25 +++++++++++++++++++++++--
