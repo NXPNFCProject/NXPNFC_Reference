@@ -1,8 +1,10 @@
 commit 4b828c23bb8164ef78b2502593e0d727184b7771
-Author: nxf63690 <sourav.kumar@nxp.com>
+Author: Sourav Kumar <sourav.kumar@nxp.com>
 Date:   Tue Jan 25 09:21:23 2022 +0530
 
     [artf900675]: VTS.AesIncremental Patch re-based for 12.04.01
+    
+    Signed-off-by: Sourav Kumar <sourav.kumar@nxp.com>
 
 diff --git a/keymaster/4.1/JavacardKeymaster4Device.cpp b/keymaster/4.1/JavacardKeymaster4Device.cpp
 index 616d366..b927731 100644
