@@ -1,2 +1,3 @@
 hal_client_domain(hal_weaver_default, hal_secure_element);
 allow hal_weaver_default hal_secure_element_default:binder call;
+allow hal_weaver_default boot_status_prop:file { getattr map open read };
