@@ -20,7 +20,7 @@ This Repo contains any additional information/files required to support the rele
 | android-12.0.0_r2              |  12.0D.00 (SN100/SN110/PN557) |  NFC_AR_00_E800_12.0D.00_OpnSrc |
 | android-12.0.0_r2              |  12.10.00 (SN100/SN110/SN220) |  NFC_AR_00_E800_12.10.00_OpnSrc |
 | android-12.0.0_r2              |  12.12.00 (PN557/SN100/SN110/SN220) |  NFC_AR_00_E800_12.12.00_OpnSrc |
-
+| android-12.0.0_r2              |  12.14.00 (PN557/PN560/SN100/SN110/SN220) |  NFC_AR_00_E800_12.14.00_OpnSrc |
 
 
 
