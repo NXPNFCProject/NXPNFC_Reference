@@ -1,0 +1,193 @@
+From 0c95698de6e29b03894d93d04739a1ec896c749b Mon Sep 17 00:00:00 2001
+From: nxf31698 <suryaprakash.konduru@nxp.com>
+Date: Mon, 18 Jul 2022 10:11:23 +0530
+Subject: [PATCH] [artf972174] Added support for handling TxLDO overcurrent
+ notification.
+
+Restarting the RF Discovery recovers the RF when it receives TxLDO
+overcurrent notification.
+
+Signed-off-by: nxf31698 <suryaprakash.konduru@nxp.com>
+---
+ nci/SN100x/jni/NativeNfcManager.cpp           | 36 +++++++++++++++++++
+ .../android/nfc/dhimpl/NativeNfcManager.java  | 11 ++++++
+ src/com/android/nfc/DeviceHost.java           |  9 +++++
+ src/com/android/nfc/NfcService.java           | 12 +++++++
+ 4 files changed, 68 insertions(+)
+
+diff --git a/nci/SN100x/jni/NativeNfcManager.cpp b/nci/SN100x/jni/NativeNfcManager.cpp
+index 439f123c..b754372f 100644
+--- a/nci/SN100x/jni/NativeNfcManager.cpp
++++ b/nci/SN100x/jni/NativeNfcManager.cpp
+@@ -196,6 +196,7 @@ jmethodID gCachedNfcManagerNotifyHwErrorReported;
+ #if(NXP_EXTNS == TRUE)
+ jmethodID gCachedNfcManagerNotifyLxDebugInfo;
+ jmethodID gCachedNfcManagerNotifyTagAbortListeners;
++jmethodID gCachedNfcManagerNotifyCoreGenericError;
+ #endif
+ 
+ const char* gNativeP2pDeviceClassName =
+@@ -330,6 +331,7 @@ static int nfcManager_staticDualUicc_Precondition(int uiccSlot);
+ static int nfcManager_setPreferredSimSlot(JNIEnv* e, jobject o, jint uiccSlot);
+ static bool nfcManager_deactivateOnPollDisabled(tNFA_ACTIVATED& activated);
+ static jint nfcManager_enableDebugNtf(JNIEnv* e, jobject o, jbyte fieldValue);
++static void nfcManager_restartRFDiscovery(JNIEnv* e, jobject o);
+ #endif
+ static uint16_t sCurrentConfigLen;
+ static uint8_t sConfig[256];
+@@ -1032,6 +1034,8 @@ static jboolean nfcManager_initNativeStruc(JNIEnv* e, jobject o) {
+       e->GetMethodID(cls.get(),"notifySeInitialized", "()V");
+   gCachedNfcManagerNotifyTagAbortListeners =
+       e->GetMethodID(cls.get(), "notifyTagAbort", "()V");
++  gCachedNfcManagerNotifyCoreGenericError =
++      e->GetMethodID(cls.get(), "notifyCoreGenericError", "(I)V");
+ #endif
+   gCachedNfcManagerNotifyTransactionListeners = e->GetMethodID(
+       cls.get(), "notifyTransactionListeners", "([B[BLjava/lang/String;)V");
+@@ -1231,6 +1235,21 @@ if (!sP2pActive && eventData->rf_field.status == NFA_STATUS_OK) {
+       SyncEventGuard guard(sNfaSetPowerSubState);
+       sNfaSetPowerSubState.notifyOne();
+     } break;
++#if(NXP_EXTNS == TRUE)
++    case NFA_DM_GEN_ERROR_REVT: {
++      struct nfc_jni_native_data* nat = getNative(NULL, NULL);
++      JNIEnv* e = NULL;
++      ScopedAttach attach(nat->vm, &e);
++      if (e == NULL) {
++        LOG(ERROR) << StringPrintf("jni env is null");
++        return;
++      }
++
++      e->CallVoidMethod(nat->manager,
++                        android::gCachedNfcManagerNotifyCoreGenericError,
++                        eventData->status);
++    } break;
++#endif
+     default:
+       DLOG_IF(INFO, nfc_debug_enabled)
+           << StringPrintf("%s: unhandled event", __func__);
+@@ -3358,6 +3377,7 @@ static JNINativeMethod gMethods[] = {
+     {"setPreferredSimSlot", "(I)I", (void*)nfcManager_setPreferredSimSlot},
+     {"doNfcSelfTest", "(I)I", (void*) nfcManager_nfcSelfTest},
+     {"doEnableDebugNtf", "(B)I", (void*) nfcManager_enableDebugNtf},
++    {"doRestartRFDiscovery", "()V", (void*)nfcManager_restartRFDiscovery},
+ #endif
+     {"doSetNfcSecure", "(Z)Z", (void*)nfcManager_doSetNfcSecure},
+     {"getNfaStorageDir", "()Ljava/lang/String;",
+@@ -3751,6 +3771,22 @@ static jint nfcManager_getFwVersion(JNIEnv * e, jobject o) {
+     return version;
+ }
+ 
++/*******************************************************************************
++**
++** Function:        nfcManager_restartRFDiscovery
++** Description:     Restarts RF discovery
++**
++**                  e: JVM environment.
++**                  o: Java object.
++**
++*******************************************************************************/
++static void nfcManager_restartRFDiscovery(JNIEnv*, jobject) {
++  if (sRfEnabled) {
++    android::startRfDiscovery(false);
++  }
++  android::startRfDiscovery(true);
++}
++
+   /*******************************************************************************
+    **
+    ** Class:       Command
+diff --git a/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java b/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java
+index 0f5cb3d1..a74bda99 100644
+--- a/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java
++++ b/nci/src/com/android/nfc/dhimpl/NativeNfcManager.java
+@@ -532,6 +532,13 @@ public class NativeNfcManager implements DeviceHost {
+         return true;
+     }
+ 
++    private native void doRestartRFDiscovery();
++
++    @Override
++    public void restartRFDiscovery() {
++        doRestartRFDiscovery();
++    }
++
+     private native boolean doSetNfcSecure(boolean enable);
+     @Override
+     public boolean setNfcSecure(boolean enable) {
+@@ -623,6 +630,10 @@ public class NativeNfcManager implements DeviceHost {
+         mListener.onHwErrorReported();
+     }
+ 
++    private void notifyCoreGenericError(int errorCode) {
++        mListener.notifyCoreGenericError(errorCode);
++    }
++
+     private void notifyTransactionListeners(byte[] aid, byte[] data, String evtSrc) {
+         mListener.onNfcTransactionEvent(aid, data, evtSrc);
+     }
+diff --git a/src/com/android/nfc/DeviceHost.java b/src/com/android/nfc/DeviceHost.java
+index 050bc62e..bbb5460e 100644
+--- a/src/com/android/nfc/DeviceHost.java
++++ b/src/com/android/nfc/DeviceHost.java
+@@ -93,6 +93,11 @@ public interface DeviceHost {
+         public void onLxDebugConfigData(int len, byte[] data);
+ 
+         public void notifyTagAbort();
++
++        /**
++         * Notifies core generic error notification
++         */
++        void notifyCoreGenericError(int errorCode);
+     }
+ 
+     public interface TagEndpoint {
+@@ -368,4 +373,8 @@ public interface DeviceHost {
+     public boolean isLockedT4tData();
+     public boolean doClearNdefT4tData();
+     public int doEnableDebugNtf(byte fieldValue);
++    /**
++     * Restarts RF Discovery
++     */
++    void restartRFDiscovery();
+ }
+diff --git a/src/com/android/nfc/NfcService.java b/src/com/android/nfc/NfcService.java
+index 0ff2f923..29c1fb02 100755
+--- a/src/com/android/nfc/NfcService.java
++++ b/src/com/android/nfc/NfcService.java
+@@ -220,6 +220,8 @@ public class NfcService implements DeviceHostListener {
+     static final int MSG_DEINIT_WIREDSE = 66;
+     static final int MSG_READ_T4TNFCEE = 67;
+     static final int MSG_WRITE_T4TNFCEE = 68;
++    static final int MSG_TXLDO_OVERCORRENT_RECOVERY = 69;
++    private static final int STATE_TXLDO_OVERCORRENT_ERROR = 0xE3;
+ 
+     // SCR/MPOS constants
+     static final int SE_READER_TYPE_INAVLID   = 0;
+@@ -687,6 +689,13 @@ public class NfcService implements DeviceHostListener {
+         new EnableDisableTask().execute(TASK_ENABLE);
+     }
+ 
++    @Override
++    public void notifyCoreGenericError(int errorCode) {
++        if (errorCode == STATE_TXLDO_OVERCORRENT_ERROR) {
++            sendMessage(NfcService.MSG_TXLDO_OVERCORRENT_RECOVERY, null);
++        }
++    }
++
+     final class ReaderModeParams {
+         public int flags;
+         public IAppCallback callback;
+@@ -4018,6 +4027,9 @@ public class NfcService implements DeviceHostListener {
+                case MSG_WLC_DISABLE:
+                 mWlc.disable(WlcServiceProxy.PersistStatus.UPDATE);
+                 break;
++                case MSG_TXLDO_OVERCORRENT_RECOVERY:
++                    mDeviceHost.restartRFDiscovery();
++                    break;
+                default:
+                  Log.e(TAG, "Unknown message received");
+                  break;
+-- 
+2.37.0
+

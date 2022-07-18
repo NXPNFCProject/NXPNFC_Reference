@@ -1,0 +1,109 @@
+From f02104dbd504137dc6c484f3d61a00ae18795fb7 Mon Sep 17 00:00:00 2001
+From: nxf31698 <suryaprakash.konduru@nxp.com>
+Date: Mon, 18 Jul 2022 10:15:52 +0530
+Subject: [PATCH] [artf972174] Added support for handling TxLDO overcurrent
+ notification.
+
+On receiving TxLDO over current notification, NFCC doesn't support
+RF activity. In order to recover from this state, restarting discovery
+will enable the RF support.
+
+Signed-off-by: nxf31698 <suryaprakash.konduru@nxp.com>
+---
+ SN100x/src/nfa/dm/nfa_dm_act.cc  | 11 +++++++++--
+ SN100x/src/nfa/include/nfa_api.h |  4 +++-
+ SN100x/src/nfc/include/nfc_api.h |  2 ++
+ SN100x/src/nfc/nfc/nfc_ncif.cc   |  5 +++--
+ 4 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/SN100x/src/nfa/dm/nfa_dm_act.cc b/SN100x/src/nfa/dm/nfa_dm_act.cc
+index 6ff094c05..48cff85e3 100644
+--- a/SN100x/src/nfa/dm/nfa_dm_act.cc
++++ b/SN100x/src/nfa/dm/nfa_dm_act.cc
+@@ -31,7 +31,7 @@
+  *  See the License for the specific language governing permissions and
+  *  limitations under the License.
+  *
+- *  Copyright 2018-2021 NXP
++ *  Copyright 2018-2022 NXP
+  *
+  ******************************************************************************/
+ /******************************************************************************
+@@ -424,7 +424,14 @@ static void nfa_dm_nfc_response_cback(tNFC_RESPONSE_EVT event,
+ 
+     case NFC_GEN_ERROR_REVT: /* generic error command or notification */
+ #if(NXP_EXTNS == TRUE)
+-      if(p_data) NFA_SCR_PROCESS_EVT(NFA_SCR_MULTIPLE_TARGET_DETECTED_EVT, p_data->status);
++      if (p_data) {
++        dm_cback_data.status = p_data->status;
++        NFA_SCR_PROCESS_EVT(NFA_SCR_MULTIPLE_TARGET_DETECTED_EVT,
++                            p_data->status);
++        if (dm_cback_data.status == NXP_NFC_TXLDO_OVER_CURRENT) {
++          (*nfa_dm_cb.p_dm_cback)(NFA_DM_GEN_ERROR_REVT, &dm_cback_data);
++        }
++      }
+ #endif
+       break;
+ 
+diff --git a/SN100x/src/nfa/include/nfa_api.h b/SN100x/src/nfa/include/nfa_api.h
+index 82220e0f2..0ce02ce44 100755
+--- a/SN100x/src/nfa/include/nfa_api.h
++++ b/SN100x/src/nfa/include/nfa_api.h
+@@ -31,7 +31,7 @@
+  *  See the License for the specific language governing permissions and
+  *  limitations under the License.
+  *
+- *  Copyright 2018-2021 NXP
++ *  Copyright 2018-2022 NXP
+  *
+  ******************************************************************************/
+ 
+@@ -220,6 +220,8 @@ typedef uint8_t tNFA_PROTOCOL_MASK;
+ #define NFA_DM_SET_TRANSIT_CONFIG_EVT 14
+ 
+ #define NFA_DM_GET_ROUTE_CONFIG_REVT 10
++
++#define NFA_DM_GEN_ERROR_REVT 12
+ #endif
+ /* T1T HR length            */
+ #define NFA_T1T_HR_LEN T1T_HR_LEN
+diff --git a/SN100x/src/nfc/include/nfc_api.h b/SN100x/src/nfc/include/nfc_api.h
+index 37573d3ce..e44d90688 100755
+--- a/SN100x/src/nfc/include/nfc_api.h
++++ b/SN100x/src/nfc/include/nfc_api.h
+@@ -199,6 +199,8 @@ typedef uint8_t tNFC_STATUS;
+   ((unsigned char)0xEA) /* param for retrieveing HCI session ID for UICC */
+ #define NXP_NFC_PARAM_SWP_SESSIONID_INT1A \
+   ((unsigned char)0x1E) /* param for retrieveing HCI session ID for UICC2 */
++#define NXP_NFC_TXLDO_OVER_CURRENT \
++  ((unsigned char)0xE3) /* Core generic error for TXLDO OVER CURRENT */
+ #endif
+ /**********************************************
+  * NFC Config Parameter IDs defined by NCI
+diff --git a/SN100x/src/nfc/nfc/nfc_ncif.cc b/SN100x/src/nfc/nfc/nfc_ncif.cc
+index 0232124b8..454707653 100644
+--- a/SN100x/src/nfc/nfc/nfc_ncif.cc
++++ b/SN100x/src/nfc/nfc/nfc_ncif.cc
+@@ -31,7 +31,7 @@
+  *  See the License for the specific language governing permissions and
+  *  limitations under the License.
+  *
+- *  Copyright 2018-2021 NXP
++ *  Copyright 2018-2022 NXP
+  *
+  ******************************************************************************/
+ 
+@@ -2439,8 +2439,9 @@ void nfc_ncif_proc_generic_error_ntf(tNFC_STATUS status)
+                     nfc_cb.nci_ese_cold_temp_timeout);
+       break;
+     }
+-    case NCI_STATUS_SYNTAX_ERROR:
+     case NCI_STATUS_PMU_TXLDO_OVERCURRENT:
++      break;
++    case NCI_STATUS_SYNTAX_ERROR:
+     case NCI_STATUS_GPADC_ERROR:
+     {
+       LOG(ERROR) <<StringPrintf("\nAborting...");
+-- 
+2.37.0
+
