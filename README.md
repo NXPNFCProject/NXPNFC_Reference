@@ -8,7 +8,7 @@ This Repo contains any additional information/files required to support the rele
 | Android Version        | NXP Release          | NXP Tag  |
 | :-------------: |:---------------------:| :-----:|
 | android-13-preview-1              |  13.01.00 (PN80T/PN81T/PN553/PN557) |  NFC_AR_00_18C0_13.01.00_OpnSrc |
-
+| android-13.0.0_r3              |  13.02.00 (PN80T/PN81T/PN553/PN557) |  NFC_AR_00_18C0_13.02.00_OpnSrc |
 
 
 
@@ -22,5 +22,5 @@ This Repo contains any additional information/files required to support the rele
 | aosp-master                |  12.01.00 (PN80T/PN81T/PN553/PN557) |  NFC_AR_00_18C0_12.01.00_OpnSrc  |
 | android-12.0.0_r2              |  12.02.00 (PN80T/PN81T/PN553/PN557) |  NFC_AR_00_18C0_12.02.00_OpnSrc |
 | android-13-preview-1              |  13.01.00 (PN80T/PN81T/PN553/PN557) |  NFC_AR_00_18C0_13.01.00_OpnSrc |
-
+| android-13.0.0_r3              |  13.02.00 (PN80T/PN81T/PN553/PN557) |  NFC_AR_00_18C0_13.02.00_OpnSrc |
 
