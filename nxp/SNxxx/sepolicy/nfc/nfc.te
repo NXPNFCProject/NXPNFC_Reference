@@ -6,6 +6,7 @@ hal_client_domain(nfc, hal_trusted_se)
 # create_dir_perms has { create rw_dir_perms }
 allow nfc nfc_data_file:dir create_dir_perms;
 allow nfc nxpnfc_hwservice:hwservice_manager find;
+allow nfc nxpnfc_service:service_manager find;
 allow nfc hal_wired_se_hwservice:hwservice_manager find;
 allow nfc hal_trusted_se_hwservice:hwservice_manager find;
 allow nfc hal_secure_element_hwservice:hwservice_manager find;

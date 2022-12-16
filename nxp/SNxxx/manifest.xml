@@ -1,4 +1,5 @@
 <manifest version="1.0" type="device" >
+    <!-- > Uncomment this for enabling the NFC HIDL service.
     <hal format="hidl">
         <name>android.hardware.nfc</name>
         <transport>hwbinder</transport>
@@ -8,7 +9,7 @@
             <name>INfc</name>
             <instance>default</instance>
         </interface>
-    </hal>
+    </hal> -->
     <!-- >
     <hal format="hidl">
         <name>android.hardware.nfc</name>
@@ -22,6 +23,7 @@
             <instance>nfc_nci</instance>
         </interface>
     </hal> -->
+    <!-- > Uncomment this for enabling the NFC HIDL service.
     <hal format="hidl">
         <name>vendor.nxp.nxpnfc</name>
         <transport>hwbinder</transport>
@@ -31,7 +33,7 @@
             <name>INxpNfc</name>
             <instance>default</instance>
         </interface>
-    </hal>
+    </hal> -->
     <sepolicy>
         <version>0.0</version>
     </sepolicy>

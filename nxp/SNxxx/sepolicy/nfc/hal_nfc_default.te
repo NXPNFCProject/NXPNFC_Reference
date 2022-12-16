@@ -7,6 +7,7 @@ set_prop(hal_nfc, vendor_nfc_prop)
 
 allow hal_nfc_default nxpese_hwservice:hwservice_manager find;
 allow hal_nfc_default nxpnfc_hwservice:hwservice_manager { find add };
+allow hal_nfc_default nxpnfc_service:service_manager { find add };
 allow hal_nfc_default hal_wired_se_hwservice:hwservice_manager find;
 allow hal_nfc_default hal_trusted_se_hwservice:hwservice_manager find;
 #allow hal_nfc_default nxpwiredse_hwservice:hwservice_manager find;

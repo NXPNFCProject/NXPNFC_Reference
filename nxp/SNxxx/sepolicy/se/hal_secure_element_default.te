@@ -23,3 +23,6 @@ allow hal_secure_element_default nfc_vendor_data_file:file { read open getattr u
 
 #============= hal_secure_element_default ==============
 allow hal_secure_element_default hal_keymint_strongbox:binder call;
+allow hal_secure_element_default boot_status_prop:file read;
+allow hal_secure_element_default nxpnfc_service:service_manager find;
+allow hal_secure_element_default servicemanager:binder call;
