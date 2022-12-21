@@ -21,7 +21,7 @@ PRODUCT_MANIFEST_FILES += packages/apps/SecureElement/secure_element-service.xml
 
 DEVICE_MANIFEST_FILE += vendor/nxp/SNxxx/manifest.xml
 
-ifeq ($(SE_ENABLED),TRUE)
+ifneq ($(SE_ENABLED),FALSE)
 	DEVICE_MANIFEST_FILE += vendor/nxp/SNxxx/manifestEse.xml
 endif
 

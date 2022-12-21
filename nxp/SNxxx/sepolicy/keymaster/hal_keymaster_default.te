@@ -1,0 +1,5 @@
+# StrongBox Hal as a client of SeHal service
+hal_client_domain(hal_keymaster_default, hal_secure_element);
+allow hal_keymaster_default hal_secure_element_default:binder call;
+
+ set_prop(hal_keymaster_default,vendor_strongbox_prop)

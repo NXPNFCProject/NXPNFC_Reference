@@ -11,12 +11,24 @@
 
 # NFC hal
 /(vendor|system/vendor)/bin/hw/android\.hardware\.nfc_snxxx@1\.2-service       u:object_r:hal_nfc_default_exec:s0
-/(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element_snxxx@1\.2-service       u:object_r:hal_secure_element_default_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.nfc-service\.nxp            u:object_r:hal_nfc_default_exec:s0
+
+# SE HAL
+/(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element_snxxx@1\.2-service       u:object_r:hal_secure_element_default_exec:s0
+
+# NXP Specific/ Proprietary test binary
 /(vendor|system/vendor)/bin/hw/android\.hardware\.wired_se@1\.0-service       u:object_r:hal_wired_se_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.trusted_se@1\.2-service       u:object_r:hal_trusted_se_default_exec:s0
+
+#StrongBox Keymaster HAL
+/(vendor|system/vendor)/bin/hw/android\.hardware\.keymaster@4\.1-javacard.service      u:object_r:hal_keymaster_default_exec:s0
+
+#StrongBox Keymint HAL
+/vendor/bin/hw/android\.hardware\.security\.keymint-service\.strongbox  u:object_r:hal_keymint_strongbox_exec:s0
+
+# Weaver Hal
+/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver@1\.0-service          u:object_r:hal_weaver_default_exec:s0
 
 #AuthSecret HAL
 /vendor/bin/hw/android\.hardware\.authsecret-service\.nxp  u:object_r:hal_authsecret_default_exec:s0
 
-/(vendor|system/vendor)/bin/hw/android\.hardware\.trusted_se@1\.2-service       u:object_r:hal_trusted_se_default_exec:s0
-/vendor/bin/hw/android\.hardware\.security\.keymint-service\.strongbox  u:object_r:hal_keymint_strongbox_exec:s0

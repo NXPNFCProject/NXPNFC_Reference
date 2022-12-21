@@ -62,20 +62,65 @@ PRODUCT_COPY_FILES += \
      vendor/$(NXP_VENDOR_DIR)/SNxxx/hw/init.$(NXP_NFC_PLATFORM).nfc.rc:vendor/etc/init/init.$(NXP_NFC_HOST).nfc.rc \
      vendor/$(NXP_VENDOR_DIR)/SNxxx/hw/init.$(NXP_NFC_PLATFORM).se.rc:vendor/etc/init/init.$(NXP_NFC_HOST).se.rc \
 
-# NFC packages
+# Service packages
 PRODUCT_PACKAGES += \
-    libnfc-nci \
     NfcNci \
-    Tag \
-    android.hardware.nfc@1.0-impl \
-    com.nxp.nfc \
-    SBUpdateApp \
+    SecureElement \
 
+
+# jar packages
 PRODUCT_PACKAGES += \
-    android.hardware.nfc_snxxx@1.2-service \
+    com.nxp.nfc \
+    com.nxp.osu \
+    com.nxp.sems \
+
+#Test Apps
+PRODUCT_PACKAGES += \
+    OSUTestAPP \
+    SBUpdateApp \
+    JrcpOmapiSmb \
+    JrcpOmapiSpi \
+    JrcpProxy \
+    JrcpOmapiSemdemon \
+
+
+#ADD ALL HAL Services
+PRODUCT_PACKAGES += \
+    android.hardware.weaver@1.0-service \
     android.hardware.secure_element_snxxx@1.2-service \
     android.hardware.wired_se@1.0-service \
     android.hardware.trusted_se@1.2-service \
+    android.hardware.nfc-service.nxp \
+    android.hardware.authsecret-service.nxp \
+    android.hardware.weaver@1.0-service \
+
+ifeq ($(NXP_NFC_HW),SN1xx)
+# ADD keymaster HAL for SN1xx
+PRODUCT_PACKAGES += \
+android.hardware.keymaster@4.1-javacard.service \
+
+else
+
+# ADD keymint hal for SN220
+PRODUCT_PACKAGES += \
+android.hardware.security.keymint-service.strongbox \
+
+endif
+
+
+#VTS/gtest native test modules
+PRODUCT_PACKAGES += \
+    VtsAidlHalNfcTargetTest \
+    VtsHalSecureElementTargetTest \
+    VtsAidlKeyMintTargetTest \
+    VtsHalRemotelyProvisionedComponentTargetTest \
+    VtsAidlSharedSecretTargetTest \
+    VtsHalKeymasterV4_0TargetTest \
+    VtsHalKeymasterV4_1TargetTest \
+    VtsHalWeaverTargetTest \
+    VtsHalAuthSecretTargetTest \
+    SelfTestHalNfcV1_2 \
+
 
 ifeq ($(ENABLE_TREBLE), true)
 PRODUCT_PACKAGES += \
@@ -88,10 +133,14 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 
 BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy \
+                       vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/authsecret \
+                       vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/keymaster \
+                       vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/keymint \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/nfc \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/se \
-                       vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/wiredse \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/trustedse \
+                       vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/weaver \
+                       vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/wiredse \
 
 ifeq ($(POWER_TRACKER_FEATURE), true)
 PRODUCT_PACKAGES += android.hardware.power.stats-service.pixel \
@@ -103,6 +152,7 @@ BOARD_SEPOLICY_DIRS += hardware/google/pixel-sepolicy/powerstats
 
 PRODUCT_SOONG_NAMESPACES += hardware/google/pixel \
                             device/google/gs101 \
+                            device/google/gs-common/powerstats \
                             device/google/gs101/powerstats \
                             hardware/nxp/tests/powerstats
 endif
