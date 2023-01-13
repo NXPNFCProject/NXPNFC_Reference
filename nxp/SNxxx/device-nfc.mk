@@ -86,13 +86,12 @@ PRODUCT_PACKAGES += \
 
 #ADD ALL HAL Services
 PRODUCT_PACKAGES += \
-    android.hardware.weaver@1.0-service \
-    android.hardware.secure_element_snxxx@1.2-service \
+    android.hardware.secure_element-service.nxp \
     android.hardware.wired_se@1.0-service \
     android.hardware.trusted_se@1.2-service \
     android.hardware.nfc-service.nxp \
     android.hardware.authsecret-service.nxp \
-    android.hardware.weaver@1.0-service \
+    android.hardware.weaver-service.nxp
 
 ifeq ($(NXP_NFC_HW),SN1xx)
 # ADD keymaster HAL for SN1xx

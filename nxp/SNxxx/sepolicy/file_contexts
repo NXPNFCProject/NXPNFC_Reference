@@ -15,6 +15,7 @@
 
 # SE HAL
 /(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element_snxxx@1\.2-service       u:object_r:hal_secure_element_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element-service\.nxp            u:object_r:hal_secure_element_default_exec:s0
 
 # NXP Specific/ Proprietary test binary
 /(vendor|system/vendor)/bin/hw/android\.hardware\.wired_se@1\.0-service       u:object_r:hal_wired_se_default_exec:s0
@@ -28,6 +29,7 @@
 
 # Weaver Hal
 /(vendor|system/vendor)/bin/hw/android\.hardware\.weaver@1\.0-service          u:object_r:hal_weaver_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver-service\.nxp          u:object_r:hal_weaver_default_exec:s0
 
 #AuthSecret HAL
 /vendor/bin/hw/android\.hardware\.authsecret-service\.nxp  u:object_r:hal_authsecret_default_exec:s0

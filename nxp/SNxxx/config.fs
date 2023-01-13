@@ -11,17 +11,17 @@ value:2903
 mode: 0755
 user: AID_VENDOR_NXP_STRONGBOX
 group: AID_SYSTEM
-caps: SYS_ADMIN SYS_NICE
+caps: SYS_ADMIN SYS_NICE WAKE_ALARM
 
-[vendor/bin/hw/android.hardware.weaver@1.0-service]
+[vendor/bin/hw/android.hardware.weaver-service.nxp]
 mode: 0755
 user: AID_VENDOR_NXP_WEAVER
 group: AID_SYSTEM
-caps: SYS_ADMIN SYS_NICE
+caps: SYS_ADMIN SYS_NICE WAKE_ALARM
 
 [vendor/bin/hw/android.hardware.authsecret-service.nxp]
 mode: 0755
 user: AID_VENDOR_NXP_AUTHSECRET
 group: AID_SYSTEM
-caps: SYS_ADMIN SYS_NICE
+caps: SYS_ADMIN SYS_NICE WAKE_ALARM
 

@@ -6,10 +6,12 @@
         <version>1.2</version>
         <interface>
             <name>ISecureElement</name>
-            <instance>eSE1</instance>
+<!-- Uncomment this for enabling the SE HIDL service.
+            <instance>eSE1</instance> -->
             <instance>eSE2</instance>
         </interface>
     </hal>
+<!-- Uncomment this for enabling the SE HIDL service.
     <hal format="hidl">
         <name>vendor.nxp.nxpese</name>
         <transport>hwbinder</transport>
@@ -19,7 +21,7 @@
             <name>INxpEse</name>
             <instance>default</instance>
         </interface>
-    </hal>
+    </hal> -->
     <hal format="hidl">
         <name>vendor.nxp.nxpwiredse</name>
         <transport>hwbinder</transport>

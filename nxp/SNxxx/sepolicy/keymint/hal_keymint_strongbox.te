@@ -16,3 +16,4 @@ allow hal_keymint_strongbox hal_secure_element_default:binder { call transfer };
 
 allow hal_keymint_strongbox boot_status_prop:file { getattr map open read };
 allow hal_keymint_strongbox secure_element_service:service_manager find;
+allow hal_keymint_strongbox self:capability2 wake_alarm;
