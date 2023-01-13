@@ -1,2 +1,0 @@
-#============= secure_element ==============
-allow secure_element hal_authsecret_default:binder transfer;
