@@ -118,7 +118,7 @@ PRODUCT_PACKAGES += \
     VtsHalKeymasterV4_1TargetTest \
     VtsHalWeaverTargetTest \
     VtsHalAuthSecretTargetTest \
-    SelfTestHalNfcV1_2 \
+    SelfTestHalAidlNfc \
 
 
 ifeq ($(ENABLE_TREBLE), true)
