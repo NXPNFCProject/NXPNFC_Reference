@@ -11,6 +11,11 @@ endif
 NXP_NFC_PLATFORM := SNxxx
 NXP_VENDOR_DIR := nxp
 
+# Variable to enable/disable power tracker feature.
+# By default this is disabled. This can be enabled by either by changing below value to true
+# or can be specified in make command like "make -j8 POWER_TRACKER_FEATURE=true"
+POWER_TRACKER_FEATURE ?= false
+
 # These are the hardware-specific features
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
@@ -87,3 +92,18 @@ BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/se \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/wiredse \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/trustedse \
+
+ifeq ($(POWER_TRACKER_FEATURE), true)
+PRODUCT_PACKAGES += android.hardware.power.stats-service.pixel \
+                    power_tracker \
+                    VtsHalPowerStatsTargetNfcTest
+
+BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/nfc/power-tracker
+BOARD_SEPOLICY_DIRS += hardware/google/pixel-sepolicy/powerstats
+
+PRODUCT_SOONG_NAMESPACES += hardware/google/pixel \
+                            device/google/gs101 \
+                            device/google/gs-common/powerstats \
+                            device/google/gs101/powerstats \
+                            hardware/nxp/tests/powerstats
+endif

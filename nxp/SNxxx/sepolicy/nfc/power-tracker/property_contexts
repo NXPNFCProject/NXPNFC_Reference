@@ -1,0 +1,7 @@
+# NFC Power properties
+vendor.nfc.nxp.activestate.entrycount   u:object_r:vendor_nfc_nxp_activestate_entrycount_prop:s0 exact uint
+vendor.nfc.nxp.standbystate.entrycount   u:object_r:vendor_nfc_nxp_standbystate_entrycount_prop:s0 exact uint
+vendor.nfc.nxp.ulpdetstate.entrycount   u:object_r:vendor_nfc_nxp_ulpdetstate_entrycount_prop:s0 exact uint
+vendor.nfc.nxp.activestate.tick   u:object_r:vendor_nfc_nxp_activestate_tick_prop:s0 exact uint
+vendor.nfc.nxp.standbystate.tick   u:object_r:vendor_nfc_nxp_standbystate_tick_prop:s0 exact uint
+vendor.nfc.nxp.ulpdetstate.tick   u:object_r:vendor_nfc_nxp_ulpdetstate_tick_prop:s0 exact uint
