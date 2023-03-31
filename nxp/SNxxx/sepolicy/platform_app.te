@@ -1,0 +1,6 @@
+#============= platform_app ==============
+allow platform_app nfc_service:service_manager find;
+#To access debug data under /data/vendor/nfc/debug/
+allow platform_app nfc_vendor_data_file:dir { r_dir_perms };
+allow platform_app nfc_vendor_debug_data_file:dir { search read getattr open };
+allow platform_app nfc_vendor_debug_data_file:file { read getattr open };

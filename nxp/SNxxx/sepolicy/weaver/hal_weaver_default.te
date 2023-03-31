@@ -1,0 +1,11 @@
+hal_server_domain(hal_weaver_default, hal_secure_element);
+hal_client_domain(hal_weaver_default, hal_secure_element);
+allow hal_weaver_default hal_secure_element_default:binder call;
+
+#============= hal_weaver_default ==============
+allow hal_weaver_default boot_status_prop:file { getattr map open read };
+allow hal_weaver_default secure_element_service:service_manager find;
+allow hal_weaver_default secure_element:binder { call transfer };
+
+allow hal_weaver_default self:capability2 wake_alarm;
+

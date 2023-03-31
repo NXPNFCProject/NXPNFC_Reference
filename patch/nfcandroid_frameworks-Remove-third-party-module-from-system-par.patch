@@ -1,0 +1,660 @@
+From 582c740bca4dc5e5e3c5ee3cdce54bf91374b500 Mon Sep 17 00:00:00 2001
+From: nxf24178 <ravindra.yashvant.shinde@nxp.com>
+Date: Mon, 14 Feb 2022 15:13:45 +0530
+Subject: [PATCH] [artf934823]: Remove third party module from system partition
+
+The Vendor specific framework code has been moved to product partition,
+a part of framework which is tightly coupled with AOSP framework has been
+moved to system_ext partition.
+
+Change-Id: I3c8c040d8081ad1f4851e5b37bdcfe83212d66df
+---
+ Android.bp                                 | 48 ++++++++++++---
+ api/current.txt                            | 10 +++
+ api/removed.txt                            |  1 +
+ api/system-current.txt                     |  1 +
+ api/system-removed.txt                     |  1 +
+ api/test-current.txt                       |  1 +
+ api/test-removed.txt                       |  1 +
+ com.nxp.nfc.xml                            |  2 +-
+ com.nxp.nfcintf.xml                        | 10 +++
+ com/nxp/nfc/NxpNfcAdapter.java             | 66 +++++---------------
+ com/nxp/nfc/NxpWlcAdapter.java             | 62 ++++++-------------
+ com/nxp/nfcintf/NfcAdapterIntf.java        | 71 ++++++++++++++++++++++
+ com/nxp/{nfc => nfcintf}/NfcConstants.java | 17 +-----
+ sems/Android.bp                            |  6 +-
+ sems/com.nxp.sems.xml                      |  2 +-
+ 15 files changed, 174 insertions(+), 125 deletions(-)
+ create mode 100644 api/current.txt
+ create mode 100644 api/removed.txt
+ create mode 100644 api/system-current.txt
+ create mode 100644 api/system-removed.txt
+ create mode 100644 api/test-current.txt
+ create mode 100644 api/test-removed.txt
+ create mode 100644 com.nxp.nfcintf.xml
+ create mode 100644 com/nxp/nfcintf/NfcAdapterIntf.java
+ rename com/nxp/{nfc => nfcintf}/NfcConstants.java (98%)
+
+diff --git a/Android.bp b/Android.bp
+index aa03d0f..3dc5512 100755
+--- a/Android.bp
++++ b/Android.bp
+@@ -1,22 +1,54 @@
+ //#######################################
+-// com.nxp.nfc - library
++// com.nxp.nfcintf - library
+ //#######################################
+-prebuilt_etc {
+-    name: "com.nxp.nfc.xml",
+-    sub_dir: "permissions",
+-    src: "com.nxp.nfc.xml",
++
++java_sdk_library {
++    name: "com.nxp.nfcintf",
++    installable: true,
++    required: ["com.nxp.nfcintf.xml"],
++    system_ext_specific: true,
++    libs: ["framework"],
++    visibility: ["//visibility:public"],
++    stubs_library_visibility: ["//visibility:public"],
++
++    unsafe_ignore_missing_latest_api: true,
++    api_packages: [ "com.nxp.nfcintf",
++                    "com.nxp.nfcintf.NfcAdapterIntf",
++                    "com.nxp.nfcintf.NfcConstants",
++                  ],
++    dex_preopt: {
++        enabled: false,
++    },
++    no_dist: true,
++    srcs: [
++        "com/nxp/nfcintf/NfcAdapterIntf.java",
++        "com/nxp/nfcintf/NfcConstants.java",
++    ],
+ }
+ 
++//#######################################
++// com.nxp.nfc - library
++//#######################################
+ java_library {
+ 
+     name: "com.nxp.nfc",
+     installable: true,
+     required: ["com.nxp.nfc.xml"],
+-
++    product_specific: true,
++    sdk_version: "current",
++    libs: ["com.nxp.nfcintf" ],
++    uses_libs: ["com.nxp.nfcintf"],
+     srcs: [
+         "com/**/I*.aidl",
+-        "com/**/*.java",
++        "com/nxp/nfc/*.java",
+         "android/**/*.java",
+     ],
+-
++}
++// ====  permissions ========================
++prebuilt_etc {
++    name: "com.nxp.nfc.xml",
++    src: "com.nxp.nfc.xml",
++    product_specific: true,
++    // Install to /system/etc/permissions
++    sub_dir: "permissions",
+ }
+diff --git a/api/current.txt b/api/current.txt
+new file mode 100644
+index 0000000..87c4c63
+--- /dev/null
++++ b/api/current.txt
+@@ -0,0 +1,10 @@
++// Signature format: 2.0
++package com.nxp_ext.nfc {
++
++  public final class NfcAdapterIntf {
++    ctor public NfcAdapterIntf();
++    method @Nullable @RequiresPermission(android.Manifest.permission.NFC) public static android.os.IBinder getVendorAdapterInterface(@Nullable String);
++  }
++
++}
++
+diff --git a/api/removed.txt b/api/removed.txt
+new file mode 100644
+index 0000000..d802177
+--- /dev/null
++++ b/api/removed.txt
+@@ -0,0 +1 @@
++// Signature format: 2.0
+diff --git a/api/system-current.txt b/api/system-current.txt
+new file mode 100644
+index 0000000..d802177
+--- /dev/null
++++ b/api/system-current.txt
+@@ -0,0 +1 @@
++// Signature format: 2.0
+diff --git a/api/system-removed.txt b/api/system-removed.txt
+new file mode 100644
+index 0000000..d802177
+--- /dev/null
++++ b/api/system-removed.txt
+@@ -0,0 +1 @@
++// Signature format: 2.0
+diff --git a/api/test-current.txt b/api/test-current.txt
+new file mode 100644
+index 0000000..d802177
+--- /dev/null
++++ b/api/test-current.txt
+@@ -0,0 +1 @@
++// Signature format: 2.0
+diff --git a/api/test-removed.txt b/api/test-removed.txt
+new file mode 100644
+index 0000000..d802177
+--- /dev/null
++++ b/api/test-removed.txt
+@@ -0,0 +1 @@
++// Signature format: 2.0
+diff --git a/com.nxp.nfc.xml b/com.nxp.nfc.xml
+index a064a3a..5753fdf 100755
+--- a/com.nxp.nfc.xml
++++ b/com.nxp.nfc.xml
+@@ -6,5 +6,5 @@ Copyright (c) 2015, The Linux Foundation. All rights reserved.
+ <!-- Assist library for NXP NFC extensions. -->
+ <permissions>
+     <library name="com.nxp.nfc"
+-        file="/system/framework/com.nxp.nfc.jar" />
++        file="/system/product/framework/com.nxp.nfc.jar" />
+ </permissions>
+diff --git a/com.nxp.nfcintf.xml b/com.nxp.nfcintf.xml
+new file mode 100644
+index 0000000..02f8d88
+--- /dev/null
++++ b/com.nxp.nfcintf.xml
+@@ -0,0 +1,10 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!--
++Copyright (c) 2015, The Linux Foundation. All rights reserved.
++-->
++
++<!-- Assist library for NQ NFC extensions. -->
++<permissions>
++    <library name="com.nxp.nfcintf"
++        file="/system/system_ext/framework/com.nxp.nfcintf.jar" />
++</permissions>
+diff --git a/com/nxp/nfc/NxpNfcAdapter.java b/com/nxp/nfc/NxpNfcAdapter.java
+index e6cc80a..4f70e67 100644
+--- a/com/nxp/nfc/NxpNfcAdapter.java
++++ b/com/nxp/nfc/NxpNfcAdapter.java
+@@ -21,17 +21,15 @@ package com.nxp.nfc;
+ 
+ import java.util.HashMap;
+ import java.util.Map;
+-import android.nfc.INfcAdapter;
+ import android.nfc.NfcAdapter;
+-import android.nfc.INfcAdapterExtras;
+ import android.os.IBinder;
+-import android.os.ServiceManager;
+ 
+ import java.io.IOException;
+ import android.os.UserHandle;
+ import android.os.RemoteException;
+-import android.annotation.SystemApi;
+-import android.annotation.RequiresPermission;
++import com.nxp.nfcintf.NfcAdapterIntf;
++import com.nxp.nfcintf.NfcConstants;
++
+ 
+ import android.util.Log;
+ import java.util.List;
+@@ -58,7 +56,7 @@ public final class NxpNfcAdapter {
+     // Final after first constructor, except for
+     // attemptDeadServiceRecovery() when NFC crashes - we accept a best effort
+     // recovery
+-    private static INfcAdapter sService;
++   // private static INfcAdapter sService;
+     private static INxpNfcAdapter sNxpService;
+ 
+     private NxpNfcAdapter() {
+@@ -74,15 +72,15 @@ public final class NxpNfcAdapter {
+                 Log.v(TAG, "could not find NFC support");
+                 throw new UnsupportedOperationException();
+             }
+-            sService = getServiceInterface();
+-            if (sService == null) {
+-                Log.e(TAG, "could not retrieve NFC service");
+-                throw new UnsupportedOperationException();
++            IBinder b = NfcAdapterIntf.getVendorAdapterInterface("nxp");
++            if (b == null) {
++              Log.e(TAG, "could not retrieve service");
++              throw new UnsupportedOperationException();
+             }
+-            sNxpService = getNxpNfcAdapterInterface();
+-             if (sNxpService == null) {
+-                Log.e(TAG, "could not retrieve NXP NFC service");
+-                throw new UnsupportedOperationException();
++            sNxpService = INxpNfcAdapter.Stub.asInterface(b);
++            if (sNxpService == null) {
++              Log.e(TAG, "could not retrieve NXP NFC service");
++              throw new UnsupportedOperationException();
+             }
+             sIsInitialized = true;
+         }
+@@ -94,16 +92,6 @@ public final class NxpNfcAdapter {
+         return nxpAdapter;
+     }
+ 
+-    /** get handle to NFC service interface */
+-    private static INfcAdapter getServiceInterface() {
+-        /* get a handle to NFC service */
+-        IBinder b = ServiceManager.getService("nfc");
+-        if (b == null) {
+-            return null;
+-        }
+-        return INfcAdapter.Stub.asInterface(b);
+-    }
+-
+     /**
+      * NFC service dead - attempt best effort recovery
+      * @hide
+@@ -111,8 +99,8 @@ public final class NxpNfcAdapter {
+     private static void attemptDeadServiceRecovery(Exception e) {
+         Log.e(TAG, "Service dead - attempting to recover",e);
+         sIsInitialized = false;
+-        INfcAdapter service = getServiceInterface();
+-        if (service == null) {
++        IBinder b = NfcAdapterIntf.getVendorAdapterInterface("nxp");
++        if (b == null) {
+             Log.e(TAG, "could not retrieve NFC service during service recovery");
+             // nothing more can be done now, sService is still stale, we'll hit
+             // this recovery path again later
+@@ -120,8 +108,7 @@ public final class NxpNfcAdapter {
+         }
+         // assigning to sService is not thread-safe, but this is best-effort code
+         // and on a well-behaved system should never happen
+-        sService = service;
+-        sNxpService = getNxpNfcAdapterInterface();
++        sNxpService = INxpNfcAdapter.Stub.asInterface(b);
+         if (sNxpService != null) {
+             sIsInitialized = true;
+         }
+@@ -228,26 +215,6 @@ public final class NxpNfcAdapter {
+        }
+      }
+ 
+-    /**
+-     * @hide
+-     */
+-    public static INxpNfcAdapter getNxpNfcAdapterInterface() {
+-      if (sService == null) {
+-        throw new UnsupportedOperationException(
+-            "You need a reference from NfcAdapter to use the "
+-            + " NXP NFC APIs");
+-      }
+-      try {
+-        IBinder b = sService.getNfcAdapterVendorInterface("nxp");
+-        if (b == null) {
+-          return null;
+-        }
+-        return INxpNfcAdapter.Stub.asInterface(b);
+-      } catch (RemoteException e) {
+-        return null;
+-      }
+-    }
+-
+     /**
+      * Change poll and listen technology
+      * Generic API is use to disable polling and enable speicific listening
+@@ -329,7 +296,6 @@ public final class NxpNfcAdapter {
+      *          MPOS_STATUS_SUCCESS
+      * @throws IOException If a failure occurred during reader mode set or reset
+      */
+-    @RequiresPermission(android.Manifest.permission.NFC)
+     public int mPOSSetReaderMode(String pkg, boolean on) throws IOException {
+       try {
+         return sNxpService.mPOSSetReaderMode(pkg, on);
+@@ -353,7 +319,6 @@ public final class NxpNfcAdapter {
+      *          FALSE if reader mode is not started
+      * @throws IOException If a failure occurred during reader mode set or reset
+      */
+-    @RequiresPermission(android.Manifest.permission.NFC)
+     public boolean mPOSGetReaderMode(String pkg) throws IOException {
+       try {
+         return sNxpService.mPOSGetReaderMode(pkg);
+@@ -382,7 +347,6 @@ public final class NxpNfcAdapter {
+      *          SCR_STATUS_FAILED
+      * @throws IOException If a failure occurred during reader mode set or reset
+      */
+-    @RequiresPermission(android.Manifest.permission.NFC)
+     public int configureSecureReader(boolean on, String readerType)
+         throws IOException {
+       try {
+diff --git a/com/nxp/nfc/NxpWlcAdapter.java b/com/nxp/nfc/NxpWlcAdapter.java
+index 7cdb0be..170dc74 100644
+--- a/com/nxp/nfc/NxpWlcAdapter.java
++++ b/com/nxp/nfc/NxpWlcAdapter.java
+@@ -17,15 +17,13 @@
+ 
+ package com.nxp.nfc;
+ 
+-import android.annotation.SystemApi;
+-import android.nfc.INfcAdapter;
+ import android.nfc.NfcAdapter;
+ import android.os.IBinder;
+ import android.os.RemoteException;
+-import android.os.ServiceManager;
+ import android.util.Log;
+ import java.io.IOException;
+ import java.util.HashMap;
++import com.nxp.nfcintf.NfcAdapterIntf;
+ 
+ public final class NxpWlcAdapter {
+   private static final String TAG = "NXPWLC";
+@@ -41,7 +39,7 @@ public final class NxpWlcAdapter {
+   // Final after first constructor, except for
+   // attemptDeadServiceRecovery() when NFC crashes - we accept a best effort
+   // recovery
+-  private static INfcAdapter sService;
++  //private static INfcAdapter sService;
+   private static INxpWlcAdapter sNxpService;
+ 
+   private NxpWlcAdapter() {}
+@@ -52,12 +50,12 @@ public final class NxpWlcAdapter {
+         Log.v(TAG, "could not find NFC support");
+         throw new UnsupportedOperationException();
+       }
+-      sService = getServiceInterface();
+-      if (sService == null) {
+-        Log.e(TAG, "could not retrieve NFC service");
++      IBinder b = NfcAdapterIntf.getVendorAdapterInterface("wlc");
++      if (b == null) {
++        Log.e(TAG, "could not retrieve service");
+         throw new UnsupportedOperationException();
+       }
+-      sNxpService = getNxpWlcAdapterInterface();
++      sNxpService = INxpWlcAdapter.Stub.asInterface(b);
+       if (sNxpService == null) {
+         Log.e(TAG, "could not retrieve NXP WLC service");
+         throw new UnsupportedOperationException();
+@@ -72,43 +70,15 @@ public final class NxpWlcAdapter {
+     return nxpAdapter;
+   }
+ 
+-  /** get handle to NFC service interface */
+-  private static INfcAdapter getServiceInterface() {
+-    /* get a handle to NFC service */
+-    IBinder b = ServiceManager.getService("nfc");
+-    if (b == null) {
+-      return null;
+-    }
+-    return INfcAdapter.Stub.asInterface(b);
+-  }
+-
+-  /**
+-   * @hide
+-   */
+-  public static INxpWlcAdapter getNxpWlcAdapterInterface() {
+-    if (sService == null) {
+-      throw new UnsupportedOperationException("You need a reference from NfcAdapter to use the "
+-          + " NXP NFC APIs");
+-    }
+-    try {
+-      IBinder b = sService.getNfcAdapterVendorInterface("wlc");
+-      if (b == null) {
+-        return null;
+-      }
+-      return INxpWlcAdapter.Stub.asInterface(b);
+-    } catch (RemoteException e) {
+-      return null;
+-    }
+-  }
+-
+   /**
+    * NFC service dead - attempt best effort recovery
+    * @hide
+    */
+   private static void attemptDeadServiceRecovery(Exception e) {
+     Log.e(TAG, "Service dead - attempting to recover", e);
+-    INfcAdapter service = getServiceInterface();
+-    if (service == null) {
++    sIsInitialized = false;
++    IBinder b = NfcAdapterIntf.getVendorAdapterInterface("wlc");
++    if (b == null) {
+       Log.e(TAG, "could not retrieve NFC service during service recovery");
+       // nothing more can be done now, sService is still stale, we'll hit
+       // this recovery path again later
+@@ -116,8 +86,10 @@ public final class NxpWlcAdapter {
+     }
+     // assigning to sService is not thread-safe, but this is best-effort code
+     // and on a well-behaved system should never happen
+-    sService = service;
+-    sNxpService = getNxpWlcAdapterInterface();
++    sNxpService = INxpWlcAdapter.Stub.asInterface(b);
++    if (sNxpService != null) {
++      sIsInitialized = true;
++    }
+     return;
+   }
+ 
+@@ -129,7 +101,7 @@ public final class NxpWlcAdapter {
+    * @return none
+    * @throws  IOException if any exception occurs during this operation
+    */
+-  @SystemApi
++  //@SystemApi
+   public void enableWlc(INxpWlcCallBack callback) throws IOException {
+     try {
+       sNxpService.enableWlc(callback);
+@@ -147,7 +119,7 @@ public final class NxpWlcAdapter {
+    * @return none
+    * @throws  IOException if any exception occurs during this operation
+    */
+-  @SystemApi
++  //@SystemApi
+   public void disableWlc(INxpWlcCallBack callback) throws IOException {
+     try {
+       sNxpService.disableWlc(callback);
+@@ -165,7 +137,7 @@ public final class NxpWlcAdapter {
+    * @return true if WlcPolling is Enabled else false
+    * @throws  IOException if any exception occurs during this operation
+    */
+-  @SystemApi
++  //@SystemApi
+   public boolean isWlcEnabled() throws IOException {
+     try {
+       return sNxpService.isWlcEnabled();
+@@ -175,4 +147,4 @@ public final class NxpWlcAdapter {
+       return false;
+     }
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/com/nxp/nfcintf/NfcAdapterIntf.java b/com/nxp/nfcintf/NfcAdapterIntf.java
+new file mode 100644
+index 0000000..225c62c
+--- /dev/null
++++ b/com/nxp/nfcintf/NfcAdapterIntf.java
+@@ -0,0 +1,71 @@
++/*
++ *
++ *  The original Work has been changed by NXP.
++ *
++ *  Copyright 2021 NXP
++ *
++ *  Licensed under the Apache License, Version 2.0 (the "License");
++ *  you may not use this file except in compliance with the License.
++ *  You may obtain a copy of the License at
++ *
++ *  http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *  Unless required by applicable law or agreed to in writing, software
++ *  distributed under the License is distributed on an "AS IS" BASIS,
++ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ *  See the License for the specific language governing permissions and
++ *  limitations under the License.
++ *
++ */
++package com.nxp.nfcintf;
++
++import android.nfc.INfcAdapter;
++import android.os.ServiceManager;
++import android.annotation.Nullable;
++import android.annotation.RequiresPermission;
++import android.os.IBinder;
++import android.os.RemoteException;
++import android.util.Log;
++
++import android.nfc.INfcAdapterExtras;
++import android.os.Bundle;
++
++public final class NfcAdapterIntf {
++    static final String TAG = "NFCIntf";
++    static private INfcAdapterExtras mSE = null;
++    /**
++     * The API will return binder object to vendor specific service.
++     *
++     */
++    @RequiresPermission(android.Manifest.permission.NFC)
++    public static @Nullable IBinder getVendorAdapterInterface(@Nullable String vendor) {
++      /* get a handle to NFC service */
++      INfcAdapter sService = null;
++      IBinder b = ServiceManager.getService("nfc");
++      if (b != null) {
++        sService = INfcAdapter.Stub.asInterface(b);
++      }
++      if (b == null || sService == null) {
++        Log.e(TAG, "could not retrieve NFC service");
++        return null;
++      }
++
++      try {
++        b = sService.getNfcAdapterVendorInterface(vendor);
++        return b;
++      } catch (RemoteException e) {
++        return null;
++      }
++    }
++
++   public static Bundle open(String pkg, IBinder b) {
++     Bundle bundle = null;
++     try {
++       bundle =  mSE.open(pkg, b);
++     } catch (Exception e) {
++       e.printStackTrace();
++     }
++     return bundle;
++   }
++}
++
+diff --git a/com/nxp/nfc/NfcConstants.java b/com/nxp/nfcintf/NfcConstants.java
+similarity index 98%
+rename from com/nxp/nfc/NfcConstants.java
+rename to com/nxp/nfcintf/NfcConstants.java
+index fde3ab7..f643a66 100644
+--- a/com/nxp/nfc/NfcConstants.java
++++ b/com/nxp/nfcintf/NfcConstants.java
+@@ -18,7 +18,7 @@
+ *
+ */
+ 
+-package com.nxp.nfc;
++package com.nxp.nfcintf;
+ 
+ import android.annotation.SdkConstant;
+ import android.annotation.SdkConstant.SdkConstantType;
+@@ -33,9 +33,6 @@ public final class NfcConstants {
+    */
+   public static final String UICC_ID = "com.nxp.uicc.ID";
+ 
+-  /**
+-   *@hide
+-   */
+   public static final int UICC_ID_TYPE = 2;
+ 
+   /**
+@@ -43,9 +40,6 @@ public final class NfcConstants {
+    */
+   public static final String UICC2_ID = "com.nxp.uicc2.ID";
+ 
+-  /**
+-   *@hide
+-   */
+   public static final int UICC2_ID_TYPE = 4;
+ 
+   /**
+@@ -53,9 +47,6 @@ public final class NfcConstants {
+    */
+   public static final String SMART_MX_ID = "com.nxp.smart_mx.ID";
+ 
+-  /**
+-   *@hide
+-   */
+   public static final int SMART_MX_ID_TYPE = 1;
+   /**
+    * UICC ID to be able to select it as the default Secure Element
+@@ -63,7 +54,6 @@ public final class NfcConstants {
+ 
+   /**
+    * ID to be able to select all Secure Elements
+-   * @hide
+    */
+   public static final String ALL_SE_ID = "com.nxp.all_se.ID";
+ 
+@@ -72,20 +62,15 @@ public final class NfcConstants {
+    */
+   public static final String HOST_ID = "com.nxp.host.ID";
+ 
+-  /**
+-   *@hide
+-   */
+   public static final int HOST_ID_TYPE = 0;
+ 
+   /**
+    * fw version major number
+-   * @hide
+    */
+   static final byte PN553_FW_MAJOR_NUM = 1;
+ 
+   /**
+    * fw ROM code version
+-   * @hide
+    */
+   static final byte PN553_FW_ROM_VER = 0x11;
+ 
+diff --git a/sems/Android.bp b/sems/Android.bp
+index aa2891e..e6bbd80 100644
+--- a/sems/Android.bp
++++ b/sems/Android.bp
+@@ -3,7 +3,7 @@
+ //#######################################
+ prebuilt_etc {
+     name: "com.nxp.sems.xml",
+-    vendor: true,
++    product_specific: true,
+     sub_dir: "permissions",
+     src:"com.nxp.sems.xml",
+ }
+@@ -12,8 +12,8 @@ java_library {
+ 
+     name: "com.nxp.sems",
+     installable: true,
+-    sdk_version: "29",
+-    vendor: true,
++    product_specific: true,
++    sdk_version: "current",
+     required: ["com.nxp.sems.xml"],
+ 
+     srcs: [
+diff --git a/sems/com.nxp.sems.xml b/sems/com.nxp.sems.xml
+index f9a0de6..78fbfe3 100755
+--- a/sems/com.nxp.sems.xml
++++ b/sems/com.nxp.sems.xml
+@@ -18,5 +18,5 @@
+ <!-- Assist library for NXP SEMS extensions. -->
+ <permissions>
+     <library name="com.nxp.sems"
+-        file="/vendor/framework/com.nxp.sems.jar" />
++        file="/system/product/framework/com.nxp.sems.jar" />
+ </permissions>
+-- 
+2.35.1
+

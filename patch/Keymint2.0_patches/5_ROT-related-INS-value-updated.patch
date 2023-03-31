@@ -1,0 +1,31 @@
+From e70a21674494fdac761db852957f93979f8ad0ed Mon Sep 17 00:00:00 2001
+From: nxf32288 <ganesh.deva_1@nxp.com>
+Date: Wed, 27 Apr 2022 16:39:54 +0530
+Subject: [PATCH 6/6] [artf957643]: ROT related INS value updated.
+
+getRotChallenge, getRot, sendRot INS values are aligned with AOSP.
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
+---
+ keymint/JavacardSecureElement.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/keymint/JavacardSecureElement.h b/keymint/JavacardSecureElement.h
+index 216763c..60347b7 100644
+--- a/keymint/JavacardSecureElement.h
++++ b/keymint/JavacardSecureElement.h
+@@ -89,9 +89,9 @@ enum class Instruction {
+     INS_UPDATE_CHALLENGE_CMD = KEYMINT_CMD_APDU_START + 32,
+     INS_FINISH_SEND_DATA_CMD = KEYMINT_CMD_APDU_START + 33,
+     INS_GET_RESPONSE_CMD = KEYMINT_CMD_APDU_START + 34,
+-    INS_GET_ROT_CHALLENGE_CMD = KEYMINT_CMD_APDU_START + 0xB0,
+-    INS_GET_ROT_DATA_CMD = KEYMINT_CMD_APDU_START + 0xB1,
+-    INS_SEND_ROT_DATA_CMD = KEYMINT_CMD_APDU_START + 0xB2,
++    INS_GET_ROT_CHALLENGE_CMD = KEYMINT_CMD_APDU_START + 45,
++    INS_GET_ROT_DATA_CMD = KEYMINT_CMD_APDU_START + 46,
++    INS_SEND_ROT_DATA_CMD = KEYMINT_CMD_APDU_START + 47,
+ };
+ 
+ class JavacardSecureElement {
+-- 
+2.35.1
+

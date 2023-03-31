@@ -1,0 +1,18 @@
+#============= hal_nfc_default ==============
+get_prop(hal_nfc, vendor_nfc_nxp_activestate_entrycount_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_activestate_entrycount_prop)
+get_prop(hal_nfc, vendor_nfc_nxp_standbystate_entrycount_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_standbystate_entrycount_prop)
+get_prop(hal_nfc, vendor_nfc_nxp_ulpdetstate_entrycount_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_ulpdetstate_entrycount_prop)
+get_prop(hal_nfc, vendor_nfc_nxp_activestate_tick_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_activestate_tick_prop)
+get_prop(hal_nfc, vendor_nfc_nxp_standbystate_tick_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_standbystate_tick_prop)
+get_prop(hal_nfc, vendor_nfc_nxp_ulpdetstate_tick_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_ulpdetstate_tick_prop)
+
+allow hal_nfc_default hal_power_stats_vendor_service:service_manager find;
+allow hal_nfc_default hal_power_stats_default:binder { call transfer};
+#allow hal_nfc_default vndbinder_device:chr_file { ioctl map open read write };
+#allow hal_nfc_default vndservicemanager:binder call;

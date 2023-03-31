@@ -1,0 +1,4 @@
+android.hardware.security.keymint.IKeyMintDevice/strongbox      u:object_r:hal_keymint_service:s0
+android.hardware.security.sharedsecret.ISharedSecret/strongbox  u:object_r:hal_sharedsecret_service:s0
+android.hardware.security.keymint.IRemotelyProvisionedComponent/strongbox u:object_r:hal_keymint_service:s0
+vendor.nxp.nxpnfc_aidl.INxpNfc/default                          u:object_r:vendor_hal_nxpnfc_service:s0

@@ -1,0 +1,16 @@
+type hal_wired_se_default, domain;
+hal_server_domain(hal_wired_se_default, hal_wired_se)
+hal_server_domain(hal_wired_se_default, hal_secure_element)
+type hal_wired_se_default_exec, exec_type, vendor_file_type, file_type;
+
+#============= hal_wired_se_default ==============
+allow hal_wired_se_default secure_element_device:chr_file rw_file_perms;
+allow hal_wired_se_default hal_wired_se_hwservice:hwservice_manager { find add };
+allow hal_wired_se_default hal_secure_element_hwservice:hwservice_manager add;
+#=================================================
+#allow hal_wired_se_default nfc_data_file:dir search;
+allow hal_wired_se_default nfc_vendor_data_file:dir { add_name read write search remove_name};
+allow hal_wired_se_default nfc_vendor_data_file:file { append getattr open create read write unlink};
+#=================================================
+
+init_daemon_domain(hal_wired_se_default)

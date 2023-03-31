@@ -1,0 +1,39 @@
+From 2cb34070838d4bdccae3cd5ff5c4f4a7adf9af5b Mon Sep 17 00:00:00 2001
+From: nxf38293 <lokanathareddy.virayagarri@nxp.com>
+Date: Wed, 13 Jul 2022 11:59:52 +0530
+Subject: [PATCH] [artf976452] Disabling the UICC2 from config file
+
+UICC2 is disabled from the MW set confg by using the A0D4.
+
+Signed-off-by: nxf38293 <lokanathareddy.virayagarri@nxp.com>
+---
+ .../gen-config-files/libnfc-nxp-SN220U_example.conf   | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/snxxx/halimpl/conf/SN220/gen-config-files/libnfc-nxp-SN220U_example.conf b/snxxx/halimpl/conf/SN220/gen-config-files/libnfc-nxp-SN220U_example.conf
+index 9cafa9e..00794e4 100644
+--- a/snxxx/halimpl/conf/SN220/gen-config-files/libnfc-nxp-SN220U_example.conf
++++ b/snxxx/halimpl/conf/SN220/gen-config-files/libnfc-nxp-SN220U_example.conf
+@@ -464,12 +464,15 @@ NXP_DISCONNECT_TAG_IN_SCRN_OFF=0x01
+ # Window size A0D8
+ # DWP Speed   A0D5
+ # How eSE connected to PN553 A012
+-# UICC2 bit rate A0D1
+-# SWP1A interface A0D4
++# UICC2 bit rate  A0D1
++# UICC1 interface A0EC
++# UICC2 interface A0D4
++# eSE interface   A0ED
+ # DWP intf behavior config, SVDD Load activated by default if set to 0x31 A037
+-NXP_CORE_CONF_EXTN={20, 02, 09, 02,
++NXP_CORE_CONF_EXTN={20, 02, 0D, 03,
+     A0, EC, 01, 01,
+-    A0, ED, 01, 01
++    A0, ED, 01, 01,
++    A0, D4, 01, 00
+ }
+ #       A0, F2, 01, 01,
+ #       A0, 40, 01, 01,
+-- 
+2.36.1
+

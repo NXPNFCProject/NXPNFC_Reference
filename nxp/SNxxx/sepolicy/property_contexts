@@ -1,0 +1,3 @@
+# NFC properties
+vendor.nfc.min_firmware     u:object_r:vendor_nfc_prop:s0
+vendor.strongbox.triggerhmac   u:object_r:vendor_strongbox_prop:s0

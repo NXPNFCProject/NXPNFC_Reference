@@ -1,0 +1,59 @@
+From 290fc0b699eaf1248dcc7c51d89b028d00baa069 Mon Sep 17 00:00:00 2001
+From: nxf32288 <ganesh.deva_1@nxp.com>
+Date: Wed, 23 Mar 2022 11:33:04 +0530
+Subject: [PATCH 2/6] [artf950442]: Fix SB not functional in stress test.
+
+Avoid channel close invoked multiple times when transmit returned
+with SW 6881 (Logical channel not supported) & Interval Timer timed out.
+
+Change-Id: I35cd4406f315027fbc73d4f9d677207bbba801dd
+Signed-off-by: Ganesh Devaraj <ganesh.deva_1@nxp.com>
+---
+ keymint/transport/OmapiTransport.cpp | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
+
+diff --git a/keymint/transport/OmapiTransport.cpp b/keymint/transport/OmapiTransport.cpp
+index 9cd9758..f2fac81 100644
+--- a/keymint/transport/OmapiTransport.cpp
++++ b/keymint/transport/OmapiTransport.cpp
+@@ -372,13 +372,16 @@ bool OmapiTransport::internalProtectedTransmitApdu(
+     res = channel->transmit(apdu, &transmitResponse);
+ 
+ #ifdef INTERVAL_TIMER
+-     int timeout = mSBAccessController.getSessionTimeout();
+-     if(timeout == 0) {
+-       closeSession(); //close immediately
+-     } else {
+-       LOGD_OMAPI("Set the timer with timeout " << timeout << " ms");
+-       mTimer.set(mSBAccessController.getSessionTimeout(), this, omapiSessionTimerFunc);
+-     }
++    int timeout = mSBAccessController.getSessionTimeout();
++    if (timeout == 0 || !res.isOk() ||
++        ((transmitResponse.size() >= 2) &&
++         (getApduStatus(transmitResponse) == RESP_CHANNEL_NOT_AVAILABLE))) {
++      closeSession(); // close immediately
++    } else {
++      LOGD_OMAPI("Set the timer with timeout " << timeout << " ms");
++      mTimer.set(mSBAccessController.getSessionTimeout(), this,
++                 omapiSessionTimerFunc);
++    }
+ #else
+      closeSession();
+ #endif
+@@ -389,13 +392,6 @@ bool OmapiTransport::internalProtectedTransmitApdu(
+         LOG(ERROR) << "transmit error: " << res.getMessage();
+         return false;
+     }
+-#ifdef INTERVAL_TIMER
+-    if ((transmitResponse.size() >= 2) &&
+-        (getApduStatus(transmitResponse) == RESP_CHANNEL_NOT_AVAILABLE)) {
+-      LOG(ERROR) << " SW is not ok. SW = " << getApduStatus(transmitResponse);
+-      if (channel != nullptr) channel->close();
+-    }
+-#endif
+     return true;
+ }
+ 
+-- 
+2.35.1
+
