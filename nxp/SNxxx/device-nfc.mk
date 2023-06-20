@@ -113,7 +113,7 @@ else
 
 # ADD keymint hal for SN220
 PRODUCT_PACKAGES += \
-android.hardware.security.keymint-service.strongbox \
+android.hardware.security.keymint-service.strongbox.nxp \
 
 endif
 
@@ -141,7 +141,20 @@ endif
 PRODUCT_PROPERTY_OVERRIDES += \
 		ro.hardware.nfc_nci=$(NXP_NFC_PLATFORM)
 PRODUCT_PRODUCT_PROPERTIES += remote_provisioning.hostname=remoteprovisioning.googleapis.com
+PRODUCT_PRODUCT_PROPERTIES += remote_provisioning.enable_rkpd=true
+PRODUCT_PRODUCT_PROPERTIES += remote_provisioning.strongbox.rkp_only=true
 VENDOR_SECURITY_PATCH = $(PLATFORM_SECURITY_PATCH)
+PRODUCT_PRODUCT_PROPERTIES += ro.crypto.metadata_init_delete_all_keys.enabled=true
+PRODUCT_PRODUCT_PROPERTIES += ro.product.device_for_attestation=$(TARGET_PRODUCT)
+PRODUCT_PRODUCT_PROPERTIES += ro.product.product_for_attestation=unknown
+PRODUCT_PRODUCT_PROPERTIES += ro.product.manufacturer_for_attestation=unknown
+PRODUCT_PRODUCT_PROPERTIES += ro.product.vendor.name=unknown
+PRODUCT_PRODUCT_PROPERTIES += ro.product.name=unknown
+PRODUCT_MODEL_FOR_ATTESTATION := $(TARGET_PRODUCT)
+PRODUCT_BRAND_FOR_ATTESTATION := Android
+
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml
 
 BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/authsecret \
@@ -171,3 +184,5 @@ PRODUCT_SOONG_NAMESPACES += hardware/google/pixel \
                             device/google/gs101/powerstats \
                             hardware/nxp/tests/powerstats
 endif
+
+PRODUCT_SYSTEM_PROPERTIES += ro.boot.hardware.sku=NXP-NFC
