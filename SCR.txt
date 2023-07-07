@@ -1,0 +1,149 @@
+NXP Software Content Register
+Outgoing License: LA_OPT_NXP_Software_License v46 June 2023
+License File:     LA_OPT_NXP_Software_License.pdf
+​
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  NCI based NFC stack
+Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_libnfc-nci
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  JNI NCI NFC
+Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_Nfc
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  Hardware abstraction layer for NXP specific controllers
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_nfc_hidlimpl
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           The Android Open Source Project (MIT) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  Hardware abstraction layer implementation for Secure Element
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_se_hidlimpl
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  NFC Interfaces & Public APIs for Google AOSP
+Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_base
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  AOSP Secure Element Service
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_secureelement
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  NXP eSE client library implementation
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_nxp_ese_clients
+Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  NXP vendor framework APIs for NXP extension interfaces, SEMS & GSMA interfaces
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_frameworks
+Origin:                    NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  Hardware abstraction layer implementation for Keymaster
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_keymaster_hidlimpl
+Origin:                    https://github.com/divegeek/JavaCardKeymaster
+                           The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  Hardware abstraction layer implementation for Weaver
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_weaver_hidlimpl
+Origin:                    NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  Hardware abstraction layer implementation for Keymint
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_keymint_hidlimpl
+Origin:                    https://github.com/divegeek/JavaCardKeymaster
+                           The Android Open Source Project (Apache-2.0) - https://source.android.com/
+                           NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware and Test Application
+Type of content:           Source
+Description and comments:  Device Test Application (DTA) used for NFC Forum testing
+Release Location:          https://github.com/NXPNFCProject/NXPAndroidDTA
+Origin:                    NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          Apache Version 2.0
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source
+Description and comments:  SE Policy updates for NFC and SE service
+Release Location:          https://github.com/NXPNFCProject/NXPNFC_Reference
+Origin:                    NXP (Apache-2.0)
+--------------------------------------------
+Outgoing License:          LA_OPT_NXP_Software_License
+License Files:             COPYING
+Package Category:          NFC SE Middleware
+Type of content:           Source, binary
+Description and comments:  Refer the below mentioned SCR files
+Release Location:          www.collabnet.nxp.com - nfcandroid_nxp_libs
+Location:                  Detailed SCR inside folders: osujar
+Origin:                    NXP (proprietary)
+                           NXP (MIT)
+--------------------------------------------
+Outgoing License:          GNU General Public License v2.0 or later
+License File:              COPYING
+Package Category:          Kernel Driver
+Type of content:           Source
+Description and comments:  NFCC I2C Interface
+Release Location:          https://github.com/NXPNFCProject/NXPNFC_I2CDriver
+Origin:                    The Android Open Source Project (GPL-2.0) - https://android.googlesource.com/kernel/common
+                           NXP(GPL-2.0)
+--------------------------------------------
+Outgoing License:          GNU General Public License v2.0 or later
+License File:              COPYING
+Package Category:          Kernel Driver
+Type of content:           Source
+Description and comments:  NFCC SPI Interface
+Release Location:          https://github.com/NXPNFCProject/NXPESE_SPIDriver
+Origin:                    The Android Open Source Project (GPL-2.0) - https://android.googlesource.com/kernel/common
+                           NXP(GPL-2.0)
+--------------------------------------------
