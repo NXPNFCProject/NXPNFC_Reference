@@ -27,14 +27,9 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.se.omapi.ese.xml:system/etc/permissions/android.hardware.se.omapi.ese.xml \
     frameworks/native/data/etc/com.android.se.xml:system/etc/permissions/com.android.se.xml \
     frameworks/native/data/etc/android.software.secure_lock_screen.xml:system/etc/permissions/android.software.secure_lock_screen.xml \
-
-
-ifneq ($(NXP_NFC_HW),SN220)
-ifneq ($(NXP_NFC_HW),SN300)
-PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.sofware.nfc.beam.xml:system/etc/permissions/android.sofware.nfc.beam.xml
-endif
-endif
+    frameworks/native/data/etc/android.software.managed_users.xml:system/etc/permissions/android.software.managed_users.xml \
+    frameworks/native/data/etc/android.software.device_id_attestation.xml:system/etc/permissions/android.software.device_id_attestation.xml \
+    frameworks/native/data/etc/android.hardware.device_unique_attestation.xml:system/etc/permissions/android.hardware.device_unique_attestation.xml \
 
 # NFC config files
 ifeq ($(NXP_NFC_HW),SN1xx)
@@ -77,7 +72,7 @@ PRODUCT_PACKAGES += \
     NfcNci \
     SecureElement \
     Tag \
-
+    rkpdapp \
 
 # jar packages
 PRODUCT_PACKAGES += \
@@ -85,15 +80,69 @@ PRODUCT_PACKAGES += \
     com.nxp.osu \
     com.nxp.sems \
 
+# DTA, WLC & other libraries
+PRODUCT_PACKAGES += \
+    WlcServiceLib \
+    libnfc_wlc_jni \
+    WlcServiceDefaults \
+    NxpDTA \
+
 #Test Apps
 PRODUCT_PACKAGES += \
+    FieldDetectApp \
     OSUTestAPP \
-    SBUpdateApp \
+    SBupdateApp \
     JrcpOmapiSmb \
     JrcpOmapiSpi \
     JrcpProxy \
     JrcpOmapiSemdemon \
-
+    JrcpOmapiVISO \
+    DynamicAidNonPaymentOffHostTest \
+    PaymentApp_eSE \
+    PaymentApp_eSE_ConflictAID \
+    PaymentApp_eSE_NoConflictAID \
+    PaymentApp_eSE_Overflow \
+    PaymentApp_host \
+    PaymentApp_host_17BAID \
+    PaymentApp_host_AID_CountTest \
+    PaymentApp_host_ConflictAID \
+    PaymentApp_host_noConflictAID \
+    PaymentApp_host_Overflow \
+    PaymentApp_uicc \
+    PaymentApp_uicc_17ByteAID \
+    PaymentApp_uicc_AIDCountTest \
+    PaymentApp_uicc_ConflictAID \
+    PaymentApp_uicc_NoConflictAID \
+    PaymentApp_uicc_Overflow \
+    PaymentApp_uicc_overflow_nonpayment_aids \
+    PaymentAppUicc2 \
+    PaymentAppSE2_eSE \
+    PaymentFelicaHostApp \
+    PaymentApp_eSE_AIDCountTest \
+    StaticDualUiccSwitch \
+    JrcpOmapi_Tee \
+    JrcpOmapi_Ree \
+    RssiApp \
+    PaymentLoopbackApp_uicc \
+    PaymentLoopbackApp_eSE \
+    PaymentApp_host_Nunit \
+    NxpTransitWallet \
+    paymentapp_ese_49AIDs \
+    paymentapp_ese_50AIDs \
+    paymentapp_uicc_49AIDs \
+    paymentapp_uicc_50AIDs \
+    PaymentFelicaHostApp_4203 \
+    FelicaHostApp_EmptyData \
+    PaymentAppSE2_eSE_AID_Filtering \
+    PaymentApp_euicc \
+    PaymentApp_euicc_Overflow \
+    PaymentApp_Preferred \
+    Paymentapp_prefix_sufix \
+    PaymentApp_uicc2 \
+    PaymentApp_host_UL_F_SO_F \
+    PaymentApp_host_UL_F_SO_T \
+    PaymentApp_host_UL_T_SO_F \
+    PaymentApp_host_UL_T_SO_T \
 
 #ADD ALL HAL Services
 PRODUCT_PACKAGES += \
@@ -130,8 +179,9 @@ PRODUCT_PACKAGES += \
     VtsHalWeaverTargetTest \
     VtsHalAuthSecretTargetTest \
     SelfTestHalAidlNfc \
-
-
+    VtsHalOmapiSeAccessControlTestCases \
+    VtsAidlKeyMintBenchmarkTest \
+    
 ifeq ($(ENABLE_TREBLE), true)
 PRODUCT_PACKAGES += \
 	vendor.nxp.nxpnfc@1.0-impl \
