@@ -17,6 +17,8 @@ LOCAL_STEM := nfc/BoardConfigNfcPartial.mk
 #BOARD_KERNEL_CMDLINE += androidboot.selinux=permissive
 BOARD_KERNEL_CMDLINE += video=HDMI-A-1:1280x800@60
 
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := vendor/nxp/SNxxx/framework_compatibility_matrix.xml
+
 PRODUCT_MANIFEST_FILES += packages/apps/SecureElement/secure_element-service.xml
 
 DEVICE_MANIFEST_FILE += vendor/nxp/SNxxx/manifest.xml

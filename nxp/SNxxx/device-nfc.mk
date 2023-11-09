@@ -27,8 +27,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.se.omapi.ese.xml:system/etc/permissions/android.hardware.se.omapi.ese.xml \
     frameworks/native/data/etc/com.android.se.xml:system/etc/permissions/com.android.se.xml \
     frameworks/native/data/etc/android.software.secure_lock_screen.xml:system/etc/permissions/android.software.secure_lock_screen.xml \
-    frameworks/native/data/etc/android.software.managed_users.xml:system/etc/permissions/android.software.managed_users.xml \
-    frameworks/native/data/etc/android.software.device_id_attestation.xml:system/etc/permissions/android.software.device_id_attestation.xml \
     frameworks/native/data/etc/android.hardware.device_unique_attestation.xml:system/etc/permissions/android.hardware.device_unique_attestation.xml \
 
 # NFC config files
@@ -103,6 +101,8 @@ PRODUCT_PACKAGES += \
     PaymentApp_eSE_NoConflictAID \
     PaymentApp_eSE_Overflow \
     PaymentApp_host \
+    PaymentApp_euicc2 \
+    PaymentApp_euicc2_Overflow \
     PaymentApp_host_17BAID \
     PaymentApp_host_AID_CountTest \
     PaymentApp_host_ConflictAID \
@@ -204,7 +204,8 @@ PRODUCT_MODEL_FOR_ATTESTATION := $(TARGET_PRODUCT)
 PRODUCT_BRAND_FOR_ATTESTATION := Android
 
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml
+    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml \
+    frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
 BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy \
                        vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/authsecret \
