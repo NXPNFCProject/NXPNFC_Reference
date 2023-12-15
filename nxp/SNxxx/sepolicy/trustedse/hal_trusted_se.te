@@ -1,8 +1,0 @@
-# HwBinder IPC from client to server, and callbacks
-binder_call(hal_trusted_se_client, hal_trusted_se_server)
-binder_call(hal_trusted_se_server, hal_trusted_se_client)
-
-allow hal_trusted_se vendor_data_file:dir { add_name read write search remove_name };
-allow hal_trusted_se vendor_data_file:file { create getattr open unlink write read append };
-
-#hal_attribute_hwservice(hal_trusted_se, hal_trusted_se_hwservice)
