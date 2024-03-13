@@ -22,7 +22,7 @@
 /(vendor|system/vendor)/bin/hw/android\.hardware\.keymaster@4\.1-javacard.service      u:object_r:hal_keymaster_default_exec:s0
 
 #StrongBox Keymint HAL
-/vendor/bin/hw/android\.hardware\.security\.keymint-service\.strongbox.nxp  u:object_r:hal_keymint_strongbox_exec:s0
+/vendor/bin/hw/android\.hardware\.security\.keymint3-service\.strongbox.nxp  u:object_r:hal_keymint_strongbox_exec:s0
 
 # Weaver Hal
 /(vendor|system/vendor)/bin/hw/android\.hardware\.weaver@1\.0-service.nxp          u:object_r:hal_weaver_default_exec:s0

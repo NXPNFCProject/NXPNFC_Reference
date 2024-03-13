@@ -143,6 +143,11 @@ PRODUCT_PACKAGES += \
     PaymentApp_host_UL_F_SO_T \
     PaymentApp_host_UL_T_SO_F \
     PaymentApp_host_UL_T_SO_T \
+    PaymentApp_eSE_17BAID \
+    PaymentApp_eSE_AllSizeAIDs \
+    PaymentApp_eSE_Overflow_48AIDs16Bytes \
+    PaymentApp_eSE_Overflow_MAX_AIDs \
+    PaymentApp_eSE_Overflow_MAX_AIDs_Plus_1 \
 
 #ADD ALL HAL Services
 PRODUCT_PACKAGES += \
@@ -162,7 +167,7 @@ else
 
 # ADD keymint hal for SN220
 PRODUCT_PACKAGES += \
-android.hardware.security.keymint-service.strongbox.nxp \
+android.hardware.security.keymint3-service.strongbox.nxp \
 
 endif
 
