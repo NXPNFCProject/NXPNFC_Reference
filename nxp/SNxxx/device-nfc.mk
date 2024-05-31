@@ -95,11 +95,16 @@ PRODUCT_PACKAGES += \
     JrcpProxy \
     JrcpOmapiSemdemon \
     JrcpOmapiVISO \
-    DynamicAidNonPaymentOffHostTest \
+    PaymentApp_DynamicAidNonPaymentOffHostTest \
     PaymentApp_eSE \
     PaymentApp_eSE_ConflictAID \
     PaymentApp_eSE_NoConflictAID \
     PaymentApp_eSE_Overflow \
+    PaymentApp_eSE_17BAID \
+    PaymentApp_eSE_AllSizeAIDs \
+    PaymentApp_eSE_Overflow_48AIDs16Bytes \
+    PaymentApp_eSE_Overflow_MAX_AIDs \
+    PaymentApp_eSE_Overflow_MAX_AIDs_Plus_1 \
     PaymentApp_host \
     PaymentApp_euicc2 \
     PaymentApp_euicc2_Overflow \
@@ -115,29 +120,29 @@ PRODUCT_PACKAGES += \
     PaymentApp_uicc_NoConflictAID \
     PaymentApp_uicc_Overflow \
     PaymentApp_uicc_overflow_nonpayment_aids \
-    PaymentAppUicc2 \
-    PaymentAppSE2_eSE \
-    PaymentFelicaHostApp \
+    PaymentApp_Uicc2 \
+    PaymentApp_SE2_eSE \
+    PaymentApp_FelicaHostApp \
     PaymentApp_eSE_AIDCountTest \
-    StaticDualUiccSwitch \
+    dualUiccSwitch \
     JrcpOmapi_Tee \
     JrcpOmapi_Ree \
     RssiApp \
-    PaymentLoopbackApp_uicc \
-    PaymentLoopbackApp_eSE \
+    PaymentApp_LoopbackApp_uicc \
+    PaymentApp_LoopbackApp_eSE \
     PaymentApp_host_Nunit \
     NxpTransitWallet \
-    paymentapp_ese_49AIDs \
-    paymentapp_ese_50AIDs \
-    paymentapp_uicc_49AIDs \
-    paymentapp_uicc_50AIDs \
-    PaymentFelicaHostApp_4203 \
-    FelicaHostApp_EmptyData \
-    PaymentAppSE2_eSE_AID_Filtering \
+    PaymentApp_ese_49AIDs \
+    PaymentApp_ese_50AIDs \
+    PaymentApp_uicc_49AIDs \
+    PaymentApp_uicc_50AIDs \
+    PaymentApp_FelicaHostApp_4203 \
+    PaymentApp_FelicaHostApp_EmptyData \
+    PaymentApp_SE2_eSE_AID_Filtering \
     PaymentApp_euicc \
     PaymentApp_euicc_Overflow \
     PaymentApp_Preferred \
-    Paymentapp_prefix_sufix \
+    PaymentApp_prefix_sufix \
     PaymentApp_uicc2 \
     PaymentApp_host_UL_F_SO_F \
     PaymentApp_host_UL_F_SO_T \
