@@ -20,14 +20,18 @@ POWER_TRACKER_FEATURE ?= false
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
     frameworks/native/data/etc/android.hardware.nfc.hcef.xml:system/etc/permissions/android.hardware.nfc.hcef.xml \
-    frameworks/native/data/etc/android.hardware.nfc.ese.xml:system/etc/permissions/android.hardware.nfc.ese.xml \
     frameworks/native/data/etc/android.hardware.nfc.uicc.xml:system/etc/permissions/android.hardware.nfc.uicc.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
-    frameworks/native/data/etc/android.hardware.se.omapi.ese.xml:system/etc/permissions/android.hardware.se.omapi.ese.xml \
-    frameworks/native/data/etc/com.android.se.xml:system/etc/permissions/com.android.se.xml \
     frameworks/native/data/etc/android.software.secure_lock_screen.xml:system/etc/permissions/android.software.secure_lock_screen.xml \
     frameworks/native/data/etc/android.hardware.device_unique_attestation.xml:system/etc/permissions/android.hardware.device_unique_attestation.xml \
+
+ifneq ($(NXP_NFC_HW),PN557)
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.nfc.ese.xml:system/etc/permissions/android.hardware.nfc.ese.xml \
+    frameworks/native/data/etc/android.hardware.se.omapi.ese.xml:system/etc/permissions/android.hardware.se.omapi.ese.xml \
+    frameworks/native/data/etc/com.android.se.xml:system/etc/permissions/com.android.se.xml
+endif
 
 # NFC config files
 ifeq ($(NXP_NFC_HW),SN1xx)
@@ -62,11 +66,16 @@ endif
 
 # NFC Init Files
 PRODUCT_COPY_FILES += \
-     vendor/$(NXP_VENDOR_DIR)/SNxxx/hw/init.$(NXP_NFC_PLATFORM).nfc.rc:vendor/etc/init/init.$(NXP_NFC_HOST).nfc.rc \
-     vendor/$(NXP_VENDOR_DIR)/SNxxx/hw/init.$(NXP_NFC_PLATFORM).se.rc:vendor/etc/init/init.$(NXP_NFC_HOST).se.rc \
+     vendor/$(NXP_VENDOR_DIR)/SNxxx/hw/init.$(NXP_NFC_PLATFORM).nfc.rc:vendor/etc/init/init.$(NXP_NFC_HOST).nfc.rc
+
+ifneq ($(NXP_NFC_HW),PN557)
+PRODUCT_COPY_FILES += \
+     vendor/$(NXP_VENDOR_DIR)/SNxxx/hw/init.$(NXP_NFC_PLATFORM).se.rc:vendor/etc/init/init.$(NXP_NFC_HOST).se.rc
+endif
 
 # Service packages
 PRODUCT_PACKAGES += \
+    framework-nfc \
     NfcNci \
     SecureElement \
     Tag \
@@ -84,6 +93,7 @@ PRODUCT_PACKAGES += \
     libnfc_wlc_jni \
     WlcServiceDefaults \
     NxpDTA \
+    TR13.2_NXPDTA \
 
 #Test Apps
 PRODUCT_PACKAGES += \
@@ -95,7 +105,7 @@ PRODUCT_PACKAGES += \
     JrcpProxy \
     JrcpOmapiSemdemon \
     JrcpOmapiVISO \
-    DynamicAidNonPaymentOffHostTest \
+    PaymentApp_DynamicAidNonPaymentOffHostTest \
     PaymentApp_eSE \
     PaymentApp_eSE_ConflictAID \
     PaymentApp_eSE_NoConflictAID \
@@ -115,29 +125,29 @@ PRODUCT_PACKAGES += \
     PaymentApp_uicc_NoConflictAID \
     PaymentApp_uicc_Overflow \
     PaymentApp_uicc_overflow_nonpayment_aids \
-    PaymentAppUicc2 \
-    PaymentAppSE2_eSE \
-    PaymentFelicaHostApp \
+    PaymentApp_Uicc2 \
+    PaymentApp_SE2_eSE \
+    PaymentApp_FelicaHostApp \
     PaymentApp_eSE_AIDCountTest \
-    StaticDualUiccSwitch \
+    dualUiccSwitch \
     JrcpOmapi_Tee \
     JrcpOmapi_Ree \
     RssiApp \
-    PaymentLoopbackApp_uicc \
-    PaymentLoopbackApp_eSE \
+    PaymentApp_LoopbackApp_uicc \
+    PaymentApp_LoopbackApp_eSE \
     PaymentApp_host_Nunit \
     NxpTransitWallet \
-    paymentapp_ese_49AIDs \
-    paymentapp_ese_50AIDs \
-    paymentapp_uicc_49AIDs \
-    paymentapp_uicc_50AIDs \
-    PaymentFelicaHostApp_4203 \
-    FelicaHostApp_EmptyData \
-    PaymentAppSE2_eSE_AID_Filtering \
+    PaymentApp_ese_49AIDs \
+    PaymentApp_ese_50AIDs \
+    PaymentApp_uicc_49AIDs \
+    PaymentApp_uicc_50AIDs \
+    PaymentApp_FelicaHostApp_4203 \
+    PaymentApp_FelicaHostApp_EmptyData \
+    PaymentApp_eSE_AID_Filtering \
     PaymentApp_euicc \
     PaymentApp_euicc_Overflow \
     PaymentApp_Preferred \
-    Paymentapp_prefix_sufix \
+    PaymentApp_prefix_sufix \
     PaymentApp_uicc2 \
     PaymentApp_host_UL_F_SO_F \
     PaymentApp_host_UL_F_SO_T \
@@ -148,24 +158,29 @@ PRODUCT_PACKAGES += \
     PaymentApp_eSE_Overflow_48AIDs16Bytes \
     PaymentApp_eSE_Overflow_MAX_AIDs \
     PaymentApp_eSE_Overflow_MAX_AIDs_Plus_1 \
+    OsuFileSearchTestApp \
 
 #ADD ALL HAL Services
+PRODUCT_PACKAGES += \
+    android.hardware.nfc-service.nxp \
+
+ifneq ($(NXP_NFC_HW),PN557)
 PRODUCT_PACKAGES += \
     android.hardware.secure_element-service.nxp \
     android.hardware.wired_se@1.0-service \
     android.hardware.trusted_se@1.2-service \
-    android.hardware.nfc-service.nxp \
     android.hardware.authsecret-service.nxp \
     android.hardware.weaver-service.nxp
+endif
 
 ifeq ($(NXP_NFC_HW),SN1xx)
 # ADD keymaster HAL for SN1xx
 PRODUCT_PACKAGES += \
 android.hardware.keymaster@4.1-javacard.service \
 
-else
+else ifneq ($(NXP_NFC_HW),PN557)
 
-# ADD keymint hal for SN220
+# ADD keymint hal for SN220, SN300
 PRODUCT_PACKAGES += \
 android.hardware.security.keymint3-service.strongbox.nxp \
 
@@ -186,6 +201,7 @@ PRODUCT_PACKAGES += \
     SelfTestHalAidlNfc \
     VtsHalOmapiSeAccessControlTestCases \
     VtsAidlKeyMintBenchmarkTest \
+    nxp_nfc_hal_gtest \
     
 ifeq ($(ENABLE_TREBLE), true)
 PRODUCT_PACKAGES += \
@@ -208,8 +224,12 @@ PRODUCT_PRODUCT_PROPERTIES += ro.product.name=unknown
 PRODUCT_MODEL_FOR_ATTESTATION := $(TARGET_PRODUCT)
 PRODUCT_BRAND_FOR_ATTESTATION := Android
 
+ifneq ($(NXP_NFC_HW),PN557)
 PRODUCT_COPY_FILES += \
-    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml \
+    frameworks/native/data/etc/android.software.device_id_attestation.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.device_id_attestation.xml
+endif
+
+PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
 
 BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy \
