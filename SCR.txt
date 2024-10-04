@@ -1,5 +1,5 @@
 NXP Software Content Register
-Outgoing License: LA_OPT_NXP_Software_License v46 June 2023
+Outgoing License: LA_OPT_NXP_Software_License v56 April 2024
 License File:     LA_OPT_NXP_Software_License.pdf
 ​
 --------------------------------------------
@@ -121,11 +121,11 @@ Origin:                    NXP (Apache-2.0)
 --------------------------------------------
 Outgoing License:          LA_OPT_NXP_Software_License
 License Files:             COPYING
-Package Category:          NFC SE Middleware
+Package Category:          NFC SE Middleware and Test Application
 Type of content:           Source, binary
 Description and comments:  Refer the below mentioned SCR files
 Release Location:          www.collabnet.nxp.com - nfcandroid_nxp_libs
-Location:                  Detailed SCR inside folders: osujar
+Location:                  Detailed SCR inside folders: osujar, OsuFileSearchTestApp
 Origin:                    NXP (proprietary)
                            NXP (MIT)
 --------------------------------------------
