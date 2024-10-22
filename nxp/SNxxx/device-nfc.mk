@@ -24,7 +24,6 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
     frameworks/native/data/etc/android.software.secure_lock_screen.xml:system/etc/permissions/android.software.secure_lock_screen.xml \
-    frameworks/native/data/etc/android.hardware.device_unique_attestation.xml:system/etc/permissions/android.hardware.device_unique_attestation.xml \
 
 ifneq ($(NXP_NFC_HW),PN557)
 PRODUCT_COPY_FILES += \
@@ -167,7 +166,6 @@ PRODUCT_PACKAGES += \
 ifneq ($(NXP_NFC_HW),PN557)
 PRODUCT_PACKAGES += \
     android.hardware.secure_element-service.nxp \
-    android.hardware.wired_se@1.0-service \
     android.hardware.trusted_se@1.2-service \
     android.hardware.authsecret-service.nxp \
     android.hardware.weaver-service.nxp
@@ -259,6 +257,15 @@ PRODUCT_SOONG_NAMESPACES += hardware/google/pixel \
                             device/google/gs-common/powerstats \
                             device/google/gs101/powerstats \
                             hardware/nxp/tests/powerstats
+endif
+
+ifneq ($(NXP_NFC_HW),PN557)
+ifeq ($(NFCHAL_WIRED_SE_ENABLE), true)
+PRODUCT_PACKAGES += WiredSe
+BOARD_SEPOLICY_DIRS += vendor/$(NXP_VENDOR_DIR)/SNxxx/sepolicy/nfc/wired-se
+else
+PRODUCT_PACKAGES += android.hardware.wired_se@1.0-service
+endif
 endif
 
 PRODUCT_SYSTEM_PROPERTIES += ro.boot.hardware.sku=NXP-NFC
