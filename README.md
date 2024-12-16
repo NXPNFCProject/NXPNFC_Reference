@@ -7,6 +7,19 @@ This Repo contains any additional information/files required to support the rele
 | :-------------: |:-------------:| 
 | NXPNFC_Reference    |  git clone https://github.com/NXPNFCProject/NXPNFC_Reference.git |
 
+#### Supported Version on "br_android_ncihalx_comm_16" branch
+| Android Version        | NXP Release          | NXP Tag  |
+| :-------------: |:---------------------:| :-----:|
+
+
+
+
+
+
+
+
+
+
 #### Supported Version on "br_android_ncihalx_comm_15" branch
 | Android Version        | NXP Release          | NXP Tag  |
 | :-------------: |:---------------------:| :-----:|
