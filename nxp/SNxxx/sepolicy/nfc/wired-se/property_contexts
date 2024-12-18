@@ -1,0 +1,3 @@
+# WiredSe properties
+persist.vendor.nfc.nxp.wiredse.max_apdu_size   u:object_r:vendor_nfc_nxp_wiredse_max_apdu_size_prop:s0 exact uint
+persist.vendor.nfc.nxp.wiredse.response_timeout   u:object_r:vendor_nfc_nxp_wiredse_response_timeout_prop:s0 exact uint

@@ -1,0 +1,13 @@
+#============= hal_nfc_default ==============
+# Wired SE Server domain
+hal_server_domain(hal_nfc_default, hal_secure_element)
+
+# Allow registering WiredSe service with service manager
+allow hal_nfc_default hal_secure_element_hwservice:hwservice_manager { find add };
+
+# Allow access to WiredSe system properties
+get_prop(hal_nfc, vendor_nfc_nxp_wiredse_max_apdu_size_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_wiredse_max_apdu_size_prop)
+get_prop(hal_nfc, vendor_nfc_nxp_wiredse_response_timeout_prop)
+set_prop(hal_nfc, vendor_nfc_nxp_wiredse_response_timeout_prop)
+
