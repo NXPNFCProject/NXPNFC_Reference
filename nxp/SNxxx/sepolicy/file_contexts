@@ -11,11 +11,9 @@
 /dev/p73               u:object_r:secure_element_device:s0
 
 # NFC hal
-/(vendor|system/vendor)/bin/hw/android\.hardware\.nfc_snxxx@1\.2-service       u:object_r:hal_nfc_default_exec:s0
-/(vendor|system/vendor)/bin/hw/android\.hardware\.nfc-service\.nxp            u:object_r:hal_nfc_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.nfc2-service\.nxp            u:object_r:hal_nfc_default_exec:s0
 
 # SE HAL
-/(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element_snxxx@1\.2-service       u:object_r:hal_secure_element_default_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.secure_element-service\.nxp            u:object_r:hal_secure_element_default_exec:s0
 
 #StrongBox Keymaster HAL
@@ -23,9 +21,12 @@
 
 #StrongBox Keymint HAL
 /vendor/bin/hw/android\.hardware\.security\.keymint3-service\.strongbox.nxp  u:object_r:hal_keymint_strongbox_exec:s0
+/vendor/bin/hw/android\.hardware\.security\.keymint4-service\.strongbox.nxp  u:object_r:hal_keymint_strongbox_exec:s0
+
+#SE Update Agent
+/vendor/bin/hw/se_update_agent\.nxp  u:object_r:hal_keymint_strongbox_exec:s0
 
 # Weaver Hal
-/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver@1\.0-service.nxp          u:object_r:hal_weaver_default_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.weaver-service\.nxp          u:object_r:hal_weaver_default_exec:s0
 
 #AuthSecret HAL

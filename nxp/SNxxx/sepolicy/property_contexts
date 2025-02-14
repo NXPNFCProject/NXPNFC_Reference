@@ -1,3 +1,7 @@
 # NFC properties
 vendor.nfc.min_firmware     u:object_r:vendor_nfc_prop:s0
 vendor.strongbox.triggerhmac   u:object_r:vendor_strongbox_prop:s0
+
+#SE Update Agent properties
+vendor.se_update_agent.load_pending   u:object_r:vendor_se_update_prop:s0
+persist.vendor.se_update_agent.load_retry_cnt   u:object_r:vendor_se_update_prop:s0

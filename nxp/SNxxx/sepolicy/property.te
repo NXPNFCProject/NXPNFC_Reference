@@ -1,4 +1,5 @@
 type vendor_secure_element_prop, vendor_property_type;
 vendor_internal_prop(vendor_nfc_prop)
 vendor_internal_prop(vendor_strongbox_prop)
+vendor_internal_prop(vendor_se_update_prop)
 
