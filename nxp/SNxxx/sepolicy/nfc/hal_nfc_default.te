@@ -1,5 +1,6 @@
 #============= hal_nfc_default ==============
 allow hal_nfc_default hal_secure_element_default:binder call;
+allow servicemanager hal_nfc_default:binder call;
 
 get_prop(hal_nfc, vendor_nfc_prop)
 set_prop(hal_nfc, vendor_nfc_prop)

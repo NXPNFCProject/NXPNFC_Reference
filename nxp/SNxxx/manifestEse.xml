@@ -9,6 +9,7 @@
 <!-- Uncomment this for enabling the SE HIDL service.
             <instance>eSE1</instance> -->
             <instance>eSE2</instance>
+            <instance>eSE3</instance>
         </interface>
     </hal>
 <!-- Uncomment this for enabling the SE HIDL service.
