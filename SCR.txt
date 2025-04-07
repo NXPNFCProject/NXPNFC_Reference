@@ -1,5 +1,5 @@
 NXP Software Content Register
-Outgoing License: LA_OPT_NXP_Software_License v46 June 2023
+Outgoing License: LA_OPT_NXP_Software_License v60 February 2025
 License File:     LA_OPT_NXP_Software_License.pdf
 ​
 --------------------------------------------
@@ -7,8 +7,9 @@ Outgoing License:          Apache Version 2.0
 License Files:             COPYING
 Package Category:          NFC SE Middleware
 Type of content:           Source
-Description and comments:  NCI based NFC stack
-Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_libnfc-nci
+Description and comments:  Nfc stack which includes NFC Interfaces & Public APIs for Google AOSP,
+                           and Nfc service, JNI & NCI based nfc stack
+Release Location:          https://github.com/NXPNFCProject/nfcandroid_modules_nfc
 Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
                            NXP (Apache-2.0)
 --------------------------------------------
@@ -16,10 +17,9 @@ Outgoing License:          Apache Version 2.0
 License Files:             COPYING
 Package Category:          NFC SE Middleware
 Type of content:           Source
-Description and comments:  JNI NCI NFC
-Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_Nfc
-Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
-                           NXP (Apache-2.0)
+Description and comments:  Nxp nfc system extensions library
+Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_libnfc-nci
+Origin:                    NXP (Apache-2.0)
 --------------------------------------------
 Outgoing License:          Apache Version 2.0
 License Files:             COPYING
@@ -37,15 +37,6 @@ Package Category:          NFC SE Middleware
 Type of content:           Source
 Description and comments:  Hardware abstraction layer implementation for Secure Element
 Release Location:          https://github.com/NXPNFCProject/nfcandroid_se_hidlimpl
-Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
-                           NXP (Apache-2.0)
---------------------------------------------
-Outgoing License:          Apache Version 2.0
-License Files:             COPYING
-Package Category:          NFC SE Middleware
-Type of content:           Source
-Description and comments:  NFC Interfaces & Public APIs for Google AOSP
-Release Location:          https://github.com/NXPNFCProject/NFC_NCIHAL_base
 Origin:                    The Android Open Source Project (Apache-2.0) - https://source.android.com/
                            NXP (Apache-2.0)
 --------------------------------------------
@@ -121,11 +112,11 @@ Origin:                    NXP (Apache-2.0)
 --------------------------------------------
 Outgoing License:          LA_OPT_NXP_Software_License
 License Files:             COPYING
-Package Category:          NFC SE Middleware
+Package Category:          NFC SE Middleware and Test Application
 Type of content:           Source, binary
 Description and comments:  Refer the below mentioned SCR files
 Release Location:          www.collabnet.nxp.com - nfcandroid_nxp_libs
-Location:                  Detailed SCR inside folders: osujar
+Location:                  Detailed SCR inside folders: osujar, OsuFileSearchTestApp
 Origin:                    NXP (proprietary)
                            NXP (MIT)
 --------------------------------------------
@@ -146,4 +137,12 @@ Description and comments:  NFCC SPI Interface
 Release Location:          https://github.com/NXPNFCProject/NXPESE_SPIDriver
 Origin:                    The Android Open Source Project (GPL-2.0) - https://android.googlesource.com/kernel/common
                            NXP(GPL-2.0)
+--------------------------------------------
+Outgoing License:          LA_OPT_NXP_Software_License
+License File:              COPYING
+Package Category:          NFC Firmware
+Type of content:           Binariy
+Description and comments:  NFC controller firmware
+Release Location:          github.com/NXP
+Origin:                    NXP (proprietary)
 --------------------------------------------
