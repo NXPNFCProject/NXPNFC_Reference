@@ -1,25 +1,5 @@
-From 108a83c55f6fb9cab228d0c5e626f125ada19574 Mon Sep 17 00:00:00 2001
-From: nxf77715 <shrivatsa.hande@nxp.com>
-Date: Fri, 17 Oct 2025 15:28:38 +0530
-Subject: Skip HCI data packet processing by Extns
- library.
-
-- If NCI command is sent by extns library and waiting for response
-  and HCI data packet is received from libnfc layer then it will
-  overwrite Nci command buffer resulting in Timer not killed for
-  NCI response even if response is received
-- HCI data command can be directly written to HAL as no extns
-  library processing is required for this.
-- Hence HCI data packet is skipped in Extns library
-
-Change-Id: Ib84d56449dd175bbbc74ae49f335ef1b3cdd8e83
----
- .../libnfc_vendor_extn/inc/common/NfcExtensionConstants.h   | 2 ++
- .../src/features/nci_state_monitor/NciStateMonitor.cpp      | 6 ++++++
- 2 files changed, 8 insertions(+)
-
 diff --git a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h
-index 88d7d0b..68ce83e 100644
+index a75e6e37..a897d633 100644
 --- a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h
 +++ b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h
 @@ -69,6 +69,8 @@ constexpr uint8_t EXT_NFC_STATUS_INDEX = 0x03;
@@ -32,10 +12,10 @@ index 88d7d0b..68ce83e 100644
  constexpr uint8_t NCI_MT_RSP = 0x40;
  constexpr uint8_t NCI_MT_NTF = 0x60;
 diff --git a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp
-index 8fde293..d26f3db 100644
+index 93a7f988..8b904b4f 100644
 --- a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp
 +++ b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp
-@@ -153,6 +153,12 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
+@@ -152,6 +152,12 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
  NFCSTATUS NciStateMonitor::processNciCmd(uint16_t dataLen,
                                           const uint8_t *pData) {
    NXPLOG_EXTNS_D(NXPLOG_ITEM_NXP_GEN_EXTN, "NciStateMonitor %s Enter", __func__);
@@ -45,9 +25,6 @@ index 8fde293..d26f3db 100644
 +                   __func__);
 +    return NFCSTATUS_EXTN_FEATURE_FAILURE;
 +  }
+   uint8_t num = 0;
    constexpr uint16_t NCI_EE_MODE_SET_CMD_GID_OID =
        (((NCI_MT_CMD | NCI_GID_EE_MANAGE) << 8) | NCI_EE_MODE_SET_OID);
-   nciCmd.clear();
--- 
-2.50.1
-

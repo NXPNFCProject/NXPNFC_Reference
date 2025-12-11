@@ -1,25 +1,8 @@
-From 16e37a6cf4130e14fc6e7a73b604939c91ad4776 Mon Sep 17 00:00:00 2001
-From: nxf65721 <shubham.salunkhe@nxp.com>
-Date: Wed, 29 Oct 2025 17:13:29 +0530
-Subject: Fix for card can't connect with SAK 0x53
- to ISO_DEP interface.
-
-- Updating protocol to ISO_DEP in RF_INTF_ACTIVATED_NTF if
-  RF_DISC_NTF is not received.
-
-Change-Id: Id2a3143079e5500caa74adc5fd56a79505fe268e
----
- .../inc/common/NfcExtensionConstants.h        |  1 +
- .../nci_state_monitor/NciStateMonitor.cpp     |  8 ++++++-
- .../nci_state_monitor/RfStateMonitor.cpp      | 24 +++++++++++++++----
- .../nci_state_monitor/RfStateMonitor.h        |  7 ++++++
- 4 files changed, 34 insertions(+), 6 deletions(-)
-
 diff --git a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h
-index 68ce83e..3f7ea9e 100644
+index a75e6e37..d7e40eb5 100644
 --- a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h
 +++ b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/inc/common/NfcExtensionConstants.h
-@@ -185,6 +185,7 @@ constexpr uint8_t NCI_EE_MODE_SET_OID = 0x01;
+@@ -183,6 +183,7 @@ constexpr uint8_t NCI_EE_MODE_SET_OID = 0x01;
  constexpr uint8_t NCI_EE_STATUS_OID = 0x02;
  constexpr uint8_t NCI_POWER_LINK_OID = 0x03;
  constexpr uint8_t NCI_RF_DISCOVERY_OID = 0x03;
@@ -28,10 +11,10 @@ index 68ce83e..3f7ea9e 100644
  constexpr uint8_t NCI_CORE_GENERIC_ERROR_OID = 0x07;
  constexpr uint8_t NCI_EE_ACTION_OID = 0x09;
 diff --git a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp
-index 1538bf9..0d07d7f 100644
+index 93a7f988..d5877ff8 100644
 --- a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp
 +++ b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/NciStateMonitor.cpp
-@@ -97,6 +97,8 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
+@@ -96,6 +96,8 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
        (((NCI_MT_NTF | NCI_GID_EE_MANAGE) << 8) | NCI_EE_MODE_SET_OID);
    constexpr uint16_t NCI_RF_DISCOVERY_NTF =
        (((NCI_MT_NTF | NCI_GID_RF_MANAGE) << 8) | NCI_RF_DISCOVERY_OID);
@@ -40,7 +23,7 @@ index 1538bf9..0d07d7f 100644
    constexpr uint16_t NCI_CORE_RESET_NTF_GID_OID =
        (((NCI_MT_NTF | NCI_GID_CORE) << 8) | NCI_CORE_RESET_OID);
    constexpr uint16_t NCI_CORE_GENERIC_ERROR_NTF =
-@@ -119,6 +121,10 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
+@@ -118,6 +120,10 @@ NFCSTATUS NciStateMonitor::handleVendorNciRspNtf(uint16_t dataLen,
      break;
    }
    case NCI_RF_DISCOVERY_NTF: {
@@ -51,20 +34,20 @@ index 1538bf9..0d07d7f 100644
      status = RfStateMonitor::getInstance()->processRfIntfActdNtf(nciRspNtf);
      break;
    }
-@@ -257,7 +263,7 @@ NFCSTATUS NciStateMonitor::handleHalEvent(uint8_t event) {
-     else
-       NXPLOG_EXTNS_I(
-           NXPLOG_ITEM_NXP_GEN_EXTN,
--          "NciStateMonitor %s sendSramConfigFlashCmd is not supported",
-+          "NciStateMonitor %s sendSramConfigFlashCmd is not supported.",
-           __func__);
-     return NFCSTATUS_EXTN_FEATURE_FAILURE;
-   }
+@@ -241,7 +247,7 @@ void NciStateMonitor::sendSramConfigFlashCmd() {
+ }
+ 
+ NFCSTATUS NciStateMonitor::handleHalEvent(uint8_t event) {
+-  NXPLOG_EXTNS_I(NXPLOG_ITEM_NXP_GEN_EXTN, "NciStateMonitor %s Enter",
++  NXPLOG_EXTNS_I(NXPLOG_ITEM_NXP_GEN_EXTN, "NciStateMonitor %s sendSramConfigFlashCmd is not supported.",
+                  __func__);
+   if (event == EXT_NFC_PRE_DISCOVER) {
+     sendSramConfigFlashCmd();
 diff --git a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.cpp b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.cpp
-index e7d5bb7..6c80dfd 100644
+index d11da7b7..60e0b4e2 100644
 --- a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.cpp
 +++ b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.cpp
-@@ -37,14 +37,14 @@ RfStateMonitor *RfStateMonitor::getInstance() {
+@@ -36,14 +36,14 @@ RfStateMonitor *RfStateMonitor::getInstance() {
  }
  
  NFCSTATUS
@@ -84,7 +67,7 @@ index e7d5bb7..6c80dfd 100644
      NXPLOG_EXTNS_I(
          NXPLOG_ITEM_NXP_GEN_EXTN,
          "RfStateMonitor %s: Updated protocol to ISO_DEP & SAK value to 0x53",
-@@ -53,6 +53,20 @@ RfStateMonitor::processRfIntfActdNtf(vector<uint8_t> &rfIntfActdNtf) {
+@@ -52,6 +52,20 @@ RfStateMonitor::processRfIntfActdNtf(vector<uint8_t> &rfIntfActdNtf) {
    return NFCSTATUS_EXTN_FEATURE_FAILURE;
  }
  
@@ -104,16 +87,15 @@ index e7d5bb7..6c80dfd 100644
 +
  NFCSTATUS RfStateMonitor::processRfDiscRspNtf(vector<uint8_t> &rfResNtf) {
  
-   const uint16_t mGidOid = ((rfResNtf[0] << 8) | rfResNtf[1]);
+   uint16_t mGidOid = ((rfResNtf[0] << 8) | rfResNtf[1]);
 diff --git a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.h b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.h
-index e3e4c7c..da2920a 100644
+index 265f1db9..c36a2197 100644
 --- a/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.h
 +++ b/hardware/nxp/nfc/snxxx/libnfc_vendor_extn/src/features/nci_state_monitor/RfStateMonitor.h
-@@ -52,6 +52,13 @@ private:
+@@ -53,6 +53,12 @@ private:
     * @param RF_INTF_ACTIVATED_NTF
     */
-   NFCSTATUS processRfIntfActdNtf(std::vector<uint8_t> &rfIntfActdNtf);
-+
+   NFCSTATUS processRfIntfActdNtf(vector<uint8_t> &rfIntfActdNtf);
 +  /**
 +   * @brief This API handle the RF_DISC_NTF for Non-Nfc Forum T2T.
 +   *
@@ -121,8 +103,5 @@ index e3e4c7c..da2920a 100644
 +   */
 +  NFCSTATUS processRfDiscNtf(std::vector<uint8_t> &rfDiscNtf);
    void updateNfcRfState(NfcRfState state);
-   static std::unique_ptr<RfStateMonitor> instance;
+   static RfStateMonitor *instance;
    NfcRfState nfcRfState;
--- 
-2.50.1
-
