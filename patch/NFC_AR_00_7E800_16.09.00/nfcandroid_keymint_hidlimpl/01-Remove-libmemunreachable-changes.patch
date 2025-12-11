@@ -1,0 +1,366 @@
+From 6a5099b081c675ab2a976db309ac918abba925a8 Mon Sep 17 00:00:00 2001
+From: nxf97491 <ramyesh.thanthri@nxp.com>
+Date: Fri, 24 Oct 2025 12:48:39 +0530
+Subject: Remove libmemunreachable changes
+
+As they have to be maintained as patch
+
+Change-Id: Ifad2b03ee98f49790f0527b9b80d50dbddeea692
+---
+ keymint/HAL/Android.bp                             |  1 -
+ keymint/HAL/JavacardKeyMint3Device.h               |  3 ---
+ keymint/HAL/JavacardKeyMint4Device.h               |  3 ---
+ keymint/HAL/JavacardKeyMintDevice.cpp              |  7 -------
+ keymint/HAL/JavacardKeyMintDevice.h                |  3 ---
+ .../JavacardRemotelyProvisionedComponentDevice.cpp |  9 ---------
+ .../JavacardRemotelyProvisionedComponentDevice.h   |  2 --
+ keymint/HAL/JavacardSharedSecret.cpp               |  6 ------
+ keymint/HAL/JavacardSharedSecret.h                 |  3 ---
+ keymint/KM200/Android.bp                           |  3 +--
+ keymint/KM200/JavacardKeyMintDevice.cpp            |  7 -------
+ keymint/KM200/JavacardKeyMintDevice.h              |  5 +----
+ .../JavacardRemotelyProvisionedComponentDevice.cpp | 14 +++-----------
+ .../JavacardRemotelyProvisionedComponentDevice.h   |  5 +----
+ keymint/KM200/JavacardSharedSecret.cpp             |  9 +--------
+ keymint/KM200/JavacardSharedSecret.h               |  5 +----
+ 16 files changed, 8 insertions(+), 77 deletions(-)
+
+diff --git a/keymint/HAL/Android.bp b/keymint/HAL/Android.bp
+index 2373e1e..59b6ea0 100644
+--- a/keymint/HAL/Android.bp
++++ b/keymint/HAL/Android.bp
+@@ -120,7 +120,6 @@ cc_defaults {
+         "libcrypto",
+         "libcutils",
+         "libjc_keymint_transport.nxp",
+-        "libmemunreachable",
+         "libkeymaster_messages",
+         "libkeymaster_portable",
+         "liblog",
+diff --git a/keymint/HAL/JavacardKeyMint3Device.h b/keymint/HAL/JavacardKeyMint3Device.h
+index f13ca60..aec1f6e 100644
+--- a/keymint/HAL/JavacardKeyMint3Device.h
++++ b/keymint/HAL/JavacardKeyMint3Device.h
+@@ -58,9 +58,6 @@ class JavacardKeyMint3Device : public BnKeyMintDevice {
+                                     shared_ptr<::keymint::javacard::JavacardKeyMintDevice> device)
+         : device_(device) {}
+     virtual ~JavacardKeyMint3Device() {}
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args) {
+-        return device_->dump(fd, args, num_args);
+-    }
+ 
+     ScopedAStatus getHardwareInfo(KeyMintHardwareInfo* info) {
+         return device_->getHardwareInfo(info);
+diff --git a/keymint/HAL/JavacardKeyMint4Device.h b/keymint/HAL/JavacardKeyMint4Device.h
+index b5d1276..8e5b100 100644
+--- a/keymint/HAL/JavacardKeyMint4Device.h
++++ b/keymint/HAL/JavacardKeyMint4Device.h
+@@ -58,9 +58,6 @@ class JavacardKeyMint4Device : public BnKeyMintDevice {
+                                     shared_ptr<::keymint::javacard::JavacardKeyMintDevice> device)
+         : device_(device) {}
+     virtual ~JavacardKeyMint4Device() {}
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args) {
+-        return device_->dump(fd, args, num_args);
+-    }
+ 
+     ScopedAStatus getHardwareInfo(KeyMintHardwareInfo* info) {
+         return device_->getHardwareInfo(info);
+diff --git a/keymint/HAL/JavacardKeyMintDevice.cpp b/keymint/HAL/JavacardKeyMintDevice.cpp
+index ca22188..0dbf7e4 100644
+--- a/keymint/HAL/JavacardKeyMintDevice.cpp
++++ b/keymint/HAL/JavacardKeyMintDevice.cpp
+@@ -41,7 +41,6 @@
+ #include <hardware/hw_auth_token.h>
+ #include <keymaster/android_keymaster_messages.h>
+ #include <keymaster/wrapped_key.h>
+-#include <memunreachable/memunreachable.h>
+ 
+ #include "JavacardSharedSecret.h"
+ 
+@@ -464,12 +463,6 @@ ScopedAStatus JavacardKeyMintDevice::convertStorageKeyToEphemeral(
+     return km_utils::kmError2ScopedAStatus(KM_ERROR_UNIMPLEMENTED);
+ }
+ 
+-binder_status_t JavacardKeyMintDevice::dump(int /* fd */, const char** /* p */, uint32_t /* q */) {
+-    LOG(INFO) << "\n KeyMint-JavacardKeyMintDevice HAL MemoryLeak Info = \n"
+-              << ::android::GetUnreachableMemoryString(true, 10000).c_str();
+-    return STATUS_OK;
+-}
+-
+ ScopedAStatus
+ JavacardKeyMintDevice::setAdditionalAttestationInfo(const vector<KeyParameter>& keyParams) {
+     LOG(INFO) << "JavacardKeyMint::setAdditionalAttestationInfo Enter";
+diff --git a/keymint/HAL/JavacardKeyMintDevice.h b/keymint/HAL/JavacardKeyMintDevice.h
+index 36e482b..bb6eba5 100644
+--- a/keymint/HAL/JavacardKeyMintDevice.h
++++ b/keymint/HAL/JavacardKeyMintDevice.h
+@@ -70,9 +70,6 @@ class JavacardKeyMintDevice {
+         : securitylevel_(SecurityLevel::STRONGBOX), card_(std::move(card)), version_(version) {}
+     virtual ~JavacardKeyMintDevice() {}
+ 
+-    // Methods from ::ndk::ICInterface follow.
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args);
+-
+     ScopedAStatus getHardwareInfo(KeyMintHardwareInfo* info);
+ 
+     ScopedAStatus addRngEntropy(const vector<uint8_t>& data);
+diff --git a/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.cpp b/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.cpp
+index a5ccbdb..110108b 100644
+--- a/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.cpp
++++ b/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.cpp
+@@ -43,8 +43,6 @@
+ #include <keymaster/cppcose/cppcose.h>
+ #include <keymaster/remote_provisioning_utils.h>
+ 
+-#include <memunreachable/memunreachable.h>
+-
+ namespace aidl::android::hardware::security::keymint {
+ using cppbor::Array;
+ using cppbor::EncodedItem;
+@@ -340,11 +338,4 @@ ScopedAStatus JavacardRemotelyProvisionedComponentDevice::generateCertificateReq
+     return ScopedAStatus::ok();
+ }
+ 
+-binder_status_t JavacardRemotelyProvisionedComponentDevice::dump(int /* fd */, const char** /* p */,
+-                                                                 uint32_t /* q */) {
+-    LOG(INFO) << "\n KeyMint-JavacardRemotelyProvisionedComponentDevice Info = \n"
+-              << ::android::GetUnreachableMemoryString(true, 10000).c_str();
+-    return STATUS_OK;
+-}
+-
+ }  // namespace aidl::android::hardware::security::keymint
+diff --git a/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.h b/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.h
+index 1899449..a052915 100644
+--- a/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.h
++++ b/keymint/HAL/JavacardRemotelyProvisionedComponentDevice.h
+@@ -74,8 +74,6 @@ class JavacardRemotelyProvisionedComponentDevice : public BnRemotelyProvisionedC
+     ScopedAStatus generateCertificateRequestV2(const std::vector<MacedPublicKey>& keysToSign,
+                                                const std::vector<uint8_t>& challenge,
+                                                std::vector<uint8_t>* csr) override;
+-    // Methods from ::ndk::ICInterface follow.
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args) override;
+ 
+   private:
+     ScopedAStatus beginSendData(const std::vector<MacedPublicKey>& keysToSign,
+diff --git a/keymint/HAL/JavacardSharedSecret.cpp b/keymint/HAL/JavacardSharedSecret.cpp
+index 92f2df0..28d2ac4 100644
+--- a/keymint/HAL/JavacardSharedSecret.cpp
++++ b/keymint/HAL/JavacardSharedSecret.cpp
+@@ -23,7 +23,6 @@
+ #include <android-base/logging.h>
+ 
+ #include <KeyMintUtils.h>
+-#include <memunreachable/memunreachable.h>
+ 
+ /* 1 sec delay till OMAPI service initialized (~ 30 to 40 secs)
+  * 20 retry as per transport layer retry logic.
+@@ -92,9 +91,4 @@ ScopedAStatus JavacardSharedSecret::computeSharedSecret(
+     *secret = std::move(optSecret.value());
+     return ScopedAStatus::ok();
+ }
+-binder_status_t JavacardSharedSecret::dump(int /* fd */, const char** /* p */, uint32_t /* q */) {
+-    LOG(INFO) << "\n KeyMint-JavacardSharedSecret HAL MemoryLeak Info = \n"
+-              << ::android::GetUnreachableMemoryString(true, 10000).c_str();
+-    return STATUS_OK;
+-}
+ }  // namespace aidl::android::hardware::security::sharedsecret
+diff --git a/keymint/HAL/JavacardSharedSecret.h b/keymint/HAL/JavacardSharedSecret.h
+index e60d857..cd0c52b 100644
+--- a/keymint/HAL/JavacardSharedSecret.h
++++ b/keymint/HAL/JavacardSharedSecret.h
+@@ -40,9 +40,6 @@ class JavacardSharedSecret : public BnSharedSecret {
+     explicit JavacardSharedSecret(shared_ptr<JavacardSecureElement> card) : card_(std::move(card)) {}
+     virtual ~JavacardSharedSecret() {}
+ 
+-    // Methods from ::ndk::ICInterface follow.
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args) override;
+-
+     ScopedAStatus getSharedSecretParameters(SharedSecretParameters* params) override;
+ 
+     ScopedAStatus computeSharedSecret(const std::vector<SharedSecretParameters>& params,
+diff --git a/keymint/KM200/Android.bp b/keymint/KM200/Android.bp
+index b419bee..02cdaa5 100644
+--- a/keymint/KM200/Android.bp
++++ b/keymint/KM200/Android.bp
+@@ -27,7 +27,7 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.
+ //
+-// Copyright 2022-2023 NXP
++// Copyright 2022-2023, 2025 NXP
+ //
+ 
+ package {
+@@ -69,7 +69,6 @@ cc_library {
+         "libcutils",
+         "libjc_keymint_transport.nxp",
+         "libbinder_ndk",
+-        "libmemunreachable",
+         "android.hardware.security.keymint-V2-ndk",
+         "android.hardware.security.rkp-V2-ndk",
+     ],
+diff --git a/keymint/KM200/JavacardKeyMintDevice.cpp b/keymint/KM200/JavacardKeyMintDevice.cpp
+index 1e6a193..5de6592 100644
+--- a/keymint/KM200/JavacardKeyMintDevice.cpp
++++ b/keymint/KM200/JavacardKeyMintDevice.cpp
+@@ -46,7 +46,6 @@
+ #include <keymaster/android_keymaster_messages.h>
+ #include <keymaster/wrapped_key.h>
+ #include <memory>
+-#include <memunreachable/memunreachable.h>
+ #include <regex.h>
+ #include <string>
+ #include <vector>
+@@ -451,10 +450,4 @@ ScopedAStatus JavacardKeyMintDevice::convertStorageKeyToEphemeral(
+     std::vector<uint8_t>* /* ephemeralKeyBlob */) {
+     return km_utils::kmError2ScopedAStatus(KM_ERROR_UNIMPLEMENTED);
+ }
+-
+-binder_status_t JavacardKeyMintDevice::dump(int /* fd */, const char** /* p */, uint32_t /* q */) {
+-    LOG(INFO) << "\n KeyMint-JavacardKeyMintDevice HAL MemoryLeak Info = \n"
+-              << ::android::GetUnreachableMemoryString(true, 10000).c_str();
+-    return STATUS_OK;
+-}
+ }  // namespace aidl::android::hardware::security::keymint
+diff --git a/keymint/KM200/JavacardKeyMintDevice.h b/keymint/KM200/JavacardKeyMintDevice.h
+index 8284800..44c8e11 100644
+--- a/keymint/KM200/JavacardKeyMintDevice.h
++++ b/keymint/KM200/JavacardKeyMintDevice.h
+@@ -29,7 +29,7 @@
+  *  See the License for the specific language governing permissions and
+  *  limitations under the License.
+  *
+- *  Copyright 2022-2023 NXP
++ *  Copyright 2022-2023, 2025 NXP
+  *
+  ******************************************************************************/
+ #pragma once
+@@ -60,9 +60,6 @@ class JavacardKeyMintDevice : public BnKeyMintDevice {
+     }
+     virtual ~JavacardKeyMintDevice() {}
+ 
+-    // Methods from ::ndk::ICInterface follow.
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args) override;
+-
+     ScopedAStatus getHardwareInfo(KeyMintHardwareInfo* info) override;
+ 
+     ScopedAStatus addRngEntropy(const vector<uint8_t>& data) override;
+diff --git a/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.cpp b/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.cpp
+index 090d567..4d50263 100644
+--- a/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.cpp
++++ b/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.cpp
+@@ -29,18 +29,17 @@
+  ** See the License for the specific language governing permissions and
+  ** limitations under the License.
+  **
+- ** Copyright 2022-2024 NXP
++ ** Copyright 2022-2025 NXP
+  **
+  *********************************************************************************/
+ 
+ #define LOG_TAG "javacard.keymint.device.rkp.strongbox-impl"
+-#include <JavacardKeyMintUtils.h>
+ #include <JavacardRemotelyProvisionedComponentDevice.h>
+-#include <aidl/android/hardware/security/keymint/MacedPublicKey.h>
+ #include <android-base/logging.h>
++#include <JavacardKeyMintUtils.h>
++#include <aidl/android/hardware/security/keymint/MacedPublicKey.h>
+ #include <keymaster/cppcose/cppcose.h>
+ #include <keymaster/remote_provisioning_utils.h>
+-#include <memunreachable/memunreachable.h>
+ 
+ #ifdef NXP_EXTNS
+ #define KM_RKP_VERSION_1 0x01
+@@ -298,11 +297,4 @@ JavacardRemotelyProvisionedComponentDevice::generateCertificateRequest(bool test
+     return ScopedAStatus::ok();
+ }
+ 
+-binder_status_t JavacardRemotelyProvisionedComponentDevice::dump(int /* fd */, const char** /* p */,
+-                                                                 uint32_t /* q */) {
+-    LOG(INFO) << "\n KeyMint-JavacardRemotelyProvisionedComponentDevice Info = \n"
+-              << ::android::GetUnreachableMemoryString(true, 10000).c_str();
+-    return STATUS_OK;
+-}
+-
+ } // namespace aidl::android::hardware::security::keymint
+diff --git a/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.h b/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.h
+index abe7e4e..c90d37f 100644
+--- a/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.h
++++ b/keymint/KM200/JavacardRemotelyProvisionedComponentDevice.h
+@@ -29,7 +29,7 @@
+  *  See the License for the specific language governing permissions and
+  *  limitations under the License.
+  *
+- *  Copyright 2022-2023 NXP
++ *  Copyright 2022-2023, 2025 NXP
+  *
+  ******************************************************************************/
+ 
+@@ -60,9 +60,6 @@ class JavacardRemotelyProvisionedComponentDevice
+ 
+   virtual ~JavacardRemotelyProvisionedComponentDevice() = default;
+ 
+-  // Methods from ::ndk::ICInterface follow.
+-  binder_status_t dump(int fd, const char **args, uint32_t num_args) override;
+-
+   ScopedAStatus getHardwareInfo(RpcHardwareInfo *info) override;
+ 
+   ScopedAStatus
+diff --git a/keymint/KM200/JavacardSharedSecret.cpp b/keymint/KM200/JavacardSharedSecret.cpp
+index cc42e60..9743f02 100644
+--- a/keymint/KM200/JavacardSharedSecret.cpp
++++ b/keymint/KM200/JavacardSharedSecret.cpp
+@@ -14,7 +14,7 @@
+  ** See the License for the specific language governing permissions and
+  ** limitations under the License.
+  **
+- ** Copyright 2021-2024 NXP
++ ** Copyright 2021-2025 NXP
+  **
+  *********************************************************************************/
+ #define LOG_TAG "javacard.strongbox.keymint.operation-impl"
+@@ -22,7 +22,6 @@
+ 
+ #include "JavacardSharedSecret.h"
+ #include <JavacardKeyMintUtils.h>
+-#include <memunreachable/memunreachable.h>
+ 
+ /* 1 sec delay till OMAPI service initialized (~ 30 to 40 secs)
+  * 20 retry as per transport layer retry logic.
+@@ -81,10 +80,4 @@ JavacardSharedSecret::computeSharedSecret(const std::vector<SharedSecretParamete
+     return ScopedAStatus::ok();
+ }
+ 
+-binder_status_t JavacardSharedSecret::dump(int /* fd */, const char** /* p */, uint32_t /* q */) {
+-    LOG(INFO) << "\n KeyMint-JavacardSharedSecret HAL MemoryLeak Info = \n"
+-              << ::android::GetUnreachableMemoryString(true, 10000).c_str();
+-    return STATUS_OK;
+-}
+-
+ }  // namespace aidl::android::hardware::security::sharedsecret
+diff --git a/keymint/KM200/JavacardSharedSecret.h b/keymint/KM200/JavacardSharedSecret.h
+index 5aba93f..c1812ea 100644
+--- a/keymint/KM200/JavacardSharedSecret.h
++++ b/keymint/KM200/JavacardSharedSecret.h
+@@ -14,7 +14,7 @@
+  *  See the License for the specific language governing permissions and
+  *  limitations under the License.
+  *
+- *  Copyright 2022-2023 NXP
++ *  Copyright 2022-2023, 2025 NXP
+  *
+  ******************************************************************************/
+ #pragma once
+@@ -41,9 +41,6 @@ class JavacardSharedSecret : public BnSharedSecret {
+         : card_(std::move(card)) {}
+     virtual ~JavacardSharedSecret() {}
+ 
+-    // Methods from ::ndk::ICInterface follow.
+-    binder_status_t dump(int fd, const char** args, uint32_t num_args) override;
+-
+     ScopedAStatus getSharedSecretParameters(SharedSecretParameters* params) override;
+ 
+     ScopedAStatus computeSharedSecret(const std::vector<SharedSecretParameters>& params,
+-- 
+2.50.1
+
