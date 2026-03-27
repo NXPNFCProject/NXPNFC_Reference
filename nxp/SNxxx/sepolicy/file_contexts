@@ -4,6 +4,7 @@
 /data/vendor/nfc(/.*)? u:object_r:nfc_vendor_data_file:s0
 /data/vendor/nfc/debug(/.*)? u:object_r:nfc_vendor_debug_data_file:s0
 /data/vendor/secure_element(/.*)? u:object_r:secure_element_vendor_data_file:s0
+/data/vendor/se_update_agent(/.*)? u:object_r:vendor_se_update_agent_data_file:s0
 /dev/nxp-nci           u:object_r:nfc_device:s0
 /dev/pn553             u:object_r:nfc_device:s0
 /dev/ttyACM0           u:object_r:nfc_device:s0

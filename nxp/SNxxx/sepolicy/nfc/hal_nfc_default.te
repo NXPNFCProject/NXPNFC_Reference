@@ -5,6 +5,23 @@ allow servicemanager hal_nfc_default:binder call;
 get_prop(hal_nfc, vendor_nfc_prop)
 set_prop(hal_nfc, vendor_nfc_prop)
 
+get_prop(hal_nfc, vendor_nfc_uicc1HciParam1_prop)
+set_prop(hal_nfc, vendor_nfc_uicc1HciParam1_prop)
+get_prop(hal_nfc, vendor_nfc_uicc1HciParam2_prop)
+set_prop(hal_nfc, vendor_nfc_uicc1HciParam2_prop)
+get_prop(hal_nfc, vendor_nfc_uicc1HciParam3_prop)
+set_prop(hal_nfc, vendor_nfc_uicc1HciParam3_prop)
+
+get_prop(hal_nfc, vendor_nfc_uicc2HciParam1_prop)
+set_prop(hal_nfc, vendor_nfc_uicc2HciParam1_prop)
+get_prop(hal_nfc, vendor_nfc_uicc2HciParam2_prop)
+set_prop(hal_nfc, vendor_nfc_uicc2HciParam2_prop)
+get_prop(hal_nfc, vendor_nfc_uicc2HciParam3_prop)
+set_prop(hal_nfc, vendor_nfc_uicc2HciParam3_prop)
+
+get_prop(hal_nfc, vendor_nfc_uiccHciCeParams_prop)
+set_prop(hal_nfc, vendor_nfc_uiccHciCeParams_prop)
+
 allow hal_nfc_default nxpese_hwservice:hwservice_manager find;
 allow hal_nfc_default nxpnfc_hwservice:hwservice_manager { find add };
 allow hal_nfc_default vendor_hal_nxpnfc_service:service_manager { find add };

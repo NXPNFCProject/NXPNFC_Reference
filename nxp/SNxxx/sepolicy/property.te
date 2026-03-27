@@ -3,3 +3,12 @@ vendor_internal_prop(vendor_nfc_prop)
 vendor_internal_prop(vendor_strongbox_prop)
 vendor_internal_prop(vendor_se_update_prop)
 
+vendor_internal_prop(vendor_nfc_uicc1HciParam1_prop)
+vendor_internal_prop(vendor_nfc_uicc1HciParam2_prop)
+vendor_internal_prop(vendor_nfc_uicc1HciParam3_prop)
+
+vendor_internal_prop(vendor_nfc_uicc2HciParam1_prop)
+vendor_internal_prop(vendor_nfc_uicc2HciParam2_prop)
+vendor_internal_prop(vendor_nfc_uicc2HciParam3_prop)
+
+vendor_internal_prop(vendor_nfc_uiccHciCeParams_prop)

@@ -4,4 +4,17 @@ vendor.strongbox.triggerhmac   u:object_r:vendor_strongbox_prop:s0
 
 #SE Update Agent properties
 vendor.se_update_agent.load_pending   u:object_r:vendor_se_update_prop:s0
+vendor.se_update_agent.run_execute    u:object_r:vendor_se_update_prop:s0
 persist.vendor.se_update_agent.load_retry_cnt   u:object_r:vendor_se_update_prop:s0
+
+persist.vendor.nfc.nxp.uicc1HciParams1    u:object_r:vendor_nfc_uicc1HciParam1_prop:s0
+persist.vendor.nfc.nxp.uicc1HciParams2    u:object_r:vendor_nfc_uicc1HciParam2_prop:s0
+persist.vendor.nfc.nxp.uicc1HciParams3    u:object_r:vendor_nfc_uicc1HciParam3_prop:s0
+
+persist.vendor.nfc.nxp.uicc2HciParams1    u:object_r:vendor_nfc_uicc2HciParam1_prop:s0
+persist.vendor.nfc.nxp.uicc2HciParams2    u:object_r:vendor_nfc_uicc2HciParam2_prop:s0
+persist.vendor.nfc.nxp.uicc2HciParams3    u:object_r:vendor_nfc_uicc2HciParam3_prop:s0
+
+persist.vendor.nfc.nxp.uiccHciCeParams    u:object_r:vendor_nfc_uiccHciCeParams_prop:s0
+
+persist.vendor.nfc.nxp.lx_debug_mask      u:object_r:vendor_nfc_prop:s0

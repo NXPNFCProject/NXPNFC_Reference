@@ -20,3 +20,7 @@ allow hal_keymint_strongbox secure_element_service:service_manager find;
 allow hal_keymint_strongbox self:capability2 wake_alarm;
 
 wakelock_use(hal_keymint_strongbox)
+
+# Allow rw access to /data/vendor/se_update_agent for SEUpdateAgent
+allow hal_keymint_strongbox vendor_se_update_agent_data_file:dir rw_dir_perms;
+allow hal_keymint_strongbox vendor_se_update_agent_data_file:file create_file_perms;
