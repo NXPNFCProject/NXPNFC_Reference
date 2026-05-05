@@ -24,3 +24,7 @@ wakelock_use(hal_keymint_strongbox)
 # Allow rw access to /data/vendor/se_update_agent for SEUpdateAgent
 allow hal_keymint_strongbox vendor_se_update_agent_data_file:dir rw_dir_perms;
 allow hal_keymint_strongbox vendor_se_update_agent_data_file:file create_file_perms;
+
+# Allow read access to /vendor/etc/loaderservice for SEUpdateAgent
+allow hal_keymint_strongbox vendor_se_update_agent_sems_script_file:dir r_dir_perms;
+allow hal_keymint_strongbox vendor_se_update_agent_sems_script_file:file r_file_perms;

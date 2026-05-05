@@ -33,3 +33,5 @@
 #AuthSecret HAL
 /vendor/bin/hw/android\.hardware\.authsecret-service\.nxp  u:object_r:hal_authsecret_default_exec:s0
 
+#Label for Sems scripts under /vendor/etc/loaderservice
+/vendor/etc/loaderservice(/.*)? u:object_r:vendor_se_update_agent_sems_script_file:s0
