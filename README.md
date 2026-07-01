@@ -14,6 +14,4 @@ This Repo contains any additional information/files required to support the rele
 | :-------------: |:---------------------:| :-----:|
 | aosp-main      |  17.05.00 (PN557/PN560/SN100/SN110/SN220/SN300) |  NFC_AR_00_7E800_17.05.00_OpnSrc (Applicable only for these three repositories : NXPNFC_Reference, NXPESE_SPIDriver & NXPNFC_I2C_Driver. ONLY This folder in this repo has been updated: https://github.com/NXPNFCProject/NXPNFC_Reference/tree/NFC_AR_00_7E800_17.05.00_OpnSrc/nxp/SNxxx/sepolicy)  |
 | aosp-main      |  17.06.00 (PN557/PN560/SN100/SN110/SN220/SN300) |  NFC_AR_00_7E800_17.06.00_OpnSrc (Applicable only for these three repositories : NXPNFC_Reference, NXPESE_SPIDriver & NXPNFC_I2C_Driver. ONLY This folder in this repo has been updated: https://github.com/NXPNFCProject/NXPNFC_Reference/tree/NFC_AR_00_7E800_17.06.00_OpnSrc/nxp/SNxxx/sepolicy)  |
-
-
-
+| android-17.0.0_r1              |  17.07.00 (PN557/PN560/SN100/SN110/SN220/SN300) |  NFC_AR_00_7E800_17.07.00_OpnSrc |
