@@ -29,7 +29,7 @@ allow hal_nfc_default vendor_hal_nxpnfc_service:service_manager { find add };
 allow hal_nfc_default nfc_device:chr_file { read write };
 allow hal_nfc_default nfc_data_file:file getattr;
 
-allow hal_nfc_default nfc_vendor_data_file:dir { getattr add_name read write search remove_name };
+allow hal_nfc_default nfc_vendor_data_file:dir { getattr add_name read write open search remove_name };
 allow hal_nfc_default nfc_vendor_data_file:file { getattr open create read write unlink setattr append };
 allow hal_nfc_default nfc_vendor_debug_data_file:dir { rw_dir_perms };
 allow hal_nfc_default nfc_vendor_debug_data_file:file { create_file_perms };

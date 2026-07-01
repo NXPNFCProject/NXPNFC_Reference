@@ -8,6 +8,6 @@ allow nfc nxpnfc_hwservice:hwservice_manager find;
 allow nfc vendor_hal_nxpnfc_service:service_manager find;
 allow nfc hal_secure_element_hwservice:hwservice_manager find;
 # allow nfc nfc_vendor_data_file:dir create_dir_perms;
-allow nfc nfc_vendor_data_file:dir { create_dir_perms add_name search read write create remove_name };
+allow nfc nfc_vendor_data_file:dir { create_dir_perms add_name search open read write create remove_name };
 # create_file_perms has { create setattr rw_file_perms link_file_perms}
 allow nfc nfc_vendor_data_file:file create_file_perms;

@@ -19,6 +19,8 @@ ifeq ($(MOCK_DEBUG),TRUE)
 endif
 
 BOARD_KERNEL_CMDLINE += video=HDMI-A-1:1280x800@60
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.public_key_digest=cc85f61bf00786cd090dc89c0dcd119f7f14a90d4e46d4fc2f17eff626b9d262
+BOARD_KERNEL_CMDLINE += androidboot.vbmeta.digest=cc85f61bf00786cd090dc89c0dcd119f7f14a90d4e46d4fc2f17eff626b9d261
 
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := vendor/nxp/SNxxx/framework_compatibility_matrix.xml
 

@@ -28,7 +28,9 @@
 /vendor/bin/hw/se_update_agent\.nxp  u:object_r:hal_keymint_strongbox_exec:s0
 
 # Weaver Hal
-/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver-service\.nxp          u:object_r:hal_weaver_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver-service\.nxp           u:object_r:hal_weaver_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver2-service\.nxp          u:object_r:hal_weaver_default_exec:s0
+/(vendor|system/vendor)/bin/hw/android\.hardware\.weaver3-service\.nxp          u:object_r:hal_weaver_default_exec:s0
 
 #AuthSecret HAL
 /vendor/bin/hw/android\.hardware\.authsecret-service\.nxp  u:object_r:hal_authsecret_default_exec:s0

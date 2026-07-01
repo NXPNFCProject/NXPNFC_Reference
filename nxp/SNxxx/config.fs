@@ -28,6 +28,18 @@ user: AID_VENDOR_NXP_WEAVER
 group: AID_SYSTEM
 caps: SYS_ADMIN SYS_NICE WAKE_ALARM
 
+[vendor/bin/hw/android.hardware.weaver2-service.nxp]
+mode: 0755
+user: AID_VENDOR_NXP_WEAVER
+group: AID_SYSTEM
+caps: SYS_ADMIN SYS_NICE WAKE_ALARM
+
+[vendor/bin/hw/android.hardware.weaver3-service.nxp]
+mode: 0755
+user: AID_VENDOR_NXP_WEAVER
+group: AID_SYSTEM
+caps: SYS_ADMIN SYS_NICE WAKE_ALARM
+
 [vendor/bin/hw/android.hardware.authsecret-service.nxp]
 mode: 0755
 user: AID_VENDOR_NXP_AUTHSECRET
